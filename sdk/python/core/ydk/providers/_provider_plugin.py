@@ -38,7 +38,10 @@ from ncclient.operations import RPC, RPCReply
 import abc
 import logging
 import importlib
+import pdb
 from ._importer import _yang_ns
+
+import subprocess
 
 try:
     import ydk_client
@@ -75,6 +78,127 @@ class YdkClient(object):
     def disconnect(self):
         self.client.close()
 
+class _OnboxClient(object):
+    def __init__(self, logger):
+            self.p = None
+            self.capabilities = ""
+            self.netconf_sp_logger = logger 
+
+    def get_capabilities(self):
+        return self.capabilities
+
+    def send_and_receive(self, rpc):
+        (stdouterr, stdin) = (self.p.stdout, self.p.stdin)
+        # Add frame size 
+        req_str = '\n#' + str(len(rpc) - 1) + '\n' + rpc + '##\n'
+        # Send the request 
+        try:
+            stdin.write(req_str)
+            stdin.flush()
+        except Exception, e:
+            self.netconf_sp_logger.error("Failed to send data, error: "+ str(e)+ " !")
+            return ""
+
+        # Now receive response from agent
+        eof = 0;
+        buf = ''
+        while eof == 0:
+            data = stdouterr.read(1)
+
+            if not data:
+                self.netconf_sp_logger.error("No response received.")
+                return ""
+
+            buf += data
+
+            if '\n##' in buf:
+                eof = 1
+
+        self.netconf_sp_logger.debug("Onbox send_and_receive successully.")
+        ## skip prefix ahead of '<' and postfix '\n##' at the end
+        ## to return xml string itself
+        buf = buf[buf.find('<'):-3];
+        return buf
+
+    def connect(self, session_config):
+        user_name = session_config.username
+        if session_config.username is None or len(session_config.username) == 0:
+            login_user = 'lab'
+        else:
+            login_user = session_config.username
+
+        # Connect with netconf agent via ssh proxy client
+        BUFSIZE = 8192
+        STDIN = '0'    # Assuming stdin will be always 0 on any env
+        STDOUT = '1'   # Assuming stdout will be always 1 on any env
+        self.netconf_sp_logger.info("Connecting to netconf agent on the box...")
+        try:
+            self.p = subprocess.Popen(
+               ['netconf_sshd_proxy', '-i', STDIN, '-o', STDOUT,
+                '-u', login_user],
+                bufsize=BUFSIZE,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                shell=False)
+        except Exception, err:
+            self.netconf_sp_logger.error("failed (%s)\n" % str(err))
+            error_msg = ("\nFailed to start netconf session!"
+                         "Please make sure you have 'netconf-yang agent ssh'"
+                         "configured on your router.")
+            self.netconf_sp_logger.error(error_msg)
+            raise YPYServiceProviderError(error_msg="failed to start netconf session")
+
+        (stdouterr, stdin) = (self.p.stdout, self.p.stdin)
+
+        # Wait for hello message from agent
+        info_msg = '\nConnected to NETCONF agent. Waiting for <hello> message...';
+        self.netconf_sp_logger.debug(info_msg)
+
+        buf = ''
+        while True:
+            data = stdouterr.read(1)
+            if not data:
+                error_msg = ("\nFailed to start netconf session!"
+                             "Please make sure you have 'netconf-yang agent ssh' "
+                             "configured on your router.")
+                self.netconf_sp_logger.error(error_msg)
+                raise YPYServiceProviderError(error_msg="failed to send netconf hello")
+
+            buf += data
+            if buf.endswith(']]>]]>'):
+                # hello message has been received
+                break
+
+        self.capabilities = buf
+        hello = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+                <capabilities>
+                    <capability>urn:ietf:params:netconf:base:1.1</capability>
+                </capabilities>
+            </hello>
+            ]]>]]>"""
+        stdin.write(hello)
+        stdin.flush()
+
+        self.netconf_sp_logger.debug("Netconf session established")
+
+    def disconnect(self):
+        close_rpc = ('<rpc message-id="101" '
+                     'xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">\n'
+                     '<close-session/>\n</rpc>\n')
+        self.send_and_receive(close_rpc)
+
+    def execute_payload(self, payload):
+        # Send the request 
+        try:
+            reply = self.send_and_receive(payload)
+            return reply
+        except:
+            reply_str = "Failed to send data!"
+            raise YPYServiceProviderError(error_code=YPYErrorCode.SERVER_REJ, error_msg=reply_str)
+ 
 
 class _SPPlugin(object):
     def __init__(self, service_protocol_name):
@@ -95,15 +219,18 @@ class _SPPlugin(object):
 
 class _ClientSPPlugin(_SPPlugin):
 
-    def __init__(self, timeout, use_native_client):
+    def __init__(self, timeout, use_native_client, onbox=False):
         self.head = None
         self._nc_manager = None
         self.use_native_client = use_native_client
+        self.onbox = onbox
+        self.netconf_sp_logger = logging.getLogger(__name__)
         if use_native_client:
             self.ydk_client = None
+        elif self.onbox:
+            self.onbox_client = _OnboxClient(self.netconf_sp_logger)
         else:
             self._nc_manager = None
-        self.netconf_sp_logger = logging.getLogger(__name__)
         self.timeout = timeout
 
     def encode(self, entity, operation, only_config):
@@ -126,12 +253,6 @@ class _ClientSPPlugin(_SPPlugin):
     def decode(self, payload, read_filter):
         if read_filter is None:
             return XmlDecoder().decode(payload)
-        if self._is_rpc_reply(read_filter):
-            if 'ok' in payload or not self._is_rpc_reply_with_output_data(read_filter):
-                return None
-            XmlDecoder()._bind_to_object(payload, read_filter.output, {})
-            return read_filter.output
-
         # In order to figure out which fields are the
         # ones we are interested find the field list
         entity = self._create_top_level_entity_from_read_filter(read_filter)
@@ -169,13 +290,15 @@ class _ClientSPPlugin(_SPPlugin):
                     if isinstance(current, YList):
                         if len(current) == 0:
                             return None
-                        if len(current) > 0:
+                        if len(current) > 2:
                             return current
+                        if len(current) == 1:
+                            current = current[0]
 
                     break
 
             if not found:
-                self.netconf_sp_logger.error('Error determing what needs to be returned')
+                self.crud_logger.error('Error determing what needs to be returned')
                 raise YPYServiceProviderError(error_msg='Error determining what needs to be returned')
 
         return current
@@ -187,7 +310,7 @@ class _ClientSPPlugin(_SPPlugin):
             non_list_filter = non_list_filter.parent
 
         if non_list_filter is None:
-            self.netconf_sp_logger.error('Cannot determine hierarchy for entity. Please set the parent reference')
+            self.crud_logger.error('Cannot determine hierarchy for entity. Please set the parent reference')
             raise YPYServiceProviderError(error_msg='Cannot determine hierarchy for entity. Please set the parent reference')
 
         top_entity_meta_info = non_list_filter._meta_info()
@@ -203,6 +326,8 @@ class _ClientSPPlugin(_SPPlugin):
     def _get_capabilities(self):
         if self.use_native_client:
             return self.ydk_client.get_capabilities()
+        elif self.onbox:
+            return self.onbox_client.get_capabilities() 
         else:
             return self._nc_manager.server_capabilities
 
@@ -216,8 +341,14 @@ class _ClientSPPlugin(_SPPlugin):
 
         if self.use_native_client:
             assert self.ydk_client is not None
+            self.netconf_sp_logger.debug('\n%s', payload)
             reply = self.ydk_client.execute_payload(payload)
             self.netconf_sp_logger.debug('\n%s', _get_pretty(reply.xml))
+            return self._handle_rpc_reply(operation, payload, reply)
+        elif self.onbox:
+            self.netconf_sp_logger.debug('\n%s', payload)
+            reply = self.onbox_client.execute_payload(payload)
+            self.netconf_sp_logger.debug('\n%s', _get_pretty(reply))
             return self._handle_rpc_reply(operation, payload, reply)
         else:
             service_provider_rpc = self._create_rpc_instance(self.timeout)
@@ -263,11 +394,16 @@ class _ClientSPPlugin(_SPPlugin):
         raise YPYServiceProviderError(error_code=YPYErrorCode.SERVER_REJ, error_msg=reply_str)
 
     def _handle_commit(self, payload, reply_str):
-        commit = '<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">\n  <commit/>\n</rpc>\n'
+        if self.onbox:
+            commit = '<rpc message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">\n  <commit/>\n</rpc>\n'
+        else:
+            commit = '<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">\n  <commit/>\n</rpc>\n'
         self.netconf_sp_logger.debug('\n%s', _get_pretty(commit))
         if self.use_native_client:
             assert self.ydk_client is not None
             rep = self.ydk_client.execute_payload(commit)
+        elif self.onbox:
+            rep = self.onbox_client.execute_payload(commit)
         else:
             assert self._nc_manager is not None
             rep = self._nc_manager.commit()
@@ -280,7 +416,8 @@ class _ClientSPPlugin(_SPPlugin):
             self.netconf_sp_logger.debug('\n%s', _get_pretty(reply_str))
 
     def connect(self, session_config):
-        assert session_config.transportMode == _SessionTransportMode.SSH
+        assert (session_config.transportMode == _SessionTransportMode.SSH or \
+                session_config.transportMode == _SessionTransportMode.ONBOX) 
         if self.use_native_client:
             self.ydk_client = YdkClient(
                 username=session_config.username,
@@ -289,6 +426,9 @@ class _ClientSPPlugin(_SPPlugin):
                 port=session_config.port)
             self.ydk_client.connect()
             return self.ydk_client
+        elif self.onbox:
+            self.onbox_client.connect(session_config)
+            return self.onbox_client
         else:
             self._nc_manager = manager.connect(
                 host=session_config.hostname,
@@ -304,6 +444,8 @@ class _ClientSPPlugin(_SPPlugin):
         if self.use_native_client:
             assert self.ydk_client is not None
             self.ydk_client.disconnect()
+        elif self.onbox:
+            self.onbox_client.disconnect()
         else:
             assert self._nc_manager is not None
             self._nc_manager.close_session()
@@ -316,10 +458,14 @@ class _ClientSPPlugin(_SPPlugin):
         return target_ds
 
     def _create_root(self):
-        NSMAP = {'xmlns': 'urn:ietf:params:xml:ns:netconf:base:1.0'}
-        self.head = etree.Element('rpc', NSMAP)
+        attrs = {'xmlns': 'urn:ietf:params:xml:ns:netconf:base:1.0'}
         if not self.use_native_client:
-            self.head.set('message-id', '101')
+            attrs['message-id'] = '101'
+            self.head = etree.Element('rpc', attrib = attrs)
+            #self.head.set('message-id', '101')
+        else:
+            self.head = etree.Element('rpc', attrs)
+
         return self.head
 
     def _match_key(self, root, entity):
@@ -334,7 +480,7 @@ class _ClientSPPlugin(_SPPlugin):
         # leaflist of enum
         if hasattr(entity, 'i_meta') and entity.i_meta.mtype == REFERENCE_ENUM_CLASS:
             key_value = getattr(entity, entity.presentation_name)
-            key_value.name.replace('_', '-').lower()
+            value = key_value.name.replace('_', '-').lower()
         value = str(entity.item)
         for ch in chs:
             if ch.tag == entity.name and ch.text == value:
@@ -552,7 +698,7 @@ class _ClientSPPlugin(_SPPlugin):
         NSMAP = {}
         if entity_ns is not None and entity_ns != empty_ns:
             NSMAP[None] = empty_ns
-        etree.SubElement(root, member.name, nsmap=NSMAP)
+        member_elem = etree.SubElement(root, member.name, nsmap=NSMAP)
 
     def _encode_key(self, root, entity, meta_info, key):
         key_value = getattr(entity, key.presentation_name)
@@ -602,12 +748,6 @@ class _ClientSPPlugin(_SPPlugin):
             parent_ns = current_parent.get('xmlns')
             current_parent = current_parent.getparent()
         return parent_ns
-
-    def _is_rpc_reply(self, top_entity):
-        return hasattr(top_entity, 'is_rpc') and top_entity.is_rpc
-
-    def _is_rpc_reply_with_output_data(self, top_entity):
-        return hasattr(top_entity, 'is_rpc') and top_entity.is_rpc and hasattr(top_entity, 'output') and top_entity.output is not None
 
 
 def operation_is_edit(operation):

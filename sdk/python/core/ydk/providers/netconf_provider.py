@@ -57,6 +57,13 @@ class NetconfServiceProvider(ServiceProvider):
                                                  self.port,
                                                  self.username,
                                                  self.password)
+        elif self.protocol == 'onbox':
+            self.session_config = _SessionConfig(
+                                                 _SessionTransportMode.ONBOX,
+                                                 self.address,
+                                                 self.port,
+                                                 self.username,
+                                                 self.password)
         else:
             self.session_config = _SessionConfig(
                                            _SessionTransportMode.SSH,
@@ -71,7 +78,8 @@ class NetconfServiceProvider(ServiceProvider):
                                % (self.address, self.port, self.protocol))
 
     def _connect(self):
-        self.sp_instance = _ClientSPPlugin(self.timeout, use_native_client=False)
+        self.sp_instance = _ClientSPPlugin(self.timeout, use_native_client=False,
+                                           onbox = (self.protocol == 'onbox'))
         self.sp_instance.connect(self.session_config)
 
     def close(self):
