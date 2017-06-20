@@ -42,6 +42,7 @@ import pdb
 from ._importer import _yang_ns
 
 import subprocess
+import re
 
 try:
     import ydk_client
@@ -78,54 +79,70 @@ class YdkClient(object):
     def disconnect(self):
         self.client.close()
 
+
 class _OnboxClient(object):
+    """
+    This class defines an onbox client which exchange netconf rpcs with
+    netconf agent running on the router through netconf sshd proxy.
+    """
     def __init__(self, logger):
             self.p = None
             self.capabilities = ""
             self.netconf_sp_logger = logger 
 
+
     def get_capabilities(self):
         return self.capabilities
 
+
+    def _get_xml(self, buf):
+        """
+        Remove netconf packet frame and extract xml content only 
+        """
+        ## skip prefix ahead of '<' and postfix '\n##' at the end
+        ## to return xml string itself
+        buf = buf[buf.find('<'):-3];
+        # remove any line start with #
+        buf = re.sub(re.compile(r"#.*\n") , "" , buf)
+        return buf
+
     def send_and_receive(self, rpc):
-        (stdouterr, stdin) = (self.p.stdout, self.p.stdin)
         # Add frame size 
         req_str = '\n#' + str(len(rpc) - 1) + '\n' + rpc + '##\n'
         # Send the request 
-        try:
-            stdin.write(req_str)
-            stdin.flush()
-        except Exception, e:
-            self.netconf_sp_logger.error("Failed to send data, error: "+ str(e)+ " !")
+        if not self._send(req_str):
             return ""
 
         # Now receive response from agent
         eof = 0;
         buf = ''
+        counter = 0
         while eof == 0:
-            data = stdouterr.read(1)
-
-            if not data:
-                self.netconf_sp_logger.error("No response received.")
-                return ""
-
+            counter += 1
+            data = self._read(1)
             buf += data
+            if counter % 100000 == 0 :
+                self.netconf_sp_logger.debug("%d bytes received\n" %(counter))
 
             if '\n##' in buf:
                 eof = 1
 
         self.netconf_sp_logger.debug("Onbox send_and_receive successully.")
-        ## skip prefix ahead of '<' and postfix '\n##' at the end
-        ## to return xml string itself
-        buf = buf[buf.find('<'):-3];
+        buf = self._get_xml(buf)
         return buf
 
-    def connect(self, session_config):
-        user_name = session_config.username
-        if session_config.username is None or len(session_config.username) == 0:
+
+    def _set_login_user(self, username):
+        if (username is None or
+            len(username) == 0):
             login_user = 'lab'
         else:
-            login_user = session_config.username
+            login_user = username
+        return login_user 
+
+
+    def _connect_to_netconf(self, session_config):
+        login_user = self._set_login_user(session_config.username)
 
         # Connect with netconf agent via ssh proxy client
         BUFSIZE = 8192
@@ -149,22 +166,32 @@ class _OnboxClient(object):
             self.netconf_sp_logger.error(error_msg)
             raise YPYServiceProviderError(error_msg="failed to start netconf session")
 
-        (stdouterr, stdin) = (self.p.stdout, self.p.stdin)
 
-        # Wait for hello message from agent
-        info_msg = '\nConnected to NETCONF agent. Waiting for <hello> message...';
-        self.netconf_sp_logger.debug(info_msg)
+    def _send(self, data):
+        try:
+            self.p.stdin.write(data)
+            self.p.stdin.flush()
+            return True
+        except Exception, e:
+            self.netconf_sp_logger.error('Failed to send data, error: %s !' % (str(e)))
+            return False 
 
+    def _read(self, num_of_chars):
+        data = self.p.stdout.read(num_of_chars)
+        if not data:
+            error_msg = ("\nFailed to get response from netconf!"
+                         "Please make sure you have 'netconf-yang agent ssh' "
+                         "configured on your router.")
+            self.netconf_sp_logger.error(error_msg)
+            raise YPYServiceProviderError(error_msg="failed to get response from netconf")
+
+        return data 
+
+
+    def _exchange_hellos(self):
         buf = ''
         while True:
-            data = stdouterr.read(1)
-            if not data:
-                error_msg = ("\nFailed to start netconf session!"
-                             "Please make sure you have 'netconf-yang agent ssh' "
-                             "configured on your router.")
-                self.netconf_sp_logger.error(error_msg)
-                raise YPYServiceProviderError(error_msg="failed to send netconf hello")
-
+            data = self._read(1)
             buf += data
             if buf.endswith(']]>]]>'):
                 # hello message has been received
@@ -179,16 +206,21 @@ class _OnboxClient(object):
                 </capabilities>
             </hello>
             ]]>]]>"""
-        stdin.write(hello)
-        stdin.flush()
+        self._send(hello)
 
+ 
+    def connect(self, session_config):
+        self._connect_to_netconf(session_config)
+        self._exchange_hellos()
         self.netconf_sp_logger.debug("Netconf session established")
+ 
 
     def disconnect(self):
         close_rpc = ('<rpc message-id="101" '
                      'xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">\n'
                      '<close-session/>\n</rpc>\n')
         self.send_and_receive(close_rpc)
+
 
     def execute_payload(self, payload):
         # Send the request 
@@ -395,7 +427,8 @@ class _ClientSPPlugin(_SPPlugin):
 
     def _handle_commit(self, payload, reply_str):
         if self.onbox:
-            commit = '<rpc message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">\n  <commit/>\n</rpc>\n'
+            commit = ('<rpc message-id="101" '
+                      'xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">\n  <commit/>\n</rpc>\n')
         else:
             commit = '<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">\n  <commit/>\n</rpc>\n'
         self.netconf_sp_logger.debug('\n%s', _get_pretty(commit))
