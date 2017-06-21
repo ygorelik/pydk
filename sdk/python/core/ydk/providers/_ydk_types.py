@@ -34,7 +34,6 @@ class _SessionTransportMode(Enum):
     TLS = 2
     TIPC = 3
     TCP = 4
-    ONBOX = 5
 
 
 #
