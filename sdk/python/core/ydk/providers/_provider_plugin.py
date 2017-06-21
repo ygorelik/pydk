@@ -38,9 +38,7 @@ from ncclient.operations import RPC, RPCReply
 import abc
 import logging
 import importlib
-import pdb
 from ._importer import _yang_ns
-
 import subprocess
 import re
 
@@ -78,7 +76,6 @@ class YdkClient(object):
 
     def disconnect(self):
         self.client.close()
-
 
 class _OnboxClient(object):
     """
@@ -230,7 +227,7 @@ class _OnboxClient(object):
         except:
             reply_str = "Failed to send data!"
             raise YPYServiceProviderError(error_code=YPYErrorCode.SERVER_REJ, error_msg=reply_str)
- 
+
 
 class _SPPlugin(object):
     def __init__(self, service_protocol_name):
@@ -285,6 +282,12 @@ class _ClientSPPlugin(_SPPlugin):
     def decode(self, payload, read_filter):
         if read_filter is None:
             return XmlDecoder().decode(payload)
+        if self._is_rpc_reply(read_filter):
+            if 'ok' in payload or not self._is_rpc_reply_with_output_data(read_filter):
+                return None
+            XmlDecoder()._bind_to_object(payload, read_filter.output, {})
+            return read_filter.output
+
         # In order to figure out which fields are the
         # ones we are interested find the field list
         entity = self._create_top_level_entity_from_read_filter(read_filter)
@@ -330,7 +333,7 @@ class _ClientSPPlugin(_SPPlugin):
                     break
 
             if not found:
-                self.crud_logger.error('Error determing what needs to be returned')
+                self.netconf_sp_logger.error('Error determing what needs to be returned')
                 raise YPYServiceProviderError(error_msg='Error determining what needs to be returned')
 
         return current
@@ -342,7 +345,7 @@ class _ClientSPPlugin(_SPPlugin):
             non_list_filter = non_list_filter.parent
 
         if non_list_filter is None:
-            self.crud_logger.error('Cannot determine hierarchy for entity. Please set the parent reference')
+            self.netconf_sp_logger.error('Cannot determine hierarchy for entity. Please set the parent reference')
             raise YPYServiceProviderError(error_msg='Cannot determine hierarchy for entity. Please set the parent reference')
 
         top_entity_meta_info = non_list_filter._meta_info()
@@ -373,7 +376,6 @@ class _ClientSPPlugin(_SPPlugin):
 
         if self.use_native_client:
             assert self.ydk_client is not None
-            self.netconf_sp_logger.debug('\n%s', payload)
             reply = self.ydk_client.execute_payload(payload)
             self.netconf_sp_logger.debug('\n%s', _get_pretty(reply.xml))
             return self._handle_rpc_reply(operation, payload, reply)
@@ -449,8 +451,7 @@ class _ClientSPPlugin(_SPPlugin):
             self.netconf_sp_logger.debug('\n%s', _get_pretty(reply_str))
 
     def connect(self, session_config):
-        assert (session_config.transportMode == _SessionTransportMode.SSH or \
-                session_config.transportMode == _SessionTransportMode.ONBOX) 
+        assert session_config.transportMode == _SessionTransportMode.SSH
         if self.use_native_client:
             self.ydk_client = YdkClient(
                 username=session_config.username,
@@ -491,14 +492,10 @@ class _ClientSPPlugin(_SPPlugin):
         return target_ds
 
     def _create_root(self):
-        attrs = {'xmlns': 'urn:ietf:params:xml:ns:netconf:base:1.0'}
+        NSMAP = {'xmlns': 'urn:ietf:params:xml:ns:netconf:base:1.0'}
+        self.head = etree.Element('rpc', NSMAP)
         if not self.use_native_client:
-            attrs['message-id'] = '101'
-            self.head = etree.Element('rpc', attrib = attrs)
-            #self.head.set('message-id', '101')
-        else:
-            self.head = etree.Element('rpc', attrs)
-
+            self.head.set('message-id', '101')
         return self.head
 
     def _match_key(self, root, entity):
@@ -513,7 +510,7 @@ class _ClientSPPlugin(_SPPlugin):
         # leaflist of enum
         if hasattr(entity, 'i_meta') and entity.i_meta.mtype == REFERENCE_ENUM_CLASS:
             key_value = getattr(entity, entity.presentation_name)
-            value = key_value.name.replace('_', '-').lower()
+            key_value.name.replace('_', '-').lower()
         value = str(entity.item)
         for ch in chs:
             if ch.tag == entity.name and ch.text == value:
@@ -731,7 +728,7 @@ class _ClientSPPlugin(_SPPlugin):
         NSMAP = {}
         if entity_ns is not None and entity_ns != empty_ns:
             NSMAP[None] = empty_ns
-        member_elem = etree.SubElement(root, member.name, nsmap=NSMAP)
+        etree.SubElement(root, member.name, nsmap=NSMAP)
 
     def _encode_key(self, root, entity, meta_info, key):
         key_value = getattr(entity, key.presentation_name)
@@ -781,6 +778,12 @@ class _ClientSPPlugin(_SPPlugin):
             parent_ns = current_parent.get('xmlns')
             current_parent = current_parent.getparent()
         return parent_ns
+
+    def _is_rpc_reply(self, top_entity):
+        return hasattr(top_entity, 'is_rpc') and top_entity.is_rpc
+
+    def _is_rpc_reply_with_output_data(self, top_entity):
+        return hasattr(top_entity, 'is_rpc') and top_entity.is_rpc and hasattr(top_entity, 'output') and top_entity.output is not None
 
 
 def operation_is_edit(operation):
