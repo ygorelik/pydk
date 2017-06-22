@@ -155,7 +155,7 @@ class _OnboxClient(object):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 shell=False)
-        except Exception, err:
+        except Exception as err:
             self.netconf_sp_logger.error("failed (%s)\n" % str(err))
             error_msg = ("\nFailed to start netconf session!"
                          "Please make sure you have 'netconf-yang agent ssh'"
@@ -169,7 +169,7 @@ class _OnboxClient(object):
             self.p.stdin.write(data)
             self.p.stdin.flush()
             return True
-        except Exception, e:
+        except Exception as e:
             self.netconf_sp_logger.error('Failed to send data, error: %s !' % (str(e)))
             return False 
 
