@@ -96,6 +96,7 @@ class ClassInitsPrinter(object):
             if stmt.search_one('presence') is None:
                 if self.one_class_per_module:
                     self.ctx.writeln('self.%s = %s.%s()' % (prop.name, get_property_name(prop.property_type, prop.property_type.iskeyword), prop.property_type.name))
+                    self.ctx.writeln('self.%s.parent = self' % prop.name)
                 else:
                     self.ctx.writeln('self.%s = %s()' %
                                      (prop.name, prop.property_type.qn()))
