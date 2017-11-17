@@ -62,6 +62,8 @@ class ClassInitsPrinter(object):
         if not isinstance(clazz.owner, Package):
             self.ctx.writeln('self.parent = None')
         properties = clazz.properties()
+        self.ctx.writeln('self.ylist_key_names = [%s]' % (','.join(["'%s'" % key.name for key in clazz.get_key_props()])))
+        self.ctx.bline()
         if clazz.stmt.search_one('presence'):
             self._print_presence_property(clazz)
 
