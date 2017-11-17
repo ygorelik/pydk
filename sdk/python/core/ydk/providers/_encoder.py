@@ -41,8 +41,8 @@ class XmlEncoder(object):
         ''' Convert the entity to an xml payload '''
         # if the entity has a parent hierarchy use that to get
         # the parent related envelope that we need
-        if (hasattr(entity, 'mtype') and not entity.mtype == ANYXML_CLASS) and \
-            (not is_filter and hasattr(entity, '_has_data') and not entity._has_data()):
+        if not has_yfilter(entity) and ((hasattr(entity, 'mtype') and not entity.mtype == ANYXML_CLASS) and \
+            (not is_filter and hasattr(entity, '_has_data') and not entity._has_data())):
             return
 
         validate_entity(entity, optype)
@@ -68,10 +68,10 @@ class XmlEncoder(object):
 
         for member in entity.i_meta.meta_info_class_members:
             value = getattr(entity, member.presentation_name)
-            if value is None or isinstance(value, list) and value == []:
+            if value is None or isinstance(value, list) and value == [] and not has_yfilter(value):
                 continue
 
-            if not member.mtype == ANYXML_CLASS and hasattr(value, '_has_data') and not value._has_data():
+            if not has_yfilter(value) and (not member.mtype == ANYXML_CLASS and hasattr(value, '_has_data') and not value._has_data()):
                 continue
 
             member_elem = None
@@ -98,6 +98,13 @@ class XmlEncoder(object):
                 for child in child_list:
                     self.encode_to_xml(child, elem, optype)
             elif member.mtype == REFERENCE_LEAFLIST and isinstance(value, list):
+                if hasattr(value, 'yfilter'):
+                    yfilter = getattr(value, 'yfilter')
+                    if isinstance(yfilter, DELETE):
+                        member_elem = etree.SubElement(elem, member.name, nsmap=NSMAP)
+                        xc = 'urn:ietf:params:xml:ns:netconf:base:1.0'
+                        member_elem.set('{' + xc + '}operation', 'delete')
+                        continue
                 for child in value:
 
                     if entity.i_meta.namespace is not None and entity.i_meta.namespace != _yang_ns._namespaces[member.module_name]:
@@ -155,3 +162,29 @@ def entity_is_rpc_input(entity):
         hasattr(entity.parent, 'is_rpc') and \
         entity.parent.is_rpc and \
         entity._meta_info().yang_name == 'input'
+
+
+def has_yfilter(entity):
+    if entity is None:
+        return False
+    if hasattr(entity, 'yfilter') and not entity.yfilter is None:
+        return True
+    if not hasattr(entity, 'i_meta'):
+        return False
+    for member in entity.i_meta.meta_info_class_members:
+        value = getattr(entity, member.presentation_name)
+        if member.mtype == REFERENCE_CLASS:
+            if has_yfilter(value):
+                return True
+        elif member.mtype == REFERENCE_LIST:
+            try:
+                for v in value:
+                    if has_yfilter(v):
+                        return True
+            except TypeError:
+                continue
+        elif member.mtype == REFERENCE_LEAFLIST:
+            if has_yfilter(value):
+                return True
+    return False
+
