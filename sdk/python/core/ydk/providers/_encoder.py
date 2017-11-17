@@ -112,6 +112,9 @@ class XmlEncoder(object):
                     text = self.encode_value(member, NSMAP, child.item)
                     member_elem = etree.SubElement(elem, member.name, nsmap=NSMAP)
                     member_elem.text = text
+                    if hasattr(child, 'yfilter'):
+                        xc = 'urn:ietf:params:xml:ns:netconf:base:1.0'
+                        member_elem.set('{' + xc + '}operation', 'delete')
             elif member.mtype == REFERENCE_UNION:
                 for contained_member in member.members:
                     NSMAP={}
