@@ -169,9 +169,10 @@ class _ClientSPPlugin(_SPPlugin):
                     if isinstance(current, YList):
                         if len(current) == 0:
                             return None
-                        if len(current) > 0:
+                        if len(current) > 2:
                             return current
-
+                        if len(current) == 1:
+                            current = current[0]
                     break
 
             if not found:
