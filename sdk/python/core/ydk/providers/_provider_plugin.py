@@ -642,7 +642,7 @@ def check_errors(payload):
             path2 = []
             error_info_detected = False
             for x in path1:
-                if x == 'rpc-error':
+                if 'rpc-error' in x:
                     err = True
                 if x != 'rpc-reply' and x != 'data'and x != 'ok':
                     path2.append(x)
