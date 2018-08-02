@@ -276,6 +276,12 @@ class XmlDecoder(object):
             identity_mod_name = entity.i_meta.module_name
             identity_name = elem.text
         py_mod_name = None
+
+        bundle_yang_ns = _get_bundle_yang_ns(_get_bundle_name(entity))
+        if (identity_mod_name, identity_name) in bundle_yang_ns._identity_map:
+            (py_mod_name, identity_clazz_name) = bundle_yang_ns._identity_map[(identity_mod_name, identity_name)]
+            return get_class_instance(py_mod_name, identity_clazz_name)
+        
         if not (identity_mod_name, identity_name) in _yang_ns._identity_map:
             # this is a hack on some platforms the identity mod_name is not available
             sp_logger = logging.getLogger(__name__)
@@ -296,6 +302,34 @@ class XmlDecoder(object):
 
     def _is_rpc_reply(self, top_entity):
         return hasattr(top_entity, 'is_rpc') and top_entity.is_rpc
+
+
+def _get_bundle_name(entity):
+    mod_name = str(getattr(entity, '__module__'))
+    return mod_name.split('.')[2]
+
+
+def _get_bundle_yang_ns(bundle_name):
+    """Search installed local ydk-models python packages, and return _yang_ns
+
+    Args:
+        bundle_name (str): bundle name.
+
+    Returns:
+        mod_yang_ns (module): bundle's _yang_ns module.
+    """
+    mod_yang_ns = None
+    from ydk import models
+    import pkgutil
+    for (_, name, ispkg) in pkgutil.iter_modules(models.__path__):
+        if ispkg and name == bundle_name:
+            try:
+                mod_yang_ns = importlib.import_module('ydk.models.{}._yang_ns'.format(name))
+                break
+            except ImportError:
+                continue
+
+    return mod_yang_ns
 
 
 def get_class(py_mod_name, clazz_name):
@@ -344,3 +378,4 @@ def is_digit(n):
         return True
     except ValueError:
         return  False
+
