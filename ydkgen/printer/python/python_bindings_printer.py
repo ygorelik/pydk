@@ -162,7 +162,8 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
     def _print_meta_module(self, package, path):
         self._print_init_file(path)
         extra_args = {'one_class_per_module': self.one_class_per_module,
-                      'sort_clazz': self.sort_clazz}
+                      'sort_clazz': self.sort_clazz,
+                      'identity_subclasses': self.identity_subclasses}
         self.print_file(get_meta_module_file_name(path, package),
                         emit_meta,
                         _EmitArgs(self.ypy_ctx, package, extra_args))
@@ -272,7 +273,8 @@ def emit_test_module(ctx, package, identity_subclasses):
 
 
 def emit_meta(ctx, package, extra_args):
-    ModuleMetaPrinter(ctx, extra_args['one_class_per_module'], extra_args['sort_clazz']).print_output(package)
+    ModuleMetaPrinter(ctx, extra_args['one_class_per_module'], extra_args['sort_clazz'],
+                      extra_args['identity_subclasses']).print_output(package)
 
 
 def emit_deviation(ctx, package, sort_clazz):

@@ -28,11 +28,12 @@ from .enum_printer import EnumPrinter
 
 class ClassMetaPrinter(object):
 
-    def __init__(self, ctx, one_class_per_module, sort_clazz):
+    def __init__(self, ctx, one_class_per_module, sort_clazz, identity_subclasses=None):
         self.ctx = ctx
         self.is_rpc = False
         self.sort_clazz = sort_clazz
         self.one_class_per_module = one_class_per_module
+        self.identity_subclasses = identity_subclasses
 
     def print_output(self, unsorted_classes):
         ''' This arranges the classes at the same level
@@ -93,7 +94,8 @@ class ClassMetaPrinter(object):
 
         for prop in prop_list:
             meta_info_data = get_meta_info_data(
-                prop, prop.property_type, prop.stmt.search_one('type'), 'py', self.one_class_per_module)
+                prop, prop.property_type, prop.stmt.search_one('type'), 'py', self.one_class_per_module,
+                self.identity_subclasses)
             self.print_meta_class_member(meta_info_data, self.ctx)
 
         '''
@@ -138,6 +140,7 @@ class ClassMetaPrinter(object):
         presentation_name = meta_info_data.presentation_name
         max_elements = meta_info_data.max_elements
         min_elements = meta_info_data.min_elements
+        default_value_object = meta_info_data.default_value_object
 
         ctx.writeln("_MetaInfoClassMember('%s', %s, \'%s\' , %s, %s, " %
                     (name, mtype, ptype, pmodule_name, clazz_name))
@@ -162,14 +165,13 @@ class ClassMetaPrinter(object):
             ctx.write("'%s', %s" %
                       (meta_info_data.module_name, meta_info_data.is_key))
 
-        if max_elements or min_elements:
+        if max_elements or min_elements or default_value_object:
             if max_elements:
                 ctx.str(", max_elements=%s" % max_elements)
             if min_elements:
-                ctx.str(", min_elements=%s),\n" % min_elements)
-            else:
-                ctx.str("),\n")
-        else:
-            ctx.str('),\n')
+                ctx.str(", min_elements=%s" % min_elements)
+            if default_value_object:
+                ctx.str(", default_value=%s" % default_value_object)
+        ctx.str('),\n')
 
         ctx.lvl_dec()
