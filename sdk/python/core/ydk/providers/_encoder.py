@@ -24,7 +24,7 @@ from lxml import etree
 from ydk._core._dm_meta_info import REFERENCE_CLASS, REFERENCE_LIST , REFERENCE_LEAFLIST, \
                                  REFERENCE_UNION, ANYXML_CLASS, REFERENCE_BITS, \
                                  REFERENCE_IDENTITY_CLASS, REFERENCE_ENUM_CLASS
-from ydk.types import Empty, DELETE, READ, Decimal64, YList, YLeafList, YListItem
+from ydk.types import Empty, DELETE, REMOVE, MERGE, REPLACE, CREATE, READ, Decimal64, YList, YLeafList, YListItem
 
 from ._importer import _yang_ns
 
@@ -53,9 +53,9 @@ class XmlEncoder(object):
             elem = etree.SubElement(root, entity.i_meta.yang_name)
             if hasattr(entity, 'yfilter'):
                 yfilter = getattr(entity, 'yfilter')
-                if isinstance(yfilter, DELETE):
+                if is_edit_yfilter(yfilter):
                     xc = 'urn:ietf:params:xml:ns:netconf:base:1.0'
-                    elem.set('{' + xc + '}operation', 'delete')
+                    elem.set('{' + xc + '}operation', get_yfilter_tag(yfilter))
             parent_ns = None
             current_parent = root
             while current_parent != None and parent_ns is None:
@@ -77,7 +77,7 @@ class XmlEncoder(object):
             member_elem = None
             NSMAP = {}
             if member.mtype not in [REFERENCE_CLASS, REFERENCE_LIST, REFERENCE_LEAFLIST, REFERENCE_IDENTITY_CLASS, \
-                                    REFERENCE_UNION] or isinstance(value, DELETE) or isinstance(value, READ):
+                                    REFERENCE_UNION] or is_edit_yfilter(value) or isinstance(value, READ):
                 if entity.i_meta.namespace is not None \
                     and entity.i_meta.namespace != _yang_ns._namespaces[member.module_name]:
                     NSMAP[None] = _yang_ns._namespaces[member.module_name]
@@ -86,9 +86,9 @@ class XmlEncoder(object):
                     self.encode_to_xml(value, member_elem, optype)
                     continue
 
-            if isinstance(value, DELETE) and not is_filter:
+            if is_edit_yfilter(value) and not is_filter:
                 xc = 'urn:ietf:params:xml:ns:netconf:base:1.0'
-                member_elem.set('{' + xc + '}operation', 'delete')
+                member_elem.set('{' + xc + '}operation', get_yfilter_tag(value))
             elif isinstance(value, READ):
                 continue
             elif member.mtype == REFERENCE_CLASS:
@@ -100,10 +100,10 @@ class XmlEncoder(object):
             elif member.mtype == REFERENCE_LEAFLIST and isinstance(value, list):
                 if hasattr(value, 'yfilter'):
                     yfilter = getattr(value, 'yfilter')
-                    if isinstance(yfilter, DELETE):
+                    if is_edit_yfilter(yfilter):
                         member_elem = etree.SubElement(elem, member.name, nsmap=NSMAP)
                         xc = 'urn:ietf:params:xml:ns:netconf:base:1.0'
-                        member_elem.set('{' + xc + '}operation', 'delete')
+                        member_elem.set('{' + xc + '}operation', get_yfilter_tag(yfilter))
                         continue
                 for child in value:
 
@@ -114,7 +114,8 @@ class XmlEncoder(object):
                     member_elem.text = text
                     if hasattr(child, 'yfilter'):
                         xc = 'urn:ietf:params:xml:ns:netconf:base:1.0'
-                        member_elem.set('{' + xc + '}operation', 'delete')
+                        yfilter = getattr(child, 'yfilter')
+                        member_elem.set('{' + xc + '}operation', get_yfilter_tag(yfilter))
             elif member.mtype == REFERENCE_UNION:
                 for contained_member in member.members:
                     NSMAP={}
@@ -191,3 +192,22 @@ def has_yfilter(entity):
                 return True
     return False
 
+
+def is_edit_yfilter(yfilter):
+    return isinstance(yfilter, DELETE) or isinstance(yfilter, REMOVE) or isinstance(yfilter, MERGE) or \
+           isinstance(yfilter, REPLACE) or isinstance(yfilter, CREATE)
+
+
+def get_yfilter_tag(yfilter):
+    tag = ''
+    if isinstance(yfilter, DELETE):
+        tag = 'delete'
+    elif isinstance(yfilter, REMOVE):
+        tag = 'remove'
+    elif isinstance(yfilter, MERGE):
+        tag = 'merge'
+    elif isinstance(yfilter, REPLACE):
+        tag = 'replace'
+    elif isinstance(yfilter, CREATE):
+        tag = 'create'
+    return tag

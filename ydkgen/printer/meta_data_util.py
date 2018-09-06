@@ -650,8 +650,10 @@ def get_default_value_object(ptype, property_type, clazz_name, default_value, id
     default_value_object = ''
     if ptype == 'Empty':
         default_value_object = "'Empty()'"
-    elif ptype == 'str' or ptype == 'int':
+    elif ptype == 'str':
         default_value_object = '"\'%s\'"' % default_value
+    or ptype == 'int':
+        default_value_object = '"%s"' % default_value
     elif ptype == 'Decimal64':
         default_value_object = '\'Decimal64("%s")\'' % default_value
     elif ptype == 'bool':

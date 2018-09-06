@@ -548,7 +548,7 @@ class _ClientSPPlugin(_SPPlugin):
         return root
 
     def _encode_empty(self, root, entity, member):
-        entity_ns = entity.i_meta.namespaces
+        entity_ns = entity.i_meta.namespace
         empty_ns = _yang_ns._namespaces[member.module_name]
         NSMAP = {}
         if entity_ns is not None and entity_ns != empty_ns:

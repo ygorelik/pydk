@@ -21,7 +21,8 @@
 """
 from ._value_encoder import ValueEncoder
 from ydk.errors import YPYModelError, YPYErrorCode
-from ydk.types import READ, DELETE, Decimal64, Empty, YList, YLeafList, YListItem
+from ydk.types import READ, DELETE, REMOVE, MERGE, REPLACE, CREATE, Decimal64, Empty, \
+    YList, YLeafList, YListItem
 from ydk._core._dm_meta_info import ATTRIBUTE, REFERENCE_ENUM_CLASS, REFERENCE_LIST, \
             REFERENCE_LEAFLIST, REFERENCE_IDENTITY_CLASS, REFERENCE_BITS, REFERENCE_UNION
 
@@ -56,7 +57,9 @@ def validate_entity_delegate(entity, optype, errors):
     """
     for member in entity.i_meta.meta_info_class_members:
         value = getattr(entity, member.presentation_name)
-        if isinstance(value, READ) or isinstance(value, DELETE):
+        if isinstance(value, READ) or isinstance(value, DELETE) or \
+                isinstance(value, REMOVE) or isinstance(value, MERGE) or \
+                isinstance(value, REPLACE) or isinstance(value, CREATE):
             continue
 
         if value is None:
