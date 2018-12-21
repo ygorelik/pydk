@@ -42,5 +42,6 @@ sdk/cpp/netconf_client.o
 sdk/cpp/tests/ydk_test
 sdk/cpp/ydk_client.so
 gen-api/
+test/test-cases/python/tests
 *.sublime-project
 *.sublime-workspace

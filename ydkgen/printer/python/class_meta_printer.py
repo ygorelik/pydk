@@ -133,6 +133,7 @@ class ClassMetaPrinter(object):
         name = meta_info_data.name
         mtype = meta_info_data.mtype
         ptype = meta_info_data.ptype
+        ytype = meta_info_data.ytype
         pmodule_name = meta_info_data.pmodule_name
         clazz_name = meta_info_data.clazz_name
         prange = meta_info_data.prange
@@ -142,8 +143,8 @@ class ClassMetaPrinter(object):
         min_elements = meta_info_data.min_elements
         default_value_object = meta_info_data.default_value_object
 
-        ctx.writeln("_MetaInfoClassMember('%s', %s, \'%s\' , %s, %s, " %
-                    (name, mtype, ptype, pmodule_name, clazz_name))
+        ctx.writeln("_MetaInfoClassMember('%s', %s, \'%s\', \'%s\', %s, %s, " %
+                    (name, mtype, ptype, ytype, pmodule_name, clazz_name))
         ctx.lvl_inc()
         ctx.writeln("%s, %s, " % (str(prange), str(pattern)))
         ctx.write("'''")

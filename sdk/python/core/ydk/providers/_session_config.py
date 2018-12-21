@@ -38,7 +38,7 @@ class _SessionConfig(object):
     for the defaults for each attribute.
     '''
 
-    def __init__(self, transport, hostname, port, username, password):
+    def __init__(self, transport, hostname, port, username, password, key_filename=None):
         '''
         Constructor
 
@@ -73,6 +73,7 @@ class _SessionConfig(object):
 
         self.username = username
         self.password = password
+        self.key_filename = key_filename
 
     def _set_transport_mode(self, transportMode):
         if transportMode is None:

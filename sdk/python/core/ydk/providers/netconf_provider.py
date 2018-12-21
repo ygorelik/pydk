@@ -48,6 +48,7 @@ class NetconfServiceProvider(ServiceProvider):
         self.password = kwargs.get('password', 'admin')
         self.protocol = kwargs.get('protocol', 'ssh')
         self.timeout = kwargs.get('timeout', 60)
+        self.key_filename = kwargs.get('key_filename', None)
         self.sp_instance = None
 
         if self.protocol == 'tcp':
@@ -56,14 +57,16 @@ class NetconfServiceProvider(ServiceProvider):
                                                  self.address,
                                                  self.port,
                                                  self.username,
-                                                 self.password)
+                                                 self.password,
+                                                 self.key_filename)
         else:
             self.session_config = _SessionConfig(
                                            _SessionTransportMode.SSH,
                                            self.address,
                                            self.port,
                                            self.username,
-                                           self.password)
+                                           self.password,
+                                           self.key_filename)
 
         self.netconf_sp_logger = logging.getLogger(__name__)
         self._connect()

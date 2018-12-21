@@ -39,6 +39,7 @@ class MetaInfoData:
         self.name = prop.stmt.arg
         self.mtype = ''
         self.ptype = ''
+        self.ytype = ''
         self.prange = []
         self.pattern = []
         self.presentation_name = "%s" % prop.name
@@ -207,6 +208,8 @@ def get_meta_info_data(prop, property_type, type_stmt, language, one_class_per_m
     """
     clazz = prop.owner
     meta_info_data = MetaInfoData(prop)
+    if type_stmt is not None:
+        meta_info_data.ytype = type_stmt.arg
     types_extractor = TypesExtractor()
     target_type_stmt = type_stmt
 

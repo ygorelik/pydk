@@ -296,6 +296,7 @@ class _ClientSPPlugin(_SPPlugin):
                 port=session_config.port,
                 username=session_config.username,
                 password=session_config.password,
+                key_filename = session_config.key_filename,
                 look_for_keys=False,
                 allow_agent=False,
                 hostkey_verify=False)

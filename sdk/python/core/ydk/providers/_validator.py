@@ -37,6 +37,8 @@ if sys.version_info > (3,):
 
 
 def validate_entity(entity, optype):
+    if hasattr(entity, 'yvalidate') and not entity.yvalidate:
+        return
     errors = []
     validate_entity_delegate(entity, optype, errors)
     if len(errors) > 0:
