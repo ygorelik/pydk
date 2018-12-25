@@ -30,7 +30,7 @@ from ydk.types import YList, YListItem, YLeafList, Empty
 from ._decoder import XmlDecoder
 from ._encoder import XmlEncoder
 from ._ydk_types import _SessionTransportMode
-
+from ._validator import is_yvalidate
 
 from ncclient import manager
 from ncclient.operations import RPC, RPCReply
@@ -406,12 +406,12 @@ class _ClientSPPlugin(_SPPlugin):
         if type(entity) == YLeafList or type(entity) == YListItem:
             # parent_meta_tuple_list is not created for leaflist's parent
             entity = entity.parent
-            XmlEncoder().encode_to_xml(entity, root, optype)
+            XmlEncoder().encode_to_xml(entity, root, optype, validate=is_yvalidate(entity))
         elif type(entity) == YList:
             for item in entity:
                 self._encode_epilogue(item, root, optype)
         else:
-            XmlEncoder().encode_to_xml(entity, root, optype)
+            XmlEncoder().encode_to_xml(entity, root, optype, validate=is_yvalidate(entity))
 
     def _check_read_only_edit_error(self, entity):
         if type(entity) == YLeafList:

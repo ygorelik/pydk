@@ -29,8 +29,7 @@ except:
     from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import ChildIdentityIdentity, YdkEnumTestEnum
 from ydk.providers import NetconfServiceProvider, NativeNetconfServiceProvider
 from ydk.services import CRUDService
-from ydk.types import READ
-
+from ydk.types import READ, REPLACE, CREATE, MERGE, REMOVE
 
 class SanityYang(unittest.TestCase):
     PROVIDER_TYPE = "non-native"
@@ -53,13 +52,11 @@ class SanityYang(unittest.TestCase):
 
     @classmethod
     def tearDownClass(self):
+        runner = Runner()
+        self.crud.delete(self.ncc, runner)
         self.ncc.close()
 
     def setUp(self):
-        runner = Runner()
-        self.crud.delete(self.ncc, runner)
-
-    def tearDown(self):
         runner = Runner()
         self.crud.delete(self.ncc, runner)
 
@@ -160,7 +157,6 @@ class SanityYang(unittest.TestCase):
         runner_read = self.crud.read(self.ncc, r_2)
         self.assertNotEqual(is_equal(r_1, runner_read), True)
 
-
     def test_read_on_identity_ref(self):
         r_1 = Runner.Ytypes.BuiltInT()
         r_1.identity_ref_value = ChildIdentityIdentity()
@@ -198,6 +194,129 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, runner)
 
         self.crud.read(self.ncc, Runner.OneList.Ldata())
+
+    def test_replace_on_leaf(self):
+        one = Runner.One()
+        one.number, one.name = 1, 'runner-one-name'
+        self.crud.create(self.ncc, one)
+
+        filter = Runner.One()
+        filter.number = READ()
+        r = self.crud.read(self.ncc, filter)
+        self.assertEqual(r.number, one.number)
+
+        # Replace leaf value and verify
+        one = Runner.One()
+        one.name = REPLACE('runner_one_name')
+        one.number = MERGE(2)
+        self.crud.update(self.ncc, one)
+
+        filter = Runner.One()
+        filter.name = READ()
+        filter.number = READ()
+        r = self.crud.read(self.ncc, filter)
+        self.assertEqual(r.name, 'runner_one_name')
+        self.assertEqual(r.number, 2)
+
+        one = Runner.One()
+        one.number = REMOVE()
+        self.crud.update(self.ncc, one)
+
+        one.number = CREATE(3)
+        self.crud.update(self.ncc, one)
+
+        r = self.crud.read(self.ncc, Runner.One())
+        self.assertEqual(r.name, 'runner_one_name')
+        self.assertEqual(r.number, 3)
+
+    def test_replace_on_enum(self):
+        # Create and verify
+        btc = Runner.Ytypes.BuiltInT()
+        btc.enum_value = YdkEnumTestEnum.local
+        self.crud.create(self.ncc, btc)
+
+        filter = Runner.Ytypes.BuiltInT()
+        filter.enum_value = READ()
+        r = self.crud.read(self.ncc, filter)
+        self.assertTrue(is_equal(r, btc))
+
+        # Replace and Verify
+        btr = Runner.Ytypes.BuiltInT()
+        btr.enum_value = REPLACE(YdkEnumTestEnum.remote)
+        self.crud.update(self.ncc, btr)
+
+        r = self.crud.read(self.ncc, filter)
+        self.assertEqual(r.enum_value, YdkEnumTestEnum.remote)
+
+    def test_create_identity_ref(self):
+        # Create and Verify
+        btc = Runner.Ytypes.BuiltInT()
+        btc.identity_ref_value = CREATE(ChildIdentityIdentity())
+        self.crud.update(self.ncc, btc)
+
+        filter = Runner.Ytypes.BuiltInT()
+        filter.identity_ref_value = READ()
+        r = self.crud.read(self.ncc, filter)
+        self.assertTrue(is_equal(r.identity_ref_value, ChildIdentityIdentity()))
+
+    def test_replace_on_list(self):
+        one_list = Runner.OneList()
+        ld1, ld2 = Runner.OneList.Ldata(), Runner.OneList.Ldata()
+        ld1.number, ld2.number = 1, 2
+        one_list.ldata.extend([ld1, ld2])
+        self.crud.create(self.ncc, one_list)
+
+        filter = Runner.OneList.Ldata()
+        filter.number = 2
+        r = self.crud.read(self.ncc, filter)
+        self.assertTrue(is_equal(r, ld2))
+
+        # Merge and Verify
+        one_merge = Runner.OneList()
+        ld3 = Runner.OneList.Ldata()
+        ld3.number = 3
+        one_merge.ldata.append(ld3)
+
+        one_merge.yfilter = MERGE()
+        self.crud.update(self.ncc, one_merge)
+
+        r = self.crud.read(self.ncc, Runner.OneList())
+        self.assertEqual(len(r.ldata), 3)
+
+        # Replace and Verify
+        replace = Runner.OneList()
+        replace.ldata.append(ld3)
+        replace.yfilter = REPLACE()
+        self.crud.update(self.ncc, replace)
+
+        r = self.crud.read(self.ncc, Runner.OneList())
+        self.assertEqual(len(r.ldata), 1)
+
+    def test_replace_on_container(self):
+        one = Runner.One()
+        one.number, one.name = 1, 'runner-one-name'
+        self.crud.create(self.ncc, one)
+
+        filter = Runner.One()
+        r = self.crud.read(self.ncc, filter)
+        self.assertEqual(one.number, r.number)
+
+        # Replace container value and verify
+        one.yfilter = REPLACE()
+        one.name = 'runner_one_name'
+        one.number = 2
+        self.crud.update(self.ncc, one)
+
+        r = self.crud.read(self.ncc, filter)
+        self.assertEqual(r.name, 'runner_one_name')
+        self.assertEqual(r.number, 2)
+
+        one.yfilter = REMOVE()
+        self.crud.update(self.ncc, one)
+
+        r = self.crud.read(self.ncc, Runner.One())
+        self.assertIsNone(r.name)
+        self.assertIsNone(r.number)
 
 
 if __name__ == '__main__':

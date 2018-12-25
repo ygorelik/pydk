@@ -26,6 +26,7 @@ import importlib
 from ydk._core._dm_meta_info import REFERENCE_BITS, \
     REFERENCE_IDENTITY_CLASS, REFERENCE_ENUM_CLASS, REFERENCE_LEAFLIST
 from ydk.types import Empty, Decimal64, YListItem
+from ydk.errors import YPYModelError
 
 from ._importer import _yang_ns
 from functools import reduce
@@ -36,7 +37,7 @@ if sys.version_info > (3,):
 
 
 class ValueEncoder(object):
-    def encode(self, member, NSMAP, value):
+    def encode(self, member, NSMAP, value, validate=True, silent=False):
         text = ''
         if member.mtype == REFERENCE_IDENTITY_CLASS or member.ptype.endswith('Identity'):
             module = importlib.import_module(member.pmodule_name)
@@ -71,20 +72,30 @@ class ValueEncoder(object):
                     or enum_value == literal:
                     text = yang_enum_name
                     break
-        elif member.ptype == 'bool' and isinstance(value, bool):
+        elif member.ptype == 'bool' and (isinstance(value, bool) or not validate):
             if value is True:
                 text = 'true'
-            else:
+            elif value is False:
                 text = 'false'
-        elif member.ptype == 'Empty' and isinstance(value, Empty):
-            pass
+        elif member.ptype == 'Empty' and (isinstance(value, Empty) or not validate):
+            if not validate and not isinstance(value, Empty):
+                text = str(value)
         elif member.ptype == 'Decimal64' and isinstance(value, Decimal64):
             text = value.s
-        elif member.ptype == 'str' and isinstance(value, str):
+        elif member.ptype == 'str' and (isinstance(value, str) or not validate):
             text = str(value)
-        elif member.ptype == 'int' and isinstance(value, (int, long)):
+        elif member.ptype == 'int' and (isinstance(value, (int, long)) or not validate):
+            text = str(value)
+        elif silent:
+            pass
+        elif not validate:
+            ydk_logger = logging.getLogger(__name__)
+            error_msg = 'Could not encode leaf {0}, type: {1}, value: {2}; converting to str type'.format(member.name, member.ptype, value)
+            ydk_logger.info(error_msg)
             text = str(value)
         else:
             ydk_logger = logging.getLogger(__name__)
-            ydk_logger.info('Could not encode leaf {0}, type: {1}, {2} value: {3}'.format(member.name, member.mtype, member.ptype, value))
+            error_msg = 'Could not encode leaf {0}, type: {1}, value: {2}'.format(member.name, member.ptype, value)
+            ydk_logger.error(error_msg)
+            raise YPYModelError(error_msg)
         return text

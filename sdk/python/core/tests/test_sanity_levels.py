@@ -22,7 +22,7 @@ from __future__ import absolute_import
 import unittest
 from compare import is_equal
 
-from ydk.types import Empty
+from ydk.types import Empty, DELETE
 try:
     from ydk.models.ydktest.ydktest_sanity import Runner
 except:
@@ -148,6 +148,7 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, r_1)
         r_1.one_list.ldata[0].number = 2
         r_1.one_list.ldata[0].name = '2'
+        r_1.one_list.ldata[0].yfilter = DELETE()
         # assuming update on nonexist key will raise Exception
         with self.assertRaises(Exception):
             self.crud.update(self.ncc, r_1.one_list.ldata[0])

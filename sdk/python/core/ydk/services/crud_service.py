@@ -111,10 +111,10 @@ class CRUDService(Service):
             self.service_logger.error('Passed in a None arg')
             err_msg = "'provider' and 'entity' cannot be None"
             raise YPYServiceError(error_msg=err_msg)
-        if self._entity_exists(provider, entity):
+        #if self._entity_exists(provider, entity):
             # read has succeeded so do an edit-config
-            MetaService.normalize_meta(provider._get_capabilities(), entity)
-            self._execute_crud_operation_on_provider(provider, entity, 'UPDATE', False)
+        MetaService.normalize_meta(provider._get_capabilities(), entity)
+        self._execute_crud_operation_on_provider(provider, entity, 'UPDATE', False)
 
     def read(self, provider, read_filter, only_config=False):
         """ Read the entity or entities

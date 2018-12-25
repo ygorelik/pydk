@@ -43,21 +43,44 @@ class MERGE(object):
     '''Marker MERGE used to mark nodes that are to be merged
     Assign DELETE object to a mark a leaf for deletion.
     A CRUD update operation will delete the leaf from the device it is on.'''
-    pass
+
+    def __init__(self, value=None):
+        self._value = value
+
+    def value(self):
+        return self._value
+
+    def set(self, value):
+        self._value = value
 
 
 class REPLACE(object):
     '''Marker class used to mark nodes that are to be replaced
     Assign REPLACE object to a mark a leaf for deletion.
     A CRUD update operation will delete the leaf from the device it is on.'''
-    pass
 
+    def __init__(self, value=None):
+        self._value = value
+
+    def value(self):
+        return self._value
+
+    def set(self, value):
+        self._value = value
 
 class CREATE(object):
     '''Marker class used to mark nodes that are to be created
     Assign CREATE object to a mark a leaf for deletion.
     A CRUD update operation will delete the leaf from the device it is on.'''
-    pass
+
+    def __init__(self, value=None):
+        self._value = value
+
+    def value(self):
+        return self._value
+
+    def set(self, value):
+        self._value = value
 
 
 class READ(object):

@@ -23,7 +23,7 @@ from ._value_encoder import ValueEncoder
 from ydk.errors import YPYModelError, YPYErrorCode
 from ydk.types import READ, DELETE, REMOVE, MERGE, REPLACE, CREATE, Decimal64, Empty, \
     YList, YLeafList, YListItem
-from ydk._core._dm_meta_info import ATTRIBUTE, REFERENCE_ENUM_CLASS, REFERENCE_LIST, \
+from ydk._core._dm_meta_info import ATTRIBUTE, REFERENCE_CLASS, REFERENCE_ENUM_CLASS, REFERENCE_LIST, \
             REFERENCE_LEAFLIST, REFERENCE_IDENTITY_CLASS, REFERENCE_BITS, REFERENCE_UNION
 
 from enum import Enum
@@ -37,8 +37,6 @@ if sys.version_info > (3,):
 
 
 def validate_entity(entity, optype):
-    if hasattr(entity, 'yvalidate') and not entity.yvalidate:
-        return
     errors = []
     validate_entity_delegate(entity, optype, errors)
     if len(errors) > 0:
@@ -59,26 +57,38 @@ def validate_entity_delegate(entity, optype, errors):
     """
     for member in entity.i_meta.meta_info_class_members:
         value = getattr(entity, member.presentation_name)
-        if isinstance(value, READ) or isinstance(value, DELETE) or \
-                isinstance(value, REMOVE) or isinstance(value, MERGE) or \
-                isinstance(value, REPLACE) or isinstance(value, CREATE):
-            continue
-
         if value is None:
             continue
+        if isinstance(value, READ) or \
+            isinstance(value, DELETE) or \
+            isinstance(value, REMOVE):
+            continue
 
-        # bits
+        if hasattr(value, 'yfilter'):
+            yfilter = value.yfilter
+            if isinstance(yfilter, READ) or \
+                isinstance(yfilter, DELETE) or \
+                isinstance(yfilter, REMOVE):
+                continue
+
         if hasattr(value, '_has_data') and not value._has_data():
             continue
 
-        if  member.mtype in (ATTRIBUTE, REFERENCE_ENUM_CLASS, REFERENCE_LIST, REFERENCE_LEAFLIST):
+        if  member.mtype in (ATTRIBUTE, REFERENCE_ENUM_CLASS, REFERENCE_UNION, REFERENCE_LIST, REFERENCE_LEAFLIST):
+            if member.mtype in (ATTRIBUTE, REFERENCE_ENUM_CLASS, REFERENCE_UNION) and \
+                (isinstance(value, REPLACE) or \
+                 isinstance(value, MERGE) or \
+                 isinstance(value, CREATE)):
+                value = value.value()
             _dm_validate_value(member, value, entity, optype, errors)
 
 def _dm_validate_value(meta, value, parent, optype, errors):
+    is_ylist_item = False
     if value is None:
         return value
     elif isinstance(value, YListItem):
         value = value.item
+        is_ylist_item = True
 
     if meta._ptype == 'Empty':
         exec('from ydk.types import Empty')
@@ -88,9 +98,16 @@ def _dm_validate_value(meta, value, parent, optype, errors):
         exec_import = 'from %s import %s' \
             % (meta.pmodule_name, meta.clazz_name.split('.')[0])
         exec(exec_import)
-    elif meta._ptype == 'str' and meta.mtype != REFERENCE_LEAFLIST and isinstance(value, bytes):
+    elif meta._ptype == 'str' and isinstance(value, bytes) and not is_ylist_item and \
+            meta.mtype != REFERENCE_LEAFLIST and meta.mtype != REFERENCE_UNION:
         new_value = str(value.decode())
-        setattr(parent, meta.presentation_name, new_value)
+        leaf = getattr(parent, meta.presentation_name)
+        if isinstance(leaf, REPLACE) or \
+            isinstance(leaf, MERGE) or \
+            isinstance(leaf, CREATE):
+            leaf.set(new_value)
+        else:
+            setattr(parent, meta.presentation_name, new_value)
         value = new_value
 
     isNumber = False
@@ -108,7 +125,8 @@ def _dm_validate_value(meta, value, parent, optype, errors):
 
         if len(value) <= max_elements:
             for v in value:
-                _dm_validate_value(meta, v, parent, optype, errors)
+                if is_yvalidate(v):
+                    validate_entity_delegate(v, optype, errors)
         else:
             errmsg = "Invalid list length, length = %d" % len(value)
             _handle_error(meta, parent, errors, errmsg)
@@ -139,6 +157,18 @@ def _dm_validate_value(meta, value, parent, optype, errors):
             errmsg = "Invalid list element type, type = %s" % value
             _handle_error(meta, parent, errors, errmsg)
         return value
+
+    elif isinstance(value, YLeafList) and meta.mtype == REFERENCE_UNION:
+        for i in range(len(value)):
+            v = value [i]
+            _dm_validate_value(meta, v, parent, optype, errors)
+        return value
+
+    elif meta.mtype == REFERENCE_UNION:
+        if _validate_union(meta, value, parent, optype, errors):
+            return value
+        else:
+            _handle_error(meta, parent, errors, errcode=YPYErrorCode.INVALID_UNION_VALUE)
 
     elif value.__class__.__name__ == meta._ptype:
         if isinstance(value, (int, long)):
@@ -200,18 +230,8 @@ def _dm_validate_value(meta, value, parent, optype, errors):
             _handle_error(meta, parent, errors, errmsg)
         return value
 
-    elif meta.mtype == REFERENCE_UNION:
-        encoded = False
-        for contained_member in meta.members:
-            # determine what kind of encoding is needed here
-            if '' == ValueEncoder().encode(contained_member, {}, value):
-                encoded = True
-                break
-        if not encoded:
-            _handle_error(meta, parent, errors, error_code=YPYErrorCode.INVALID_UNION_VALUE)
-
     else:
-        if '' == ValueEncoder().encode(meta, {}, value):
+        if '' == ValueEncoder().encode(meta, {}, value, silent=True):
             errmsg = "Invalid type: '%s'. Expected type: '%s'" % (type(value).__name__, meta._ptype)
             _handle_error(meta, parent, errors, errmsg)
 
@@ -242,6 +262,26 @@ def _validate_number(meta, value, parent, errors):
             errmsg = '{}: {} not in range {}'.format(errcode.value, value, _range)
             _handle_error(meta, parent, errors, errmsg, errcode)
     return value
+
+def _validate_union(meta, value, parent, optype, errors):
+    if meta.mtype == REFERENCE_UNION and len(meta.members) > 0:
+        for contained_member in meta.members:
+            if contained_member.mtype == REFERENCE_UNION:
+                # handle nested union structure
+               if _validate_union(contained_member, value, parent, optype, errors):
+                    return True
+            else:
+                if len(ValueEncoder().encode(contained_member, {}, value, silent=True)) > 0:
+                    return True
+    else:
+        if len(ValueEncoder().encode(contained_member, {}, value, silent=True)) > 0:
+            return True
+    return False
+
+def is_yvalidate(entity, validate=True):
+    if validate and hasattr(entity, 'yvalidate') and not entity.yvalidate:
+        validate = False
+    return validate
 
 def _handle_error(meta, parent, errors, errmsg=None, errcode=None):
     services_logger = logging.getLogger(__name__)

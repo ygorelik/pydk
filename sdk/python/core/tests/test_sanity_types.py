@@ -60,13 +60,11 @@ class SanityTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(self):
+        runner = Runner()
+        self.crud.delete(self.ncc, runner)
         self.ncc.close()
 
     def setUp(self):
-        runner = Runner()
-        self.crud.delete(self.ncc, runner)
-
-    def tearDown(self):
         runner = Runner()
         self.crud.delete(self.ncc, runner)
 
@@ -74,7 +72,6 @@ class SanityTest(unittest.TestCase):
         runner = Runner()
         runner.ytypes = runner.Ytypes()
         runner.ytypes.built_in_t = runner.ytypes.BuiltInT()
-
         return runner
 
     def test_int8(self):
@@ -423,7 +420,8 @@ class SanityTest(unittest.TestCase):
 
     def test_union_complex_list(self):
         runner = self._create_runner()
-        runner.ytypes.built_in_t.younion_list.append("123:45")
+        runner.ytypes.built_in_t.younion_list.append('123:45')
+        runner.ytypes.built_in_t.younion_list.append(23)
         self.crud.create(self.ncc, runner)
 
         # Read into Runner2
@@ -431,8 +429,8 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        result = is_equal(runner, runner1)
-        self.assertEqual(result, True)
+        union_list = runner.ytypes.built_in_t.younion_list
+        self.assertTrue(23 in union_list and '123:45' in union_list)
 
     def test_identityref(self):
         runner = self._create_runner()
