@@ -166,13 +166,14 @@ class ClassMetaPrinter(object):
             ctx.write("'%s', %s" %
                       (meta_info_data.module_name, meta_info_data.is_key))
 
-        if max_elements or min_elements or default_value_object:
-            if max_elements:
-                ctx.str(", max_elements=%s" % max_elements)
-            if min_elements:
-                ctx.str(", min_elements=%s" % min_elements)
-            if default_value_object:
-                ctx.str(", default_value=%s" % default_value_object)
+        if max_elements:
+            ctx.str(", max_elements=%s" % max_elements)
+        if min_elements:
+            ctx.str(", min_elements=%s" % min_elements)
+        if default_value_object:
+            ctx.str(", default_value=%s" % default_value_object)
+        if not meta_info_data.is_config:
+            ctx.str(", is_config=False")
         ctx.str('),\n')
 
         ctx.lvl_dec()

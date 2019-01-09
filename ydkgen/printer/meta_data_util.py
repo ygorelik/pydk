@@ -21,7 +21,7 @@
 """
 from ydkgen.api_model import Bits, Class, Enum, Package
 from ydkgen.builder import TypesExtractor
-from ydkgen.common import convert_to_reStructuredText, get_module_name
+from ydkgen.common import convert_to_reStructuredText, get_module_name, is_config_stmt
 from pyang import types
 from pyang.error import EmitError
 from pyang.types import BinaryTypeSpec, BooleanTypeSpec, Decimal64TypeSpec, EmptyTypeSpec, \
@@ -60,6 +60,7 @@ class MetaInfoData:
         self.units = ''
         self.default_value = ''
         self.default_value_object = None
+        self.is_config = is_config_stmt(prop.stmt)
         self.status = ''
 
 
@@ -132,6 +133,8 @@ def get_type_doc(meta_info_data, type_depth):
             properties_description.append('\t**mandatory**\: True\n\n')
         if meta_info_data.is_presence:
             properties_description.append('\t**presence node**\: True\n\n')
+        if not meta_info_data.is_config:
+            properties_description.append('\t**config**\: False\n\n')
         if len(meta_info_data.units) > 0:
             properties_description.append('\t**units**\: %s\n\n' % meta_info_data.units)
         if len(meta_info_data.default_value) > 0:
@@ -255,11 +258,10 @@ def get_meta_info_data(prop, property_type, type_stmt, language, one_class_per_m
 
         if prop.stmt.keyword == 'leaf-list':
             meta_info_data.mtype = 'REFERENCE_LEAFLIST'
-            target = ''
             if isinstance(meta_info_data.doc_link, list):
                 doc_link = map(lambda l: '\n\n\t\t%s' % l, meta_info_data.doc_link)
                 target = ''.join(doc_link)
-            meta_info_data.doc_link = target
+                meta_info_data.doc_link = target
             meta_info_data.doc_link = '\n\t\t' + _get_list_doc_link_tag(
                 meta_info_data, 'doc_link', language, meta_info_data.mtype)
         elif prop.stmt.keyword == 'list':

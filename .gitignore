@@ -46,3 +46,5 @@ test/test-cases/python/tests
 test/scripts
 *.sublime-project
 *.sublime-workspace
+sdk/python/core/dist
+sdk/python/core/ydk.egg-info
