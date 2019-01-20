@@ -13,7 +13,8 @@ from ydk._core._dm_meta_info import ATTRIBUTE, REFERENCE_CLASS, REFERENCE_LIST, 
 from ydk.errors import YPYError, YPYModelError
 from ydk.providers._importer import _yang_ns
 _meta_table = {
-    'WithDefaultsModeEnum' : _MetaInfoEnum('WithDefaultsModeEnum', 'ydk.models.ietf.ietf_netconf_with_defaults',
+    'WithDefaultsModeEnum' : _MetaInfoEnum('WithDefaultsModeEnum', 'ydk.models.ydktest.ietf_netconf_with_defaults', 'WithDefaultsModeEnum',
+        '''Possible modes to report default data.''',
         {
             'report-all':'report_all',
             'report-all-tagged':'report_all_tagged',

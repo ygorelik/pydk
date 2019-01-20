@@ -176,7 +176,7 @@ def create_pip_packages(output_directory):
         sys.exit(exit_code)
     print('=================================================')
     print('Successfully generated Python YDK at %s' % (py_sdk_root,))
-    print('Please read %s/README.md for information on how to install the package in your environment' % (
+    print('Please read %s/README.md\nfor information on how to install the package in your environment' % (
         py_sdk_root,))
 
 
@@ -247,6 +247,18 @@ if __name__ == '__main__':
                       dest="verbose",
                       default=False,
                       help="Verbose mode")
+
+    parser.add_option("-i", "--install",
+                      action="store_true",
+                      dest="install",
+                      default=False,
+                      help="Install generated component")
+
+    parser.add_option("-s", "--sudo",
+                      action="store_true",
+                      dest="sudo",
+                      default=False,
+                      help="Install with sudo access")
 
     parser.add_option("--generate-doc",
                       action="store_true",
@@ -334,11 +346,30 @@ if __name__ == '__main__':
     print('\nTime taken for code/doc generation: {0} {1}\n'.format(minutes_str, seconds_str))
     print('\nCreating {0} package...\n'.format(language))
 
+    success = True
     if options.cpp:
         create_shared_libraries(output_directory)
     else:
         create_pip_packages(output_directory)
+        if options.install:
+            dist_dir = '%s/dist' % output_directory
+            file_list=os.listdir(dist_dir)
+            if len(file_list) == 1:
+                dist = file_list[0]
+                print('\nInstalling {0} package {1} ...\n'.format(language, dist))
+                sudo = ''
+                if options.sudo:
+                    sudo = 'sudo '
+                os.system('%spip install %s/%s -U' % (sudo, dist_dir, dist))
 
+            elif len(file_list) == 0:
+                print('\nCannot find installation package in directory %s' % dist_dir)
+                success = False
+            else:
+                print('\nThe directory %s contains multiple packages:\n  %s' % (dist_dir, file_list))
+                print('Please manually complete the installation process')
+
+    if success:
+        print('\nCode generation and installation completed successfully!')
     minutes_str, seconds_str = _get_time_taken(start_time)
-    print('Code generation and installation completed successfully!')
-    print('Total time taken: {0} {1}\n'.format(minutes_str, seconds_str))
+    print('\nTotal time taken: {0} {1}\n'.format(minutes_str, seconds_str))
