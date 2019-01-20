@@ -417,10 +417,8 @@ function py_test_gen {
     print_msg "py_test_gen"
 
     cd $YDKGEN_HOME
-    run_test generate.py --core --python
-    run_test generate.py --bundle profiles/test/ydk-models-test.json  --generate-tests --python
-    pip install gen-api/python/ydk/dist/ydk*.tar.gz
-    pip install gen-api/python/models_test-bundle/dist/ydk*.tar.gz
+    run_test generate.py -i --core --python
+    run_test generate.py -i --bundle profiles/test/ydk-models-test.json  --generate-tests --python
 
     # py_test_gen_test
 }
