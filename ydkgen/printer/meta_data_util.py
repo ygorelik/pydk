@@ -462,8 +462,10 @@ def get_length_limits(length_type):
             pmin = m_min
         if m_max == 'max':
             pmax = '18446744073709551615'
-        else:
+        elif m_max is not None:
             pmax = m_max
+        else:
+            pmax = pmin
         prange.append((pmin, pmax))
     return prange
 
