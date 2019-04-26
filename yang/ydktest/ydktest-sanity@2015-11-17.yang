@@ -241,7 +241,9 @@ module ydktest-sanity {
 
         leaf number32 {
           description "integer value type";
-          type int32;
+          type int32 {
+            range "min..0 | 19 | 1000..max";
+          }
         }
 
         leaf number64 {
@@ -283,7 +285,6 @@ module ydktest-sanity {
             range "1 .. 3.14 | 10 | 20..max";
           }
         }
-
 
         leaf name {
           description "this is string value";
@@ -345,7 +346,7 @@ module ydktest-sanity {
           }
           default "auto-sense-speed";
         }
-        
+
 //TODO
         /*leaf-list bits-list {
           description "this is bits type list";
@@ -357,7 +358,7 @@ module ydktest-sanity {
             bit val2 {
               position 1;
             }
-          }          
+          }
         }*/
 
         leaf younion {
@@ -400,8 +401,8 @@ module ydktest-sanity {
 
         leaf-list enum-llist {
           type Ydk-Enum-test;
-          description "A leaf-list of enum";
           max-elements 3;
+          description "A leaf-list of enum";
         }
 
         leaf-list identity-llist {
@@ -472,7 +473,7 @@ module ydktest-sanity {
           type string;
         }
       }
-      
+
       list identity-list {
         description "one list data";
         key "id-ref";
@@ -494,7 +495,7 @@ module ydktest-sanity {
         }
       }
     }
-  
+
   }
 
 

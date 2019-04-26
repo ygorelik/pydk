@@ -48,3 +48,4 @@ test/scripts
 *.sublime-workspace
 sdk/python/core/dist
 sdk/python/core/ydk.egg-info
+yang/xr-config-models/
