@@ -42,48 +42,48 @@ oc-pattern.yang:
 	cp ../../models/oc-pattern\@2015-11-17.yang oc-pattern.yang
 
 openconfig-bgp-common-multiprotocol.yang:
-	cp ../../models/openconfig-bgp-common-multiprotocol.yang openconfig-bgp-common-multiprotocol.yang
+	cp ../../models/openconfig-bgp-common-multiprotocol\@2016-06-21.yang openconfig-bgp-common-multiprotocol.yang
 
 openconfig-bgp-common-structure.yang:
-	cp ../../models/openconfig-bgp-common-structure.yang openconfig-bgp-common-structure.yang
+	cp ../../models/openconfig-bgp-common-structure\@2016-06-21.yang openconfig-bgp-common-structure.yang
 
 openconfig-bgp-common.yang:
-	cp ../../models/openconfig-bgp-common.yang openconfig-bgp-common.yang
+	cp ../../models/openconfig-bgp-common\@2016-06-21.yang openconfig-bgp-common.yang
 
 openconfig-bgp-global.yang:
-	cp ../../models/openconfig-bgp-global.yang openconfig-bgp-global.yang
+	cp ../../models/openconfig-bgp-global\@2016-06-21.yang openconfig-bgp-global.yang
 
 openconfig-bgp-neighbor.yang:
-	cp ../../models/openconfig-bgp-neighbor.yang openconfig-bgp-neighbor.yang
+	cp ../../models/openconfig-bgp-neighbor\@2016-06-21.yang openconfig-bgp-neighbor.yang
 
 openconfig-bgp-peer-group.yang:
-	cp ../../models/openconfig-bgp-peer-group.yang openconfig-bgp-peer-group.yang
+	cp ../../models/openconfig-bgp-peer-group\@2016-06-21.yang openconfig-bgp-peer-group.yang
 
 openconfig-bgp-policy.yang: openconfig-routing-policy.yang openconfig-policy-types.yang
-	cp ../../models/openconfig-bgp-policy.yang openconfig-bgp-policy.yang
+	cp ../../models/openconfig-bgp-policy\@2016-06-21.yang openconfig-bgp-policy.yang
 
 openconfig-bgp-types.yang: openconfig-types.yang openconfig-extensions.yang
-	cp ../../models/openconfig-bgp-types.yang openconfig-bgp-types.yang
+	cp ../../models/openconfig-bgp-types\@2016-06-21.yang openconfig-bgp-types.yang
 
 openconfig-bgp.yang: openconfig-bgp-common.yang openconfig-bgp-common-multiprotocol.yang \
 				openconfig-bgp-common-structure.yang openconfig-bgp-peer-group.yang \
 			openconfig-bgp-neighbor.yang openconfig-bgp-global.yang
-	cp ../../models/openconfig-bgp.yang openconfig-bgp.yang
+	cp ../../models/openconfig-bgp\@2016-06-21.yang openconfig-bgp.yang
 
 openconfig-extensions.yang:
-	cp ../../models/openconfig-extensions.yang openconfig-extensions.yang
+	cp ../../models/openconfig-extensions\@2015-10-09.yang openconfig-extensions.yang
 
 openconfig-interfaces.yang: ietf-interfaces.yang
-	cp ../../models/openconfig-interfaces.yang openconfig-interfaces.yang
+	cp ../../models/openconfig-interfaces\@2016-05-26.yang openconfig-interfaces.yang
 
 openconfig-routing-policy.yang: openconfig-interfaces.yang
-	cp ../../models/openconfig-routing-policy.yang openconfig-routing-policy.yang
+	cp ../../models/openconfig-routing-policy\@2016-05-12.yang openconfig-routing-policy.yang
 
 openconfig-types.yang:
-	cp ../../models/openconfig-types.yang openconfig-types.yang
+	cp ../../models/openconfig-types\@2016-05-31.yang openconfig-types.yang
 
 openconfig-policy-types.yang:
-	cp ../../models/openconfig-policy-types.yang openconfig-policy-types.yang
+	cp ../../models/openconfig-policy-types@2016-05-12.yang openconfig-policy-types.yang
 
 ydktest-filterread.yang:
 	cp ../../models/ydktest-filterread\@2015-11-17.yang ydktest-filterread.yang
@@ -101,7 +101,7 @@ ydktest-sanity.yang: ydktest-types.yang ydktest-sanity-submodule.yang
 	cp ../../models/ydktest-sanity\@2015-11-17.yang ydktest-sanity.yang
 
 ydktest-types.yang:
-	cp ../../models/ydktest-types.yang ydktest-types.yang
+	cp ../../models/ydktest-types\@2016-05-23.yang ydktest-types.yang
 
 main.yang:
 	cp ../../models/main@2015-11-17.yang main.yang

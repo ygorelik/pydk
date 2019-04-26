@@ -446,6 +446,6 @@ py_tests
 #test_gen_tests
 
 cd $YDKGEN_HOME
-print_msg "gathering cpp coverage"
+#print_msg "gathering cpp coverage"
 print_msg "combining python coverage"
 coverage combine
