@@ -230,6 +230,19 @@ class SanityYang(unittest.TestCase):
 
         self.assertEqual(is_equal(obj_A, entity), True)
 
+    def test_mand(self):
+        # READ
+        r_1 = Runner()
+        mand = r_1.MandList()
+        mand.name = 'test'
+        mand.num = 20
+        r_1.mand_list.append(mand)
+        payload = self.codec.encode(self.provider, r_1)
+        entity = self.codec.decode(self.provider, payload)
+        self.assertEqual(is_equal(r_1, entity), True)
+        self.assertEqual(payload, self.codec.encode(self.provider, entity))
+
+
 if __name__ == '__main__':
     import sys
     suite = unittest.TestLoader().loadTestsFromTestCase(SanityYang)

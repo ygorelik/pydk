@@ -232,6 +232,7 @@ module ydktest-sanity {
         leaf number8 {
           description " 8 bit integer value type";
           type int8;
+          mandatory true;
         }
 
         leaf number16 {
@@ -672,6 +673,17 @@ module ydktest-sanity {
        leaf some-leaf {
           type string;
        }
+    }
+
+    list mand-list {
+        key "name";
+        leaf name {
+            type string;
+        }
+        leaf num {
+            type int16;
+            mandatory true;
+        }
     }
   }
 }
