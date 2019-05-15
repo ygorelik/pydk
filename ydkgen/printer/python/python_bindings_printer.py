@@ -56,8 +56,8 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
             self._print_nmsp_declare_init(self.models_dir)
 
         # RST Documentation
-        if self.ydk_doc_dir is not None:
-            self._print_python_rst_ydk_models()
+        # if self.ydk_doc_dir is not None:
+        #     self._print_python_rst_ydk_models()
         return ()
 
     def _print_modules(self):
@@ -107,8 +107,8 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
         self._print_meta_module(package, meta_dir)
         if self.generate_tests:
             self._print_tests(package, test_output_dir)
-        if self.ydk_doc_dir is not None:
-            self._print_python_rst_module(package)
+        # if self.ydk_doc_dir is not None:
+        #     self._print_python_rst_module(package)
 
     def _print_python_rst_module(self, package):
         if self.ydk_doc_dir is None:
