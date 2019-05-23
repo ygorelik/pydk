@@ -42,5 +42,10 @@ sdk/cpp/netconf_client.o
 sdk/cpp/tests/ydk_test
 sdk/cpp/ydk_client.so
 gen-api/
+test/test-cases/python/tests
+test/scripts
 *.sublime-project
 *.sublime-workspace
+sdk/python/core/dist
+sdk/python/core/ydk.egg-info
+yang/xr-config-models/

@@ -22,18 +22,22 @@
 # Terminal colors
 RED="\033[0;31m"
 NOCOLOR="\033[0m"
+YELLOW='\033[1;33m'
+MSG_COLOR=$YELLOW
 
 PY_GENERATE="python2"
 PY_TEST="python3"
 
 function print_msg {
-    echo -e "${RED}*** $(date) *** tests.sh | $1${NOCOLOR}"
+    echo -e "${MSG_COLOR}*** $(date) *** tests.sh | $@ ${NOCOLOR}"
 }
 
 function run_exec_test {
     $@
     local status=$?
     if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Exiting '$@' with status=$status"
         exit $status
     fi
     return $status
@@ -43,6 +47,8 @@ function run_test_no_coverage {
     python $@
     local status=$?
     if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Exiting '$@' with status=$status"
         exit $status
     fi
     return $status
@@ -52,6 +58,8 @@ function run_test {
     coverage run --source=ydkgen,sdk,generate --branch --parallel-mode $@ > /dev/null
     local status=$?
     if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Exiting '$@' with status=$status"
         exit $status
     fi
     return $status
@@ -262,6 +270,22 @@ function py_sanity_augmentation_test {
     run_test sdk/python/core/tests/test_sanity_augmentation.py
 }
 
+function py_sanity_one_class_per_module {
+    print_msg "deactivate virtualenv"
+    deactivate
+    cd $YDKGEN_HOME && source gen_env/bin/activate
+    print_msg "generating one class per module style of classes"
+    run_test generate.py --bundle profiles/test/ydktest.json -o
+    source test_env/bin/activate
+    pip install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
+    run_test sdk/python/core/tests/test_sanity_levels.py
+    run_test sdk/python/core/tests/test_sanity_types.py
+    run_test sdk/python/core/tests/test_sanity_filters.py
+    #run_test sdk/python/core/tests/test_sanity_filter_read.py
+    run_test sdk/python/core/tests/test_sanity_netconf.py
+    run_test sdk/python/core/tests/test_sanity_codec.py
+}
+
 function cpp_sanity_core_gen_install {
     print_msg "cpp_sanity_core_gen_install"
 
@@ -340,12 +364,10 @@ function py_tests {
 
     init_env $GEN_ENV $TEST_ENV
 
-    # Install ydk-cpp core before starting tests
-    cpp_sanity_core_gen_install
-
     py_sanity_ydktest
     py_sanity_deviation
     py_sanity_augmentation
+    py_sanity_one_class_per_module
     teardown_env
 }
 
@@ -395,10 +417,8 @@ function py_test_gen {
     print_msg "py_test_gen"
 
     cd $YDKGEN_HOME
-    run_test generate.py --core --python
-    run_test generate.py --bundle profiles/test/ydk-models-test.json  --generate-tests --python
-    pip install gen-api/python/ydk/dist/ydk*.tar.gz
-    pip install gen-api/python/models_test-bundle/dist/ydk*.tar.gz
+    run_test generate.py -i --core --python
+    run_test generate.py -i --bundle profiles/test/ydk-models-test.json  --generate-tests --python
 
     # py_test_gen_test
 }
@@ -420,10 +440,12 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/..
 
 py_tests
-init_rest_server
-cpp_tests
-test_gen_tests
+
+#init_rest_server
+#cpp_tests
+#test_gen_tests
+
 cd $YDKGEN_HOME
-print_msg "gathering cpp coverage"
+#print_msg "gathering cpp coverage"
 print_msg "combining python coverage"
 coverage combine

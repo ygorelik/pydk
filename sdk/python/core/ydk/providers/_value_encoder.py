@@ -26,6 +26,7 @@ import importlib
 from ydk._core._dm_meta_info import REFERENCE_BITS, \
     REFERENCE_IDENTITY_CLASS, REFERENCE_ENUM_CLASS, REFERENCE_LEAFLIST
 from ydk.types import Empty, Decimal64, YListItem
+from ydk.errors import YPYModelError
 
 from ._importer import _yang_ns
 from functools import reduce
@@ -35,14 +36,36 @@ if sys.version_info > (3,):
     long = int
 
 
+def check_value_is_subclass_to_handle_deepcopy(value, clazz):
+    value_is_subclass = False
+    val_class = None
+    try:
+        val_str = str(value)
+        if 'ydk.models' in val_str:
+            class_path =  val_str.split(' ')[0].lstrip('<')
+            module_path = '.'.join(class_path.split('.')[:4])
+            clazz_name = '.'.join(class_path.split('.')[4:])
+            module = importlib.import_module(module_path)
+            val_class = reduce(getattr, clazz_name.split('.'), module)
+            value_is_subclass = issubclass(val_class, clazz)
+    except:
+        pass
+    return val_class, value_is_subclass
+
+
 class ValueEncoder(object):
-    def encode(self, member, NSMAP, value):
+    def encode(self, member, NSMAP, value, validate=True, silent=False):
         text = ''
         if member.mtype == REFERENCE_IDENTITY_CLASS or member.ptype.endswith('Identity'):
             module = importlib.import_module(member.pmodule_name)
             clazz = reduce(getattr, member.clazz_name.split('.'), module)
-
-            if issubclass(type(value), clazz):
+            is_sub = issubclass(type(value), clazz)
+            val_is_sub = False
+            if not is_sub:
+                val_class, val_is_sub = check_value_is_subclass_to_handle_deepcopy(value, clazz)
+                if val_is_sub:
+                    value = val_class()
+            if is_sub or val_is_sub:
                 identity_inst = value
                 if _yang_ns._namespaces[member.module_name] == _yang_ns._namespaces[identity_inst._meta_info().module_name]:
                     # no need for prefix in this case
@@ -71,20 +94,30 @@ class ValueEncoder(object):
                     or enum_value == literal:
                     text = yang_enum_name
                     break
-        elif member.ptype == 'bool' and isinstance(value, bool):
+        elif member.ptype == 'bool' and (isinstance(value, bool) or not validate):
             if value is True:
                 text = 'true'
-            else:
+            elif value is False:
                 text = 'false'
-        elif member.ptype == 'Empty' and isinstance(value, Empty):
-            pass
+        elif member.ptype == 'Empty' and (isinstance(value, Empty) or not validate):
+            if not validate and not isinstance(value, Empty):
+                text = str(value)
         elif member.ptype == 'Decimal64' and isinstance(value, Decimal64):
             text = value.s
-        elif member.ptype == 'str' and isinstance(value, str):
+        elif member.ptype == 'str' and (isinstance(value, str) or not validate):
             text = str(value)
-        elif member.ptype == 'int' and isinstance(value, (int, long)):
+        elif member.ptype == 'int' and (isinstance(value, (int, long)) or not validate):
+            text = str(value)
+        elif silent:
+            pass
+        elif not validate:
+            ydk_logger = logging.getLogger(__name__)
+            error_msg = 'Could not encode leaf {0}, type: {1}, value: {2}; converting to str type'.format(member.name, member.ptype, value)
+            ydk_logger.info(error_msg)
             text = str(value)
         else:
             ydk_logger = logging.getLogger(__name__)
-            ydk_logger.info('Could not encode leaf {0}, type: {1}, {2} value: {3}'.format(member.name, member.mtype, member.ptype, value))
+            error_msg = 'Could not encode leaf {0}, type: {1}, value: {2}'.format(member.name, member.ptype, value)
+            ydk_logger.error(error_msg)
+            raise YPYModelError(error_msg)
         return text

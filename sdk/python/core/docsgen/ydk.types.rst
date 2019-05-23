@@ -10,11 +10,68 @@ Contains type definitions.
 
 	Bases: :class:`object`
 	
-	Marker class used to mark nodes that are to be deleted. 
+	Marker class used to mark existing nodes that are to be deleted. 
 
-	Assign DELETE object to a mark a leaf for deletion. A CRUD update operation will delete the leaf from the device it is on.
+	Assign `DELETE()` to a leaf for its deletion. A CRUD update operation will delete the leaf from the device when this marker is set.
 	
-	
+	Assign `DELETE()` to a container object attribute `yfilter` in order to mark it for delete operation.
+
+
+.. py:class:: ydk.types.REMOVE()
+
+    Bases: :class:`object`
+    
+    Class marker, which is used to mark nodes that are to be deleted silently (no error developed, if the object does not exists). 
+
+    Assign `REMOVE()` to a leaf for its deletion. A CRUD update operation will silently delete the leaf from the device when this marker is set.
+    
+    Assign `REMOVE()` to a container object attribute `yfilter` in order to mark it for remove operation.
+
+
+.. py:class:: ydk.types.READ()
+
+    Bases: :class:`object`
+    
+    Class marker, which is used to mark nodes that are to be read from device. 
+
+    Assign `READ()` to a leaf in order to read specifically leaf value.
+    
+    Assign `READ()` to a container object attribute `yfilter` to mark it for read operation.
+
+
+.. py:class:: ydk.types.CREATE(value=None)
+
+    Bases: :class:`object`
+    
+    Class marker, which is used to mark nodes that are to be created. 
+
+    Assign `CREATE(value)` to a leaf in order to create it with specified `value`.
+    
+    Assign `CREATE()` to a container object attribute `yfilter` to mark it for create operation.
+
+
+.. py:class:: ydk.types.MERGE(value=None)
+
+    Bases: :class:`object`
+    
+    Class marker, which is used to mark nodes that are to be merged with existing configuration. 
+
+    Assign `MERGE(value)` to a leaf in order to create or replace it with specified `value`.
+    
+    Assign `MERGE()` to a container object attribute `yfilter` to mark it for merge operation.
+
+
+.. py:class:: ydk.types.REPLACE(value=None)
+
+    Bases: :class:`object`
+    
+    Class marker, which is used to mark nodes that are to be merged with existing configuration. 
+
+    Assign `REPLACE(value)` to a leaf in order to replace its value with specified `value`.
+    
+    Assign `REPLACE()` to a container object attribute `yfilter` to mark it for replace operation.
+
+
 .. py:class:: ydk.types.Decimal64(str_val)
 
 	Bases: :class:`object`
@@ -50,12 +107,6 @@ Contains type definitions.
 	To set a bit use the name of the bit as a key into the dictionary and set the 
 	value to True (False to unset).
 
-
-.. py:class:: ydk.types.READ()
-
-	Bases: :class:`object`
-	
-	Marker class used to mark nodes that are to be read.
 
 .. py:class:: ydk.types.YList()
 

@@ -1,17 +1,18 @@
 Using Types
 ***********
-This document will explain and give examples to using the ydk types.
+This document explains and shows examples for using some of the YDK types.
 Types explained will include:
 
-- Empty.
-- Decimal64.
-- FixedBitsDict.
-- YList.
+- Empty
+- Decimal64
+- FixedBitsDict
+- YList
+- YLeafList
 
 Example use of Empty type
 =========================
 
-- The leaf being configured (accept_route) under the module ydk.models.openconfig.openconfig_routing_policy:
+The leaf being configured (accept_route) under the module ydk.models.openconfig.openconfig_routing_policy:
 
 **accept_route:** accepts the route into the routing table.
 **type:** Empty
@@ -31,7 +32,7 @@ Example use of Empty type
 Example use of Decimal64 type
 =============================
 
-- The leaf being configured (restart_timer) under the ydk.models.openconfig_bgp.bgp module:
+The leaf being configured (restart_timer) under the ydk.models.openconfig_bgp.bgp module:
 **restart_timer:** Time interval in seconds after which the BGP session is re-established after being torn down due to exceeding the max-prefix limit.
 **type:** Decimal64
 
@@ -45,7 +46,7 @@ Example use of Decimal64 type
 Example use of FixedBitsDict type
 =================================
 
-- The leaf being configured (restart_timer) under the ydk.models.ietf.ietf_netconf_acm module:
+The leaf being configured (restart_timer) under the ydk.models.ietf.ietf_netconf_acm module:
 **access_operations:** Access operations associated with this rule.  This leaf matches if it has the value '*' or if the bit corresponding to the requested operation is set.
 **type:** str
 
@@ -61,7 +62,7 @@ Example use of FixedBitsDict type
 Example use of YList type
 =========================
 
-- The node being configured is afi_safi under the ydk.models.openconfig_bgp.bgp module:
+The node being configured is afi_safi under the ydk.models.openconfig_bgp.bgp module:
 
 .. code-block:: python
 
@@ -77,7 +78,7 @@ Example use of YList type
 Example use of YLeafList type
 =============================
 
-- The leaf being configured (ipv4_dscp) under the ydk.models.cisco_ios_xr.Cisco_IOS_XR_asr9k_policymgr_cfg module:
+The leaf being configured (ipv4_dscp) under the ydk.models.cisco_ios_xr.Cisco_IOS_XR_asr9k_policymgr_cfg module:
 **ipv4_dscp:** An leaflist of Match IPv4 DSCP.
 **type:** YLeafList
 

@@ -403,14 +403,15 @@ CodecService: Provides encode/decode API's
                 Encodes the python entity and returns the payload. Entity is either:
                   - an instance of an entity class defined under the ydk.models package or subpackages, or
                   - a dictionary containing:
-                     - module names as keys and
-                     - entity instances as values
+                     module names as keys and
+                     entity instances as values
 
                 :return: encoded value can be:
-                  - an instance of an XML payload defined for a yang module, or
-                  - a dictionary containing:
-                     - module names as keys and
-                     - instances of XML payload defined for a yang module as values
+                        - an instance of an XML payload defined for a yang module, or
+                        - a dictionary containing:
+                        
+                           - module names as keys and
+                           - instances of XML payload defined for a yang module as values
 
                 :raises ydk.errors.YPYDataValidationError: if validation error has occurred
 
@@ -419,14 +420,15 @@ CodecService: Provides encode/decode API's
                 Decodes the the payload and returns the python entity. Payload is either:
                   - an instance of an XML payload defined for a yang module, or
                   - a dictionary containing:
-                     - module names as keys and
-                     - instances of XML payload defined for a yang module as values
+                     module names as keys and
+                     instances of XML payload defined for a yang module as values
 
                 :return: decoded entity. Entity is either:
                   - an instance of an entity class defined under the ydk.models package or subpackages, or
                   - a dictionary containing:
-                     - module names as keys and
-                     - entity instances as values
+                  
+                     module names as keys and
+                     entity instances as values
 
                 :raises ydk.errors.YPYDataValidationError: if validation error has occurred
 

@@ -21,9 +21,11 @@
 
 RED="\033[0;31m"
 NOCOLOR="\033[0m"
+YELLOW='\033[1;33m'
+MSG_COLOR=$YELLOW
 
 function print_msg {
-    echo -e "${RED}*** $(date) *** dependencies_linux.sh | $1${NOCOLOR}"
+    echo -e "${MSG_COLOR}*** $(date) *** dependencies_linux.sh | $@ ${NOCOLOR}"
 }
 
 function install_dependencies {
@@ -39,12 +41,12 @@ function install_dependencies {
                             git \
                             libcmocka0 \
                             libcurl4-openssl-dev \
-                            libpcre3-dev \
-                            libpcre++-dev \
-                            libssh-dev \
-                            libtool \
-                            libxml2-dev \
-                            libxslt1-dev \
+#                            libpcre3-dev \
+#                            libpcre++-dev \
+#                            libssh-dev \
+#                            libtool \
+#                            libxml2-dev \
+#                            libxslt1-dev \
                             pkg-config \
                             python-dev \
                             python-pip \
@@ -60,8 +62,8 @@ function install_dependencies {
                             cmake > /dev/null
 
     sudo apt-get install clang-3.8 lldb-3.8 -y
-    sudo ln -f -s /usr/bin/clang++-3.8 /usr/bin/clang++
-    sudo ln -f -s /usr/bin/clang-3.8 /usr/bin/clang
+    sudo ln -fs /usr/bin/clang++-3.8 /usr/bin/clang++
+    sudo ln -fs /usr/bin/clang-3.8 /usr/bin/clang
 }
 
 function install_confd {

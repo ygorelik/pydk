@@ -30,7 +30,7 @@ from ydk.types import YList, YListItem, YLeafList, Empty
 from ._decoder import XmlDecoder
 from ._encoder import XmlEncoder
 from ._ydk_types import _SessionTransportMode
-
+from ._validator import is_yvalidate
 
 from ncclient import manager
 from ncclient.operations import RPC, RPCReply
@@ -329,7 +329,6 @@ class _ClientSPPlugin(_SPPlugin):
                             return current
                         if len(current) == 1:
                             current = current[0]
-
                     break
 
             if not found:
@@ -469,6 +468,7 @@ class _ClientSPPlugin(_SPPlugin):
                 port=session_config.port,
                 username=session_config.username,
                 password=session_config.password,
+                key_filename = session_config.key_filename,
                 look_for_keys=False,
                 allow_agent=False,
                 hostkey_verify=False)
@@ -580,12 +580,12 @@ class _ClientSPPlugin(_SPPlugin):
         if type(entity) == YLeafList or type(entity) == YListItem:
             # parent_meta_tuple_list is not created for leaflist's parent
             entity = entity.parent
-            XmlEncoder().encode_to_xml(entity, root, optype)
+            XmlEncoder().encode_to_xml(entity, root, optype, validate=is_yvalidate(entity))
         elif type(entity) == YList:
             for item in entity:
                 self._encode_epilogue(item, root, optype)
         else:
-            XmlEncoder().encode_to_xml(entity, root, optype)
+            XmlEncoder().encode_to_xml(entity, root, optype, validate=is_yvalidate(entity))
 
     def _check_read_only_edit_error(self, entity):
         if type(entity) == YLeafList:
@@ -723,7 +723,7 @@ class _ClientSPPlugin(_SPPlugin):
         return root
 
     def _encode_empty(self, root, entity, member):
-        entity_ns = entity.i_meta.namespaces
+        entity_ns = entity.i_meta.namespace
         empty_ns = _yang_ns._namespaces[member.module_name]
         NSMAP = {}
         if entity_ns is not None and entity_ns != empty_ns:
@@ -817,7 +817,7 @@ def check_errors(payload):
             path2 = []
             error_info_detected = False
             for x in path1:
-                if x == 'rpc-error':
+                if 'rpc-error' in x:
                     err = True
                 if x != 'rpc-reply' and x != 'data'and x != 'ok':
                     path2.append(x)

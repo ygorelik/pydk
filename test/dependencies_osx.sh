@@ -21,24 +21,22 @@
 
 RED="\033[0;31m"
 NOCOLOR="\033[0m"
+YELLOW='\033[1;33m'
+MSG_COLOR=$YELLOW
 
 function print_msg {
-    echo -e "${RED}*** $(date) *** dependencies_osx.sh | $1${NOCOLOR}"
+    echo -e "${MSG_COLOR}*** $(date) *** dependencies_osx.sh | $@ ${NOCOLOR}"
 }
 
 function install_dependencies {
     print_msg "install_dependencies"
 
-    brew install curl \
-                 doxygen \
-                 libssh \
-                 pcre \
-                 wget \
-                 xml2 \
-                 lcov
+    brew install curl doxygen wget xml2
+#                 pcre  \
+#                 lcov
 
-    brew install libssh
-    brew link libssh
+#    brew install libssh
+#    brew link libssh
 }
 
 function install_confd {

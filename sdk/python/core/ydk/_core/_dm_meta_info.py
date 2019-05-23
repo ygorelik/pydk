@@ -14,6 +14,7 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
+import importlib
 
 ATTRIBUTE = 0
 REFERENCE_CLASS = 1
@@ -27,14 +28,15 @@ ANYXML_CLASS = 8
 
 class _MetaInfoClassMember(object):
 
-    def __init__(self, name, mtype, ptype,
+    def __init__(self, name, mtype, ptype, ytype,
                  pmodule_name, clazz_name,
                  prange, pattern, doc,
                  presentation_name, module_name, is_key,
-                 members=[], max_elements=None, min_elements=None):
+                 members=[], max_elements=None, min_elements=None, default_value=None, is_config=True, is_presence=False, is_mandatory=False):
         self._name = name
         self._mtype = mtype
         self._ptype = ptype
+        self._ytype = ytype
         self._pmodule_name = pmodule_name
         self._clazz_name = clazz_name
         self._range = prange
@@ -48,6 +50,10 @@ class _MetaInfoClassMember(object):
         self._members = members
         self._max_elements = max_elements
         self._min_elements = min_elements
+        self._default_value = default_value
+        self._is_config = is_config
+        self._is_presence = is_presence
+        self._is_mandatory = is_mandatory
 
     @property
     def members(self):
@@ -60,6 +66,10 @@ class _MetaInfoClassMember(object):
     @property
     def ptype(self):
         return self._ptype
+
+    @property
+    def ytype(self):
+        return self._ytype
 
     @property
     def pmodule_name(self):
@@ -93,12 +103,43 @@ class _MetaInfoClassMember(object):
     def min_elements(self):
         return self._min_elements
 
+    @property
+    def default_value(self):
+        return self._default_value
+
+    def union_list(self):
+        _list = []
+        if self._mtype == REFERENCE_UNION:
+            for union_member in self._members:
+                if (union_member._ptype == 'str'):
+                    pattern = union_member._pattern
+                else:
+                    pattern = union_member._range
+                _list.append((union_member._ptype, union_member._ytype, pattern))
+        return _list
+
+    def ydk_class(self):
+        if (self.mtype != REFERENCE_ENUM_CLASS and self.mtype != REFERENCE_CLASS and self.mtype != REFERENCE_IDENTITY_CLASS) or \
+            len(self._pmodule_name) == 0 or len(self._clazz_name) == 0:
+            return None
+        m = importlib.import_module(self._pmodule_name)
+        cls_list = self._clazz_name.split('.')
+        for cls in cls_list:
+            m = getattr(m, cls)
+        return m
+
+    def enum_dict(self):
+        if self.mtype == REFERENCE_ENUM_CLASS:
+            return self.ydk_class().__members__
+        return dict()
+
 
 class _MetaInfoClass(object):
 
     def __init__(
             self,
             name,
+            doc,
             is_abstract,
             meta_info_class_members,
             module_name,
@@ -106,6 +147,7 @@ class _MetaInfoClass(object):
             namespace,
             pmodule_name):
         self.name = name
+        self.doc = doc
         self.namespace = namespace
         self.meta_info_class_members = meta_info_class_members
         self.module_name = module_name
@@ -116,17 +158,43 @@ class _MetaInfoClass(object):
     def key_members(self):
         return [ member for member in self.meta_info_class_members if member.is_key]
 
+    def member(self, name):
+        for m in self.meta_info_class_members:
+            if m.name == name:
+                return m
+        return None
+
+    def ydk_class(self):
+        m = importlib.import_module(self.pmodule_name)
+        cls_list = self.name.split('.')
+        for cls in cls_list:
+            m = getattr(m, cls)
+        return m
 
 class _MetaInfoEnum(object):
     def __init__(
                  self,
                  name,
                  pmodule_name,
+                 clazz_name,
+                 doc,
                  literal_map,
                  module_name,
                  namespace):
         self.name = name
         self.pmodule_name = pmodule_name
+        self.clazz_name = clazz_name
+        self.doc = doc
         self.literal_map = literal_map
         self.module_name = module_name
         self.namespace = namespace
+
+    def ydk_class(self):
+        m = importlib.import_module(self.pmodule_name)
+        cls_list = self.clazz_name.split('.')
+        for cls in cls_list:
+            m = getattr(m, cls)
+        return m
+
+    def enum_dict(self):
+        return self.ydk_class().__members__

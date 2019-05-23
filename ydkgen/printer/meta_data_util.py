@@ -21,7 +21,7 @@
 """
 from ydkgen.api_model import Bits, Class, Enum, Package
 from ydkgen.builder import TypesExtractor
-from ydkgen.common import convert_to_reStructuredText, get_module_name
+from ydkgen.common import convert_to_reStructuredText, get_module_name, is_config_stmt
 from pyang import types
 from pyang.error import EmitError
 from pyang.types import BinaryTypeSpec, BooleanTypeSpec, Decimal64TypeSpec, EmptyTypeSpec, \
@@ -39,6 +39,7 @@ class MetaInfoData:
         self.name = prop.stmt.arg
         self.mtype = ''
         self.ptype = ''
+        self.ytype = ''
         self.prange = []
         self.pattern = []
         self.presentation_name = "%s" % prop.name
@@ -58,6 +59,8 @@ class MetaInfoData:
         self.is_presence = False
         self.units = ''
         self.default_value = ''
+        self.default_value_object = None
+        self.is_config = is_config_stmt(prop.stmt)
         self.status = ''
 
 
@@ -81,7 +84,7 @@ def get_class_docstring(clazz, language, identity_subclasses=None):
             id_subclasses = identity_subclasses
 
         meta_info_data = get_meta_info_data(
-            prop, prop.property_type, prop.stmt.search_one('type'), language,
+            prop, prop.property_type, prop.stmt.search_one('type'), language, False,
             identity_subclasses=id_subclasses)
 
         if meta_info_data is None:
@@ -130,6 +133,8 @@ def get_type_doc(meta_info_data, type_depth):
             properties_description.append('\t**mandatory**\: True\n\n')
         if meta_info_data.is_presence:
             properties_description.append('\t**presence node**\: True\n\n')
+        if not meta_info_data.is_config:
+            properties_description.append('\t**config**\: False\n\n')
         if len(meta_info_data.units) > 0:
             properties_description.append('\t**units**\: %s\n\n' % meta_info_data.units)
         if len(meta_info_data.default_value) > 0:
@@ -196,7 +201,7 @@ def format_range_string(ranges):
     return range_string
 
 
-def get_meta_info_data(prop, property_type, type_stmt, language, identity_subclasses=None):
+def get_meta_info_data(prop, property_type, type_stmt, language, one_class_per_module, identity_subclasses=None):
     """ Gets an instance of MetaInfoData that has the useful information about the property.
 
         Args:
@@ -206,6 +211,8 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
     """
     clazz = prop.owner
     meta_info_data = MetaInfoData(prop)
+    if type_stmt is not None:
+        meta_info_data.ytype = type_stmt.arg
     types_extractor = TypesExtractor()
     target_type_stmt = type_stmt
 
@@ -230,8 +237,16 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
         meta_info_data.default_value = default_value.arg
 
     if isinstance(property_type, Class):
-        meta_info_data.pmodule_name = "'%s'" % property_type.get_py_mod_name()
-        meta_info_data.clazz_name = "'%s'" % property_type.qn()
+        meta_info_data.pmodule_name = "'%s'" % property_type.get_py_mod_name(one_class_per_module)
+        if one_class_per_module:
+            if property_type.is_identity():
+                meta_info_data.clazz_name = "'%s%s'" % (
+                    (property_type.owner.name + '.') if (not isinstance(property_type.owner, Package)) else '',
+                    property_type.name)
+            else:
+                meta_info_data.clazz_name = "'%s'" % property_type.name
+        else:
+            meta_info_data.clazz_name = "'%s'" % property_type.qn()
 
         if identity_subclasses is None:
             meta_info_data.doc_link = get_class_crossref_tag(
@@ -243,11 +258,10 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
 
         if prop.stmt.keyword == 'leaf-list':
             meta_info_data.mtype = 'REFERENCE_LEAFLIST'
-            target = ''
             if isinstance(meta_info_data.doc_link, list):
                 doc_link = map(lambda l: '\n\n\t\t%s' % l, meta_info_data.doc_link)
                 target = ''.join(doc_link)
-            meta_info_data.doc_link = target
+                meta_info_data.doc_link = target
             meta_info_data.doc_link = '\n\t\t' + _get_list_doc_link_tag(
                 meta_info_data, 'doc_link', language, meta_info_data.mtype)
         elif prop.stmt.keyword == 'list':
@@ -259,14 +273,19 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
         else:
             meta_info_data.mtype = 'REFERENCE_CLASS'
         # if the class is local use just the local name
-        if property_type in clazz.owned_elements:
+        if one_class_per_module or property_type in clazz.owned_elements:
             meta_info_data.ptype = property_type.name
         else:
             meta_info_data.ptype = property_type.qn()
 
     elif isinstance(property_type, Enum):
-        meta_info_data.pmodule_name = "'%s'" % property_type.get_py_mod_name()
-        meta_info_data.clazz_name = "'%s'" % property_type.qn()
+        meta_info_data.pmodule_name = "'%s'" % property_type.get_py_mod_name(one_class_per_module)
+        if one_class_per_module:
+            meta_info_data.clazz_name = "'%s%s'" % (
+                (property_type.owner.name + '.') if (not isinstance(property_type.owner, Package)) else '',
+                property_type.name)
+        else:
+            meta_info_data.clazz_name = "'%s'" % property_type.qn()
 
         meta_info_data.doc_link = get_class_crossref_tag(property_type.name,
                                                          property_type,
@@ -277,14 +296,19 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
             meta_info_data.doc_link = _get_list_doc_link_tag(
                 meta_info_data, 'doc_link', language, meta_info_data.mtype)
 
-        if prop.property_type in clazz.owned_elements:
+        if one_class_per_module or prop.property_type in clazz.owned_elements:
             meta_info_data.ptype = property_type.name
         else:
             meta_info_data.ptype = property_type.qn()
 
     elif isinstance(property_type, Bits):
-        meta_info_data.pmodule_name = "'%s'" % property_type.get_py_mod_name()
-        meta_info_data.clazz_name = "'%s'" % property_type.qn()
+        meta_info_data.pmodule_name = "'%s'" % property_type.get_py_mod_name(one_class_per_module)
+        if one_class_per_module:
+            meta_info_data.clazz_name = "'%s%s'" % (
+            (property_type.owner.name + '.') if (not isinstance(property_type.owner, Package)) else '',
+            property_type.name)
+        else:
+            meta_info_data.clazz_name = "'%s'" % property_type.qn()
         meta_info_data.doc_link = get_bits_doc_link(property_type, language)
         meta_info_data.mtype = 'REFERENCE_BITS'
         if prop.is_many:
@@ -292,7 +316,7 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
             meta_info_data.doc_link = _get_list_doc_link_tag(
                 meta_info_data, 'doc_link', language, meta_info_data.mtype)
 
-        if prop.property_type in clazz.owned_elements:
+        if one_class_per_module or prop.property_type in clazz.owned_elements:
             meta_info_data.ptype = property_type.name
         else:
             meta_info_data.ptype = property_type.qn()
@@ -336,8 +360,13 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
             meta_info_data.doc_link += get_primitive_type_tag('bool', language)
         elif isinstance(type_spec, Decimal64TypeSpec):
             meta_info_data.ptype = 'Decimal64'
+            lower = str(type_spec.min.s)
+            if type_spec.max is not None:
+                upper = str(type_spec.max.s)
+            else:
+                upper = lower
             meta_info_data.prange.append(
-                ('%s' % str(type_spec.min.s), '%s' % str(type_spec.max.s)))
+                ('%s' % lower, '%s' % upper))
             meta_info_data.doc_link += get_primitive_type_tag('Decimal64', language)
         elif isinstance(type_spec, EmptyTypeSpec):
             meta_info_data.ptype = 'Empty'
@@ -350,7 +379,10 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
             meta_info_data.ptype = 'int'
             meta_info_data.doc_link += meta_info_data.ptype
             lower = str(type_spec.min)
-            upper = str(type_spec.max)
+            if type_spec.max is not None:
+                upper = str(type_spec.max)
+            else:
+                upper = lower
             meta_info_data.prange.append((lower, upper))
         elif isinstance(type_spec, LengthTypeSpec):
             meta_info_data.ptype = 'str'
@@ -383,7 +415,7 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
             for contained_type_stmt in type_spec.types:
                 contained_property_type = types_extractor.get_property_type(contained_type_stmt)
                 child_meta_info_data = get_meta_info_data(
-                    prop, contained_property_type, contained_type_stmt, language,
+                    prop, contained_property_type, contained_type_stmt, language, one_class_per_module,
                     identity_subclasses=identity_subclasses)
                 meta_info_data.children.append(child_meta_info_data)
 
@@ -393,6 +425,12 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
             meta_info_data.doc_link += get_primitive_type_tag('str', language)
         else:
             raise EmitError('Illegal path')
+
+    if default_value is not None:
+        meta_info_data.default_value_object = get_default_value_object(meta_info_data.ptype, property_type,
+                                                                       meta_info_data.clazz_name, default_value.arg,
+                                                                       identity_subclasses)
+
     return meta_info_data
 
 
@@ -424,8 +462,10 @@ def get_length_limits(length_type):
             pmin = m_min
         if m_max == 'max':
             pmax = '18446744073709551615'
-        else:
+        elif m_max is not None:
             pmax = m_max
+        else:
+            pmax = pmin
         prange.append((pmin, pmax))
     return prange
 
@@ -445,9 +485,10 @@ def get_range_limits(range_type):
 
             if m_max == 'max':
                 pmax = range_type.base.max
+            elif m_max is not None:
+                pmax = m_max
             else:
-                if m_max is not None:
-                    pmax = m_max
+                pmax = pmin
             if types.yang_type_specs['uint64'].max == pmax:
                 prange.append((str(pmin), str(pmax)))
             prange.append((str(pmin), str(pmax)))
@@ -462,9 +503,10 @@ def get_range_limits(range_type):
                     pmin = str(m_min)
             if m_max == 'max':
                 pmax = range_type.base.max.s
+            elif m_max is not None:
+                pmax = str(m_max)
             else:
-                if m_max is not None:
-                    pmax = str(m_max)
+                pmax = pmin
             prange.append(('%s' % str(pmin), '%s' % str(pmax)))
     return prange
 
@@ -619,3 +661,34 @@ def get_class_bases(clazz, language):
         for item in clazz.extends:
             bases.append(get_class_crossref_tag(item.name, item, language))
     return bases
+
+
+def get_default_value_object(ptype, property_type, clazz_name, default_value, identity_subclasses):
+    default_value_object = ''
+    if ptype == 'Empty':
+        default_value_object = "'Empty()'"
+    elif ptype == 'str':
+        default_value_object = '"\'%s\'"' % default_value
+    elif ptype == 'int':
+        default_value_object = '"%s"' % default_value
+    elif ptype == 'Decimal64':
+        default_value_object = '\'Decimal64("%s")\'' % default_value
+    elif ptype == 'bool':
+        default_value_object = "'%s'" % ('False' if default_value == 'false' else 'True')
+    elif isinstance(property_type, Bits):
+        default_value_object = "'%s'" % default_value
+    elif isinstance(property_type, Enum):
+        for l in property_type.literals:
+            if l.stmt.arg == default_value:
+                default_value_object = "'%s.%s'" % (property_type.fqn(), l.name)
+                break
+    elif isinstance(property_type, Class):
+        if identity_subclasses is not None:
+            if id(property_type) in identity_subclasses:
+                for c in identity_subclasses[id(property_type)]:
+                    if c.stmt.arg in default_value:
+                        default_value_object = "'%s()'" % c.fqn()
+                        break
+    else:
+        default_value_object = "'%s'" % default_value
+    return default_value_object
