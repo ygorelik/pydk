@@ -39,6 +39,8 @@ import abc
 import logging
 import importlib
 from ._importer import _yang_ns
+import subprocess
+import re
 
 try:
     import ydk_client
@@ -75,6 +77,157 @@ class YdkClient(object):
     def disconnect(self):
         self.client.close()
 
+class _OnboxClient(object):
+    """
+    This class defines an onbox client which exchange netconf rpcs with
+    netconf agent running on the router through netconf sshd proxy.
+    """
+    def __init__(self, logger):
+            self.p = None
+            self.capabilities = ""
+            self.netconf_sp_logger = logger 
+
+
+    def get_capabilities(self):
+        return self.capabilities
+
+
+    def _get_xml(self, buf):
+        """
+        Remove netconf packet frame and extract xml content only 
+        """
+        ## skip prefix ahead of '<' and postfix '\n##' at the end
+        ## to return xml string itself
+        buf = buf[buf.find('<'):-3];
+        # remove any line start with #
+        buf = re.sub(re.compile(r"#.*\n") , "" , buf)
+        return buf
+
+    def send_and_receive(self, rpc):
+        # Add frame size 
+        req_str = '\n#' + str(len(rpc) - 1) + '\n' + rpc + '##\n'
+        # Send the request 
+        if not self._send(req_str):
+            return ""
+
+        # Now receive response from agent
+        eof = 0;
+        buf = ''
+        counter = 0
+        while eof == 0:
+            counter += 1
+            data = self._read(1)
+            buf += data
+            if counter % 100000 == 0 :
+                self.netconf_sp_logger.debug("%d bytes received\n" %(counter))
+
+            if '\n##' in buf:
+                eof = 1
+
+        self.netconf_sp_logger.debug("Onbox send_and_receive successully.")
+        buf = self._get_xml(buf)
+        return buf
+
+
+    def _set_login_user(self, username):
+        if (username is None or
+            len(username) == 0):
+            login_user = 'lab'
+        else:
+            login_user = username
+        return login_user 
+
+
+    def _connect_to_netconf(self, session_config):
+        login_user = self._set_login_user(session_config.username)
+
+        # Connect with netconf agent via ssh proxy client
+        BUFSIZE = 8192
+        STDIN = '0'    # Assuming stdin will be always 0 on any env
+        STDOUT = '1'   # Assuming stdout will be always 1 on any env
+        self.netconf_sp_logger.info("Connecting to netconf agent on the box...")
+        try:
+            self.p = subprocess.Popen(
+               ['netconf_sshd_proxy', '-i', STDIN, '-o', STDOUT,
+                '-u', login_user],
+                bufsize=BUFSIZE,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                shell=False)
+        except Exception as err:
+            self.netconf_sp_logger.error("failed (%s)\n" % str(err))
+            error_msg = ("\nFailed to start netconf session!"
+                         "Please make sure you have 'netconf-yang agent ssh'"
+                         "configured on your router.")
+            self.netconf_sp_logger.error(error_msg)
+            raise YPYServiceProviderError(error_msg="failed to start netconf session")
+
+
+    def _send(self, data):
+        try:
+            self.p.stdin.write(data)
+            self.p.stdin.flush()
+            return True
+        except Exception as e:
+            self.netconf_sp_logger.error('Failed to send data, error: %s !' % (str(e)))
+            return False 
+
+    def _read(self, num_of_chars):
+        data = self.p.stdout.read(num_of_chars)
+        if not data:
+            error_msg = ("\nFailed to get response from netconf!"
+                         "Please make sure you have 'netconf-yang agent ssh' "
+                         "configured on your router.")
+            self.netconf_sp_logger.error(error_msg)
+            raise YPYServiceProviderError(error_msg="failed to get response from netconf")
+
+        return data 
+
+
+    def _exchange_hellos(self):
+        buf = ''
+        while True:
+            data = self._read(1)
+            buf += data
+            if buf.endswith(']]>]]>'):
+                # hello message has been received
+                break
+
+        self.capabilities = buf
+        hello = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+                <capabilities>
+                    <capability>urn:ietf:params:netconf:base:1.1</capability>
+                </capabilities>
+            </hello>
+            ]]>]]>"""
+        self._send(hello)
+
+ 
+    def connect(self, session_config):
+        self._connect_to_netconf(session_config)
+        self._exchange_hellos()
+        self.netconf_sp_logger.debug("Netconf session established")
+ 
+
+    def disconnect(self):
+        close_rpc = ('<rpc message-id="101" '
+                     'xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">\n'
+                     '<close-session/>\n</rpc>\n')
+        self.send_and_receive(close_rpc)
+
+
+    def execute_payload(self, payload):
+        # Send the request 
+        try:
+            reply = self.send_and_receive(payload)
+            return reply
+        except:
+            reply_str = "Failed to send data!"
+            raise YPYServiceProviderError(error_code=YPYErrorCode.SERVER_REJ, error_msg=reply_str)
+
 
 class _SPPlugin(object):
     def __init__(self, service_protocol_name):
@@ -95,15 +248,18 @@ class _SPPlugin(object):
 
 class _ClientSPPlugin(_SPPlugin):
 
-    def __init__(self, timeout, use_native_client):
+    def __init__(self, timeout, use_native_client, onbox=False):
         self.head = None
         self._nc_manager = None
         self.use_native_client = use_native_client
+        self.onbox = onbox
+        self.netconf_sp_logger = logging.getLogger(__name__)
         if use_native_client:
             self.ydk_client = None
+        elif self.onbox:
+            self.onbox_client = _OnboxClient(self.netconf_sp_logger)
         else:
             self._nc_manager = None
-        self.netconf_sp_logger = logging.getLogger(__name__)
         self.timeout = timeout
 
     def encode(self, entity, operation, only_config):
@@ -204,6 +360,8 @@ class _ClientSPPlugin(_SPPlugin):
     def _get_capabilities(self):
         if self.use_native_client:
             return self.ydk_client.get_capabilities()
+        elif self.onbox:
+            return self.onbox_client.get_capabilities() 
         else:
             return self._nc_manager.server_capabilities
 
@@ -219,6 +377,11 @@ class _ClientSPPlugin(_SPPlugin):
             assert self.ydk_client is not None
             reply = self.ydk_client.execute_payload(payload)
             self.netconf_sp_logger.debug('\n%s', _get_pretty(reply.xml))
+            return self._handle_rpc_reply(operation, payload, reply)
+        elif self.onbox:
+            self.netconf_sp_logger.debug('\n%s', payload)
+            reply = self.onbox_client.execute_payload(payload)
+            self.netconf_sp_logger.debug('\n%s', _get_pretty(reply))
             return self._handle_rpc_reply(operation, payload, reply)
         else:
             service_provider_rpc = self._create_rpc_instance(self.timeout)
@@ -264,11 +427,17 @@ class _ClientSPPlugin(_SPPlugin):
         raise YPYServiceProviderError(error_code=YPYErrorCode.SERVER_REJ, error_msg=reply_str)
 
     def _handle_commit(self, payload, reply_str):
-        commit = '<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">\n  <commit/>\n</rpc>\n'
+        if self.onbox:
+            commit = ('<rpc message-id="101" '
+                      'xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">\n  <commit/>\n</rpc>\n')
+        else:
+            commit = '<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">\n  <commit/>\n</rpc>\n'
         self.netconf_sp_logger.debug('\n%s', _get_pretty(commit))
         if self.use_native_client:
             assert self.ydk_client is not None
             rep = self.ydk_client.execute_payload(commit)
+        elif self.onbox:
+            rep = self.onbox_client.execute_payload(commit)
         else:
             assert self._nc_manager is not None
             rep = self._nc_manager.commit()
@@ -290,6 +459,9 @@ class _ClientSPPlugin(_SPPlugin):
                 port=session_config.port)
             self.ydk_client.connect()
             return self.ydk_client
+        elif self.onbox:
+            self.onbox_client.connect(session_config)
+            return self.onbox_client
         else:
             self._nc_manager = manager.connect(
                 host=session_config.hostname,
@@ -306,6 +478,8 @@ class _ClientSPPlugin(_SPPlugin):
         if self.use_native_client:
             assert self.ydk_client is not None
             self.ydk_client.disconnect()
+        elif self.onbox:
+            self.onbox_client.disconnect()
         else:
             assert self._nc_manager is not None
             self._nc_manager.close_session()
