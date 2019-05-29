@@ -531,7 +531,7 @@ class Class(NamedElement):
 
     @stmt.setter
     def stmt(self, stmt):
-        name = escape_name(stmt.arg)
+        name = escape_name(stmt.unclashed_arg if hasattr(stmt, 'unclashed_arg') else stmt.arg)
         if stmt.keyword == 'grouping':
             name = '%sGrouping' % camel_case(name)
         elif stmt.keyword == 'identity':
@@ -717,7 +717,7 @@ class Property(NamedElement):
     @stmt.setter
     def stmt(self, stmt):
         self._stmt = stmt
-        name = snake_case(stmt.arg)
+        name = snake_case(stmt.unclashed_arg if hasattr(stmt, 'unclashed_arg') else stmt.arg)
         if self.iskeyword(name) or self.iskeyword(name.lower()):
             name = '%s_' % name
         self.name = name
@@ -911,9 +911,8 @@ def snake_case(input_text):
 
 
 def get_property_name(element, iskeyword):
-    name = snake_case(element.stmt.arg)
-    if iskeyword(name) or iskeyword(name.lower()) or (
-            element.owner is not None and element.stmt.arg.lower() == element.owner.stmt.arg.lower()):
+    name = snake_case(element.stmt.unclashed_arg if hasattr(element.stmt, 'unclashed_arg') else element.stmt.arg)
+    if iskeyword(name) or iskeyword(name.lower()) or (element.owner is not None and element.stmt.arg.lower() == element.owner.stmt.arg.lower()):
         name = '%s_' % name
     return name
 
