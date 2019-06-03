@@ -326,7 +326,7 @@ class _ClientSPPlugin(_SPPlugin):
                         if len(current) == 0:
                             return None
                         if len(current) >= 2:
-                            return current
+                            return _get_child_values_if_possible(yang_node_name, yang_nodes, current)
                         if len(current) == 1:
                             current = current[0]
                     break
@@ -836,3 +836,38 @@ def _get_pretty(string):
     parser = etree.XMLParser(remove_blank_text=True)
     element = etree.XML(string.encode('UTF-8'), parser)
     return etree.tostring(element, encoding='UTF-8', pretty_print=True).decode('UTF-8')
+
+
+def _get_child_values_if_possible(yang_node_name, yang_nodes, current):
+    idx = yang_nodes.index(yang_node_name)
+    if idx == len(yang_nodes) - 1:
+        return current
+    ret = []
+    for curr in current:
+        reta = _get_child_values(yang_nodes[idx + 1:], curr)
+        if reta:
+            ret.append(reta)
+    return ret
+
+
+def _get_child_values(yang_nodes, curr):
+    for yang_node in yang_nodes:
+        found = False
+        for member in curr._meta_info().meta_info_class_members:
+            if member.name == yang_node:
+                found = True
+                curr = getattr(curr, member.presentation_name)
+                if curr is None:
+                    break
+                if isinstance(curr, YList):
+                    if len(curr) == 0:
+                        return curr
+                    if len(curr) >= 2:
+                        return curr
+                    if len(curr) == 1:
+                        curr = curr[0]
+                break
+
+        if not found:
+            return None
+    return curr
