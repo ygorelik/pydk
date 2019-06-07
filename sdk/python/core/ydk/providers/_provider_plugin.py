@@ -863,7 +863,7 @@ def _get_child_values(yang_nodes, curr):
                     if len(curr) == 0:
                         return curr
                     if len(curr) >= 2:
-                        return curr
+                        return _get_child_values_if_possible(yang_node, yang_nodes, curr)
                     if len(curr) == 1:
                         curr = curr[0]
                 break

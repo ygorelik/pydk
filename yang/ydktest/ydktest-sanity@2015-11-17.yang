@@ -675,6 +675,20 @@ module ydktest-sanity {
        }
     }
 
+    list one-key-list {
+        key testy;
+        leaf testy {
+            type string;
+        }
+        container test {
+          container best {
+            leaf gest {
+                type string;
+            }
+          }
+        }
+    }
+
     list mand-list {
         key "name";
         leaf name {
