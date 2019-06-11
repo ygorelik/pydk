@@ -76,9 +76,16 @@ class ClassMetaPrinter(object):
         self._print_meta_member(clazz)
 
     def _print_meta_member(self, clazz):
+        mtype = 'REFERENCE_CLASS'
+        if clazz.stmt.keyword == 'list':
+            mtype = 'REFERENCE_LIST'
+        elif clazz.stmt.keyword == 'leaf-list':
+            mtype = 'REFERENCE_LEAFLIST'
+        elif clazz.stmt.keyword == 'identity':
+            mtype = 'REFERENCE_IDENTITY_CLASS'
         self.ctx.writeln('\'%s\' : {' % (clazz.qn()))
         self.ctx.lvl_inc()
-        self.ctx.writeln("'meta_info' : _MetaInfoClass('%s'," % clazz.qn())
+        self.ctx.writeln("'meta_info' : _MetaInfoClass('%s', %s," % (clazz.qn(), mtype))
         self.ctx.lvl_inc()
         description = " "
         for st in clazz.stmt.substmts:
@@ -92,7 +99,6 @@ class ClassMetaPrinter(object):
             self.ctx.writeln('False, ')
         self.ctx.writeln('[')
 
-        prop_list = []
         if self.is_rpc:
             prop_list = [p for p in clazz.owned_elements if isinstance(p, Property)]
         else:
@@ -110,6 +116,7 @@ class ClassMetaPrinter(object):
     def __init__(
             self,
             name,
+            mtype
             is_abstract,
             meta_info_class_members,
             module_name,
@@ -125,8 +132,8 @@ class ClassMetaPrinter(object):
             self.ctx.writeln('None,')
         else:
             self.ctx.writeln("_yang_ns._namespaces['%s']," % module_name)
-        self.ctx.lvl_dec()
         self.ctx.writeln("'%s'" % clazz.get_py_mod_name(self.one_class_per_module))
+        self.ctx.lvl_dec()
         self.ctx.writeln('),')
 
         self.ctx.lvl_dec()
@@ -149,10 +156,10 @@ class ClassMetaPrinter(object):
         min_elements = meta_info_data.min_elements
         default_value_object = meta_info_data.default_value_object
 
-        ctx.writeln("_MetaInfoClassMember('%s', %s, \'%s\', \'%s\', %s, %s, " %
-                    (name, mtype, ptype, ytype, pmodule_name, clazz_name))
+        ctx.writeln("_MetaInfoClassMember('%s', %s, '%s', '%s'," % (name, mtype, ptype, ytype))
         ctx.lvl_inc()
-        ctx.writeln("%s, %s, " % (str(prange), str(pattern)))
+        ctx.writeln("%s, %s," % (pmodule_name, clazz_name))
+        ctx.writeln("%s, %s," % (str(prange), str(pattern)))
         ctx.write("'''")
         if meta_info_data.comment is not None:
             for line in meta_info_data.comment.split('\n'):

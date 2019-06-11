@@ -3,14 +3,12 @@ sudo: required
 matrix:
     include:
         - os: linux
-          dist: trusty
+          dist: xenial
           language: python
-          python: 2.7
+          python: 3.5
         - os: osx
+          osx_image: xcode8.3
           language: generic
-
-before_install:
-    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update                    ; fi
 
 script:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./test/dependencies_osx.sh     ; fi

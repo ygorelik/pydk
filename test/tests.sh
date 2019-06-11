@@ -170,6 +170,7 @@ function py_sanity_ydktest_test {
 
 function py_sanity_ydktest_test_ncclient {
     print_msg "py_sanity_ydktest_test_ncclient"
+    run_test sdk/python/core/tests/test_meta.py
     run_test sdk/python/core/tests/test_sanity_types.py
     run_test sdk/python/core/tests/test_sanity_errors.py
     run_test sdk/python/core/tests/test_sanity_filters.py
@@ -446,6 +447,5 @@ py_tests
 #test_gen_tests
 
 cd $YDKGEN_HOME
-#print_msg "gathering cpp coverage"
 print_msg "combining python coverage"
 coverage combine

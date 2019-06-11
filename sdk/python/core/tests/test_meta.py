@@ -32,6 +32,7 @@ except:
     from ydk.models.ydktest.openconfig_bgp.bgp.bgp import Bgp
 
 from ydk._core._dm_meta_info import _MetaInfoEnum, REFERENCE_UNION, REFERENCE_ENUM_CLASS
+from ydk._core._dm_meta_info import module_meta, module_enums
 
 class MetaSanityTest(unittest.TestCase):
 
@@ -53,7 +54,9 @@ class MetaSanityTest(unittest.TestCase):
         embeded_enum_meta = built_in_t_meta.member('embeded-enum')
         self.assertIsNotNone(embeded_enum_meta)
         embeded_enum_map = embeded_enum_meta.enum_dict()
-        print("\nEnum dictionary:\n    %s" % embeded_enum_map)
+        print("\nEnum dictionary:")
+        for name in embeded_enum_map:
+            print("%12s: %s" % (name, embeded_enum_map[name]))
         self.assertTrue(len(embeded_enum_map) > 0)
         self.assertEqual(embeded_enum_map['seven']._value_, 7)
 
@@ -76,7 +79,22 @@ class MetaSanityTest(unittest.TestCase):
         # Print PeerType enum
         peer_type_meta = openconfig_bgp_types.PeerTypeEnum._meta_info()
         if isinstance(peer_type_meta, _MetaInfoEnum):
-            print("\nEnum dictionary:\n    %s" % peer_type_meta.enum_dict())
+            peer_type_enum_dict = peer_type_meta.enum_dict()
+            print("\nEnum dictionary:")
+            for name in peer_type_enum_dict:
+                print("%12s: %s" % (name, peer_type_enum_dict[name]))
+
+    def test_module_meta(self):
+        bgp_name = openconfig_bgp.__name__
+        meta = module_meta(bgp_name)
+        print("\nModule meta dictionary:")
+        for name in sorted(meta):
+            print("%80s: %s" % (name, meta[name]))
+        meta = module_enums(bgp_name)
+        print("\nModule enum meta dictionary:")
+        for name in sorted(meta):
+            print("%55s: %s" % (name, meta[name]))
+        print('')
 
 
 if __name__ == '__main__':
