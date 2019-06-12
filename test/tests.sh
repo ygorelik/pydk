@@ -309,7 +309,7 @@ function py_sanity_augmentation_test {
 function py_sanity_one_class_per_module {
     print_msg "Activating gen_env virtualenv"
     deactivate
-    cd $YDKGEN_HOME && ${HOME}/source gen_env/bin/activate
+    cd $YDKGEN_HOME && source ${HOME}/gen_env/bin/activate
     print_msg "generating one class per module style of classes"
     run_test generate.py --bundle profiles/test/ydktest.json -o
     deactivate
