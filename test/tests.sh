@@ -28,6 +28,18 @@ MSG_COLOR=$YELLOW
 PY_GENERATE="python2"
 PY_TEST="python3"
 
+os_type=$(uname)
+if [[ ${os_type} == "Linux" ]] ; then
+    os_info=$(cat /etc/*-release)
+else
+    os_info=$(sw_vers)
+fi
+print_msg "Running OS type: $os_type"
+print_msg "OS info: $os_info"
+if [[ ${os_type} == "Linux" && ${os_info} != *"trusty"* && ${os_info} != *"fedora"* ]] ; then
+    run_with_coverage=1
+fi
+
 function print_msg {
     echo -e "${MSG_COLOR}*** $(date) *** tests.sh | $@ ${NOCOLOR}"
 }
@@ -35,7 +47,7 @@ function print_msg {
 function run_exec_test {
     $@
     local status=$?
-    if [ $status -ne 0 ]; then
+    if [[ $status -ne 0 ]]; then
         MSG_COLOR=$RED
         print_msg "Exiting '$@' with status=$status"
         exit $status
@@ -44,25 +56,32 @@ function run_exec_test {
 }
 
 function run_test_no_coverage {
+    print_msg "Executing: ${PYTHON_BIN} $@"
     python $@
     local status=$?
-    if [ $status -ne 0 ]; then
+    if [[ $status -ne 0 ]]; then
         MSG_COLOR=$RED
-        print_msg "Exiting '$@' with status=$status"
+        print_msg "Exiting 'python $@' with status=$status"
         exit $status
     fi
     return $status
 }
 
 function run_test {
-    coverage run --source=ydkgen,sdk,generate --branch --parallel-mode
+  if [[ $(command -v coverage) && $run_with_coverage ]] ; then
+    print_msg "Executing with coverage: python $@"
+    coverage run --source=ydkgen,sdk,generate --branch --parallel-mode $@
     local status=$?
-    if [ $status -ne 0 ]; then
+    if [[ $status -ne 0 ]]; then
         MSG_COLOR=$RED
-        print_msg "Exiting '$@' with status=$status"
+        print_msg "Exiting 'python $@' with status=$status"
         exit $status
     fi
-    return $status
+    return ${status}
+  fi
+  run_test_no_coverage $@
+  local status=$?
+  return $status
 }
 
 function init_env {
@@ -83,10 +102,16 @@ function init_env {
     virtualenv -p $PY_TEST test_env
 
     source test_env/bin/activate
-    pip install -r requirements.txt coverage > /dev/null
+    pip install -r requirements.txt lxml > /dev/null
+    if [[ $run_with_coverage ]] ; then
+        pip install coverage > /dev/null
+    fi
 
     source gen_env/bin/activate
-    pip install -r requirements.txt coverage > /dev/null
+    pip install -r requirements.txt lxml > /dev/null
+    if [[ $run_with_coverage ]] ; then
+        pip install coverage > /dev/null
+    fi
 }
 
 function init_confd {
@@ -440,7 +465,7 @@ function test_gen_tests {
 ########################## EXECUTION STARTS HERE #############################
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd $DIR/..
+cd ${DIR}/..
 
 py_tests
 
@@ -448,6 +473,8 @@ py_tests
 #cpp_tests
 #test_gen_tests
 
-cd $YDKGEN_HOME
-print_msg "combining python coverage"
-coverage combine
+cd ${YDKGEN_HOME}
+if [[ ${run_with_coverage} ]] ; then
+    print_msg "combining python coverage"
+    coverage combine
+fi
