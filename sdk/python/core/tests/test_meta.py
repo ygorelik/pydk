@@ -24,8 +24,11 @@ import unittest
 
 try:
     from ydk.models.ydktest.ydktest_sanity import Runner
+    from ydk.models.ydktest import openconfig_bgp
+    from ydk.models.ydktest import openconfig_bgp_types
 except ImportError:
     from ydk.models.ydktest.ydktest_sanity.runner.runner import Runner
+    from ydk.models.ydktest.openconfig_bgp.bgp.bgp import Bgp
 
 from ydk._core._dm_meta_info import _MetaInfoEnum, REFERENCE_UNION, REFERENCE_ENUM_CLASS
 from ydk._core._dm_meta_info import module_meta, module_enums
