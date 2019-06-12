@@ -9,6 +9,8 @@ matrix:
         - os: osx
           osx_image: xcode8.3
           language: generic
+    allow_failures:
+        - os: osx
 
 script:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./test/dependencies_osx.sh     ; fi
