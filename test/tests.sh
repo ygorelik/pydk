@@ -55,7 +55,7 @@ function run_test_no_coverage {
 }
 
 function run_test {
-    coverage run --source=ydkgen,sdk,generate --branch --parallel-mode $@ > /dev/null
+    coverage run --source=ydkgen,sdk,generate --branch --parallel-mode
     local status=$?
     if [ $status -ne 0 ]; then
         MSG_COLOR=$RED
@@ -147,30 +147,29 @@ function py_sanity_ydktest_test {
 
     run_test gen-api/python/ydktest-bundle/ydk/models/ydktest/test/import_tests.py
 
-    print_msg "deactivate virtualenv to gather coverage"
-    deactivate
-    pip install -r requirements.txt
-    pip install coverage
-    export PYTHONPATH=$PYTHONPATH:sdk/python/core
+#    print_msg "deactivate virtualenv to gather coverage"
+#    deactivate
+#    pip install -r requirements.txt
+#    pip install coverage
+#    export PYTHONPATH=$PYTHONPATH:sdk/python/core
 
-    print_msg "Copy cpp-wrapper to sdk directory"
-    cd gen-api/python/ydk/ && python setup.py build && cd -
-    cp gen-api/python/ydk/build/lib*/*.so sdk/python/core
+#    print_msg "Copy cpp-wrapper to sdk directory"
+#    cd gen-api/python/ydk/ && python setup.py build && cd -
+#    cp gen-api/python/ydk/build/lib*/*.so sdk/python/core
 
     run_test sdk/python/core/tests/test_sanity_codec.py
 
     py_sanity_ydktest_test_ncclient
 
-    git checkout .
-    export PYTHONPATH=
+#    git checkout .
+#    export PYTHONPATH=
 
-    print_msg "reactivate virtualenv"
-    source test_env/bin/activate
+#    print_msg "reactivate virtualenv"
+#    source test_env/bin/activate
 }
 
 function py_sanity_ydktest_test_ncclient {
     print_msg "py_sanity_ydktest_test_ncclient"
-    run_test sdk/python/core/tests/test_meta.py
     run_test sdk/python/core/tests/test_sanity_types.py
     run_test sdk/python/core/tests/test_sanity_errors.py
     run_test sdk/python/core/tests/test_sanity_filters.py
@@ -272,11 +271,14 @@ function py_sanity_augmentation_test {
 }
 
 function py_sanity_one_class_per_module {
-    print_msg "deactivate virtualenv"
+    print_msg "activate gen_env virtualenv"
     deactivate
     cd $YDKGEN_HOME && source gen_env/bin/activate
     print_msg "generating one class per module style of classes"
     run_test generate.py --bundle profiles/test/ydktest.json -o
+    deactivate
+
+    print_msg "activate test_env virtualenv"
     source test_env/bin/activate
     pip install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
     run_test sdk/python/core/tests/test_sanity_levels.py

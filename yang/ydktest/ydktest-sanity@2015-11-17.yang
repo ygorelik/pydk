@@ -232,7 +232,6 @@ module ydktest-sanity {
         leaf number8 {
           description " 8 bit integer value type";
           type int8;
-          mandatory true;
         }
 
         leaf number16 {
