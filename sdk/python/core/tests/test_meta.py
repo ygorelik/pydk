@@ -85,15 +85,15 @@ class MetaSanityTest(unittest.TestCase):
                 print("%12s: %s" % (name, peer_type_enum_dict[name]))
 
     def test_module_meta(self):
-        bgp_name = openconfig_bgp.__name__
+        bgp_name = Runner.__module__
         meta = module_meta(bgp_name)
         print("\nModule meta dictionary:")
         for name in sorted(meta):
-            print("%80s: %s" % (name, meta[name]))
+            print("%40s: %s" % (name, meta[name]))
         meta = module_enums(bgp_name)
         print("\nModule enum meta dictionary:")
         for name in sorted(meta):
-            print("%55s: %s" % (name, meta[name]))
+            print("%40s: %s" % (name, meta[name]))
         print('')
 
 

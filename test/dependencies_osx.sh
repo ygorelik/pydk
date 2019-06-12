@@ -54,8 +54,28 @@ function download_moco {
     cd -
 }
 
+function check_python_installation {
+  print_msg "Checking python and pip installation"
+  python3 -V
+  status=$?
+  if [ $status -ne 0 ]; then
+    print_msg "Installing python3"
+    brew install python
+  fi
+  pip3 -V
+  status=$?
+  if [ $status -ne 0 ]; then
+    print_msg "Installing pip${PYTHON_VERSION}"
+    run_cmd curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+    run_cmd sudo -H python3 get-pip.py
+  fi
+  sudo pip3 install virtualenv
+}
+
 ########################## EXECUTION STARTS HERE #############################
 
 install_dependencies
 install_confd
 download_moco
+
+check_python_installation

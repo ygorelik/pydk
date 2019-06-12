@@ -19,27 +19,6 @@
 #
 # ------------------------------------------------------------------
 
-# Terminal colors
-RED="\033[0;31m"
-NOCOLOR="\033[0m"
-YELLOW='\033[1;33m'
-MSG_COLOR=$YELLOW
-
-PY_GENERATE="python2"
-PY_TEST="python3"
-
-os_type=$(uname)
-if [[ ${os_type} == "Linux" ]] ; then
-    os_info=$(cat /etc/*-release)
-else
-    os_info=$(sw_vers)
-fi
-print_msg "Running OS type: $os_type"
-print_msg "OS info: $os_info"
-if [[ ${os_type} == "Linux" && ${os_info} != *"trusty"* && ${os_info} != *"fedora"* ]] ; then
-    run_with_coverage=1
-fi
-
 function print_msg {
     echo -e "${MSG_COLOR}*** $(date) *** tests.sh | $@ ${NOCOLOR}"
 }
@@ -409,14 +388,12 @@ function py_tests {
     py_sanity_deviation
     py_sanity_augmentation
     py_sanity_one_class_per_module
-    teardown_env
 }
 
 function cpp_tests {
     init_env "python" "python"
     cpp_sanity_core_test
     cpp_sanity_ydktest
-    teardown_env
 }
 
 function cpp_test_gen_test {
@@ -478,6 +455,27 @@ function test_gen_tests {
 
 ########################## EXECUTION STARTS HERE #############################
 
+# Terminal colors
+RED="\033[0;31m"
+NOCOLOR="\033[0m"
+YELLOW='\033[1;33m'
+MSG_COLOR=$YELLOW
+
+PY_GENERATE="python2"
+PY_TEST="python3"
+
+os_type=$(uname)
+if [[ ${os_type} == "Linux" ]] ; then
+    os_info=$(cat /etc/*-release)
+else
+    os_info=$(sw_vers)
+fi
+print_msg "Running OS type: $os_type"
+print_msg "OS info: $os_info"
+if [[ ${os_type} == "Linux" && ${os_info} != *"trusty"* && ${os_info} != *"fedora"* ]] ; then
+    run_with_coverage=1
+fi
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd ${DIR}/..
 
@@ -488,7 +486,10 @@ py_tests
 #test_gen_tests
 
 cd ${YDKGEN_HOME}
-if [[ ${run_with_coverage} ]] ; then
-    print_msg "combining python coverage"
+print_msg "Activating test_env virtualenv"
+source ${HOME}/test_env/bin/activate
+if [[ $(command -v coverage) && ${run_with_coverage} ]] ; then
+    print_msg "Combining python coverage"
     coverage combine
 fi
+teardown_env
