@@ -28,6 +28,19 @@ function print_msg {
     echo -e "${MSG_COLOR}*** $(date) *** dependencies_osx.sh | $@ ${NOCOLOR}"
 }
 
+function run_cmd {
+    local cmd=$@
+    print_msg "Running: $cmd"
+    $@
+    local status=$?
+    if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Exiting '$@' with status=$status"
+        exit $status
+    fi
+    return $status
+}
+
 function install_dependencies {
     print_msg "install_dependencies"
 
@@ -60,12 +73,12 @@ function check_python_installation {
   status=$?
   if [ $status -ne 0 ]; then
     print_msg "Installing python3"
-    brew install python
+    brew upgrade python
   fi
   pip3 -V
   status=$?
   if [ $status -ne 0 ]; then
-    print_msg "Installing pip${PYTHON_VERSION}"
+    print_msg "Installing pip3"
     run_cmd curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
     run_cmd sudo -H python3 get-pip.py
   fi
