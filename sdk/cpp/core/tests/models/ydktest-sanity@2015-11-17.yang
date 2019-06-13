@@ -673,6 +673,31 @@ module ydktest-sanity {
           type string;
        }
     }
+
+    list one-key-list {
+        key testy;
+        leaf testy {
+            type string;
+        }
+        container test {
+          container best {
+            leaf gest {
+                type string;
+            }
+          }
+        }
+    }
+
+    list mand-list {
+        key "name";
+        leaf name {
+            type string;
+        }
+        leaf num {
+            type int16;
+            mandatory true;
+        }
+    }
   }
 
   container conditional-interface {

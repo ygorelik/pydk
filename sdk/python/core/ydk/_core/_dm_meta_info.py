@@ -51,6 +51,8 @@ class _MetaInfoClassMember(object):
         self._module_name = module_name
         self._is_key = is_key
         self._members = members
+        if members is None:
+            self._members = []
         self._max_elements = max_elements
         self._min_elements = min_elements
         self._default_value = default_value
@@ -111,6 +113,22 @@ class _MetaInfoClassMember(object):
     @property
     def default_value(self):
         return self._default_value
+
+    @property
+    def is_config(self):
+        return self._is_config
+
+    @property
+    def is_mandatory(self):
+        return self._is_mandatory
+
+    @property
+    def is_presence(self):
+        return self._is_presence
+
+    @property
+    def is_config(self):
+        return self._is_config
 
     def union_list(self):
         _list = []

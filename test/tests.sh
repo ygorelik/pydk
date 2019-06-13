@@ -66,7 +66,7 @@ function run_test {
 function init_env {
     print_msg "init_env"
 
-    export YDKGEN_HOME=`pwd` && cd $YDKGEN_HOME
+    YDKGEN_HOME=$(pwd)
 
     PY_GENERATE="$1"
     PY_TEST="$2"

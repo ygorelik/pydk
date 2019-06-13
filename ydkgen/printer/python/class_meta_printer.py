@@ -76,10 +76,6 @@ class ClassMetaPrinter(object):
         self._print_meta_member(clazz)
 
     def _print_meta_member(self, clazz):
-        # prop_list =
-        # meta_info_data = get_meta_info_data(
-        #     prop, prop.property_type, prop.stmt.search_one('type'), 'py', self.one_class_per_module,
-        #     self.identity_subclasses)
         mtype = 'REFERENCE_CLASS'
         if clazz.stmt.keyword == 'list':
             mtype = 'REFERENCE_LIST'
@@ -114,7 +110,7 @@ class ClassMetaPrinter(object):
                 self.identity_subclasses)
             self.print_meta_class_member(meta_info_data, self.ctx)
 
-        self.ctx.writeln('],'),
+        self.ctx.writeln('],')
         module_name = "%s" % get_module_name(clazz.stmt)
         self.ctx.writeln("'%s'," % module_name)
         self.ctx.writeln("'%s'," % clazz.stmt.arg)

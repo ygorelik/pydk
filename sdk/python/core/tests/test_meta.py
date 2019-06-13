@@ -58,10 +58,31 @@ class MetaSanityTest(unittest.TestCase):
         for name in embeded_enum_map:
             print("%12s: %s" % (name, embeded_enum_map[name]))
         self.assertTrue(len(embeded_enum_map) > 0)
-        self.assertEqual(embeded_enum_map['seven']._value_, 7)
+        self.assertEqual(embeded_enum_map['seven'].value, 7)
 
         test_enum_union_meta()
         test_module_meta()
+
+    def test_mandatory_leaf(self):
+        mand_list = Runner.MandList()
+        mand_meta = mand_list._meta_info()
+        self.assertFalse(mand_meta.has_must)
+        self.assertFalse(mand_meta.has_when)
+
+        num_meta = mand_meta.member('num')
+        self.assertIsNotNone(num_meta)
+        self.assertTrue(num_meta.is_mandatory)
+        self.assertTrue(num_meta.is_config)
+
+    def test_must_when(self):
+        from ydk.models.ydktest import ydktest_sanity
+        ifc = ydktest_sanity.ConditionalInterface()
+        ifc_meta = ifc._meta_info()
+        self.assertTrue(ifc_meta.has_must)
+        self.assertTrue(ifc_meta.has_when)
+        self.assertTrue(ifc_meta.is_config)
+        self.assertFalse(ifc_meta.is_mandatory)
+        self.assertFalse(ifc_meta.is_presence)
 
 
 def test_enum_union_meta():
