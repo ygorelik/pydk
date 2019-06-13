@@ -21,7 +21,7 @@ class_meta_printer.py
 
 """
 from ydkgen.api_model import Class, Enum, Property
-from ydkgen.common import sort_classes_at_same_level, get_module_name
+from ydkgen.common import sort_classes_at_same_level, get_module_name, is_config_stmt
 from ydkgen.printer.meta_data_util import get_meta_info_data
 from .enum_printer import EnumPrinter
 
@@ -76,6 +76,10 @@ class ClassMetaPrinter(object):
         self._print_meta_member(clazz)
 
     def _print_meta_member(self, clazz):
+        # prop_list =
+        # meta_info_data = get_meta_info_data(
+        #     prop, prop.property_type, prop.stmt.search_one('type'), 'py', self.one_class_per_module,
+        #     self.identity_subclasses)
         mtype = 'REFERENCE_CLASS'
         if clazz.stmt.keyword == 'list':
             mtype = 'REFERENCE_LIST'
@@ -110,20 +114,6 @@ class ClassMetaPrinter(object):
                 self.identity_subclasses)
             self.print_meta_class_member(meta_info_data, self.ctx)
 
-        '''
-        class _MetaInfoClass(object):
-
-    def __init__(
-            self,
-            name,
-            mtype
-            is_abstract,
-            meta_info_class_members,
-            module_name,
-            yang_name,
-            namespace,
-            pmodule_name):
-        '''
         self.ctx.writeln('],'),
         module_name = "%s" % get_module_name(clazz.stmt)
         self.ctx.writeln("'%s'," % module_name)
@@ -132,7 +122,18 @@ class ClassMetaPrinter(object):
             self.ctx.writeln('None,')
         else:
             self.ctx.writeln("_yang_ns._namespaces['%s']," % module_name)
-        self.ctx.writeln("'%s'" % clazz.get_py_mod_name(self.one_class_per_module))
+        self.ctx.writeln("'%s'," % clazz.get_py_mod_name(self.one_class_per_module))
+        if mtype == 'REFERENCE_CLASS' or mtype == 'REFERENCE_LIST':
+            if not is_config_stmt(clazz.stmt):
+                self.ctx.writeln("is_config=False,")
+            if clazz.stmt.search_one('presence'):
+                self.ctx.writeln("is_presence=True,")
+            if clazz.stmt.search_one('mandatory'):
+                self.ctx.writeln("has_mandatory=True,")
+            if clazz.stmt.search_one('when'):
+                self.ctx.writeln("has_when=True,")
+            if clazz.stmt.search_one('must'):
+                self.ctx.writeln("has_must=True,")
         self.ctx.lvl_dec()
         self.ctx.writeln('),')
 
@@ -191,6 +192,10 @@ class ClassMetaPrinter(object):
             ctx.str(", is_presence=True")
         if meta_info_data.mandatory:
             ctx.str(", is_mandatory=True")
+        if meta_info_data.has_when:
+            ctx.str(", has_when=True")
+        if meta_info_data.has_must:
+            ctx.str(", has_must=True")
         ctx.str('),\n')
 
         ctx.lvl_dec()

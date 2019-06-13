@@ -88,7 +88,7 @@ _meta_table = {
             'ietf-netconf',
             'source',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'GetConfigRpc.Input' : {
@@ -121,7 +121,7 @@ _meta_table = {
             'ietf-netconf',
             'input',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'GetConfigRpc.Output' : {
@@ -142,7 +142,7 @@ _meta_table = {
             'ietf-netconf',
             'output',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'GetConfigRpc' : {
@@ -166,7 +166,7 @@ _meta_table = {
             'ietf-netconf',
             'get-config',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'EditConfigRpc.Input.Target' : {
@@ -192,7 +192,7 @@ _meta_table = {
             'ietf-netconf',
             'target',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'EditConfigRpc.Input.DefaultOperationEnum' : _MetaInfoEnum('DefaultOperationEnum',
@@ -270,7 +270,7 @@ _meta_table = {
             'ietf-netconf',
             'input',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'EditConfigRpc' : {
@@ -289,7 +289,7 @@ configuration to the specified target configuration.''',
             'ietf-netconf',
             'edit-config',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'CopyConfigRpc.Input.Target' : {
@@ -330,7 +330,7 @@ configuration to the specified target configuration.''',
             'ietf-netconf',
             'target',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'CopyConfigRpc.Input.Source' : {
@@ -379,7 +379,7 @@ configuration to the specified target configuration.''',
             'ietf-netconf',
             'source',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'CopyConfigRpc.Input' : {
@@ -412,7 +412,7 @@ configuration to the specified target configuration.''',
             'ietf-netconf',
             'input',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'CopyConfigRpc' : {
@@ -431,7 +431,7 @@ contents of another complete configuration datastore.''',
             'ietf-netconf',
             'copy-config',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'DeleteConfigRpc.Input.Target' : {
@@ -457,7 +457,7 @@ contents of another complete configuration datastore.''',
             'ietf-netconf',
             'target',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'DeleteConfigRpc.Input' : {
@@ -476,7 +476,7 @@ contents of another complete configuration datastore.''',
             'ietf-netconf',
             'input',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'DeleteConfigRpc' : {
@@ -494,7 +494,7 @@ contents of another complete configuration datastore.''',
             'ietf-netconf',
             'delete-config',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'LockRpc.Input.Target' : {
@@ -527,7 +527,7 @@ contents of another complete configuration datastore.''',
             'ietf-netconf',
             'target',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'LockRpc.Input' : {
@@ -546,7 +546,7 @@ contents of another complete configuration datastore.''',
             'ietf-netconf',
             'input',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'LockRpc' : {
@@ -565,7 +565,7 @@ system of a device.''',
             'ietf-netconf',
             'lock',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'UnlockRpc.Input.Target' : {
@@ -598,7 +598,7 @@ system of a device.''',
             'ietf-netconf',
             'target',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'UnlockRpc.Input' : {
@@ -617,7 +617,7 @@ system of a device.''',
             'ietf-netconf',
             'input',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'UnlockRpc' : {
@@ -636,7 +636,7 @@ previously obtained with the 'lock' operation.''',
             'ietf-netconf',
             'unlock',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'GetRpc.Input' : {
@@ -663,7 +663,7 @@ previously obtained with the 'lock' operation.''',
             'ietf-netconf',
             'input',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'GetRpc.Output' : {
@@ -685,7 +685,7 @@ previously obtained with the 'lock' operation.''',
             'ietf-netconf',
             'output',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'GetRpc' : {
@@ -709,7 +709,7 @@ previously obtained with the 'lock' operation.''',
             'ietf-netconf',
             'get',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'CloseSessionRpc' : {
@@ -721,7 +721,7 @@ previously obtained with the 'lock' operation.''',
             'ietf-netconf',
             'close-session',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'KillSessionRpc.Input' : {
@@ -740,7 +740,7 @@ previously obtained with the 'lock' operation.''',
             'ietf-netconf',
             'input',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'KillSessionRpc' : {
@@ -758,7 +758,7 @@ previously obtained with the 'lock' operation.''',
             'ietf-netconf',
             'kill-session',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'CommitRpc.Input' : {
@@ -813,7 +813,7 @@ previously obtained with the 'lock' operation.''',
             'ietf-netconf',
             'input',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'CommitRpc' : {
@@ -832,7 +832,7 @@ current configuration.''',
             'ietf-netconf',
             'commit',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'DiscardChangesRpc' : {
@@ -845,7 +845,7 @@ running configuration.''',
             'ietf-netconf',
             'discard-changes',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'CancelCommitRpc.Input' : {
@@ -868,7 +868,7 @@ running configuration.''',
             'ietf-netconf',
             'input',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'CancelCommitRpc' : {
@@ -889,7 +889,7 @@ If the confirmed commit is persistent, the parameter
             'ietf-netconf',
             'cancel-commit',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'ValidateRpc.Input.Source' : {
@@ -938,7 +938,7 @@ If the confirmed commit is persistent, the parameter
             'ietf-netconf',
             'source',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'ValidateRpc.Input' : {
@@ -957,7 +957,7 @@ If the confirmed commit is persistent, the parameter
             'ietf-netconf',
             'input',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
     'ValidateRpc' : {
@@ -975,7 +975,7 @@ If the confirmed commit is persistent, the parameter
             'ietf-netconf',
             'validate',
             _yang_ns._namespaces['ietf-netconf'],
-            'ydk.models.ydktest.ietf_netconf'
+            'ydk.models.ydktest.ietf_netconf',
         ),
     },
 }

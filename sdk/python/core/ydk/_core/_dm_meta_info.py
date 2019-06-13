@@ -35,7 +35,7 @@ class _MetaInfoClassMember(object):
                  presentation_name, module_name, is_key,
                  members=[], max_elements=None, min_elements=None,
                  default_value=None, is_config=True, is_presence=False,
-                 is_mandatory=False):
+                 is_mandatory=False, has_when=False, has_must=False):
         self._name = name
         self._mtype = mtype
         self._ptype = ptype
@@ -57,6 +57,8 @@ class _MetaInfoClassMember(object):
         self._is_config = is_config
         self._is_presence = is_presence
         self._is_mandatory = is_mandatory
+        self.has_when = has_when
+        self.has_must = has_must
 
     @property
     def members(self):
@@ -150,7 +152,10 @@ class _MetaInfoClass(object):
             module_name,
             yang_name,
             namespace,
-            pmodule_name):
+            pmodule_name,
+            is_config=True, is_presence=False, is_mandatory=False,
+            has_when=False, has_must=False,
+            ):
         self.name = name
         self.mtype = mtype
         self.doc = doc
@@ -160,6 +165,11 @@ class _MetaInfoClass(object):
         self.yang_name = yang_name
         self.is_abstract = is_abstract
         self.pmodule_name = pmodule_name
+        self.is_config = is_config
+        self.is_presence = is_presence
+        self.is_mandatory = is_mandatory
+        self.has_when = has_when
+        self.has_must = has_must
 
     def key_members(self):
         return [ member for member in self.meta_info_class_members if member.is_key]

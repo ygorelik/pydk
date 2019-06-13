@@ -22,13 +22,10 @@
 #  open-config bgp yang module.
 #
 
-
-
 from __future__ import print_function
 from __future__ import absolute_import
 from ydk.types import Empty
 from ydk.services import CRUDService
-import logging
 
 from session_mgr import establish_session, init_logging
 from ydk.models.openconfig import openconfig_bgp
@@ -36,10 +33,7 @@ from ydk.models.openconfig import openconfig_bgp_types
 from ydk.models.openconfig.openconfig_routing_policy import RoutingPolicy
 from ydk.errors import YPYError
 
-
-
-
-#<bgp xmlns="http://openconfig.net/yang/bgp">
+# <bgp xmlns="http://openconfig.net/yang/bgp">
 #  <global>
 #    <config>
 #      <as>65172</as>
@@ -72,8 +66,7 @@ from ydk.errors import YPYError
 #      </afi-safis>
 #    </neighbor>
 #  </neighbors>
-#</bgp>
-
+# </bgp>
 
 
 def bgp_run(crud_service, session):
@@ -148,8 +141,6 @@ def bgp_run(crud_service, session):
 #    crud_service.create(session, routing_policy)
 
     bgp_cfg_read = crud_service.read(session, bgp.Bgp())
-
-
 
     #crud on just the neighbor
 
