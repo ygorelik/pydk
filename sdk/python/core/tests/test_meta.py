@@ -30,7 +30,7 @@ except ImportError:
     from ydk.models.ydktest.ydktest_sanity.runner.runner import Runner
     from ydk.models.ydktest.openconfig_bgp.bgp.bgp import Bgp
 
-from ydk._core._dm_meta_info import _MetaInfoEnum, REFERENCE_UNION, REFERENCE_ENUM_CLASS
+from ydk._core._dm_meta_info import _MetaInfoEnum, REFERENCE_UNION
 from ydk._core._dm_meta_info import module_meta, module_enums
 
 
@@ -60,41 +60,46 @@ class MetaSanityTest(unittest.TestCase):
         self.assertTrue(len(embeded_enum_map) > 0)
         self.assertEqual(embeded_enum_map['seven']._value_, 7)
 
-    def test_enum_union_meta(self):
-        nbr_ipv6 = openconfig_bgp.Bgp.Neighbors.Neighbor()
-        nbr_ipv6.neighbor_address = '2001:db8:fff1::1'
-        nbr_ipv6.config.neighbor_address = '2001:db8:fff1::1'
-        nbr_ipv6.config.peer_as = 65002
-        nbr_ipv6.config.peer_type = openconfig_bgp_types.PeerTypeEnum.INTERNAL
+        test_enum_union_meta()
+        test_module_meta()
 
-        # Print neighbor address Union
-        config_meta = nbr_ipv6.config._meta_info()
-        print("{}  --  {}".format(config_meta.name, config_meta.doc))
-        for member in config_meta.meta_info_class_members:
-            if member.mtype == REFERENCE_UNION:
-                print("\nUnion list of tuples:")
-                for item in member.union_list():
-                    print("    {}".format(item))
 
-        # Print PeerType enum
-        peer_type_meta = openconfig_bgp_types.PeerTypeEnum._meta_info()
-        if isinstance(peer_type_meta, _MetaInfoEnum):
-            peer_type_enum_dict = peer_type_meta.enum_dict()
-            print("\nEnum dictionary:")
-            for name in peer_type_enum_dict:
-                print("%12s: %s" % (name, peer_type_enum_dict[name]))
+def test_enum_union_meta():
+    nbr_ipv6 = openconfig_bgp.Bgp.Neighbors.Neighbor()
+    nbr_ipv6.neighbor_address = '2001:db8:fff1::1'
+    nbr_ipv6.config.neighbor_address = '2001:db8:fff1::1'
+    nbr_ipv6.config.peer_as = 65002
+    nbr_ipv6.config.peer_type = openconfig_bgp_types.PeerTypeEnum.INTERNAL
 
-    def test_module_meta(self):
-        bgp_name = Runner.__module__
-        meta = module_meta(bgp_name)
-        print("\nModule meta dictionary:")
-        for name in sorted(meta):
-            print("%40s: %s" % (name, meta[name]))
-        meta = module_enums(bgp_name)
-        print("\nModule enum meta dictionary:")
-        for name in sorted(meta):
-            print("%40s: %s" % (name, meta[name]))
-        print('')
+    # Print neighbor address Union
+    config_meta = nbr_ipv6.config._meta_info()
+    print("{}  --  {}".format(config_meta.name, config_meta.doc))
+    for member in config_meta.meta_info_class_members:
+        if member.mtype == REFERENCE_UNION:
+            print("\nUnion list of tuples:")
+            for item in member.union_list():
+                print("    {}".format(item))
+
+    # Print PeerType enum
+    peer_type_meta = openconfig_bgp_types.PeerTypeEnum._meta_info()
+    if isinstance(peer_type_meta, _MetaInfoEnum):
+        peer_type_enum_dict = peer_type_meta.enum_dict()
+        print("\nEnum dictionary:")
+        for name in peer_type_enum_dict:
+            print("%12s: %s" % (name, peer_type_enum_dict[name]))
+
+
+def test_module_meta():
+    bgp_name = Runner.__module__
+    meta = module_meta(bgp_name)
+    print("\nModule meta dictionary:")
+    for name in sorted(meta):
+        print("%40s: %s" % (name, meta[name]))
+    meta = module_enums(bgp_name)
+    print("\nModule enum meta dictionary:")
+    for name in sorted(meta):
+        print("%40s: %s" % (name, meta[name]))
+    print('')
 
 
 if __name__ == '__main__':
