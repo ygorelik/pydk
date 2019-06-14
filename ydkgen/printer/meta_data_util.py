@@ -62,6 +62,8 @@ class MetaInfoData:
         self.default_value_object = None
         self.is_config = is_config_stmt(prop.stmt)
         self.status = ''
+        self.has_when = False
+        self.has_must = False
 
 
 def get_class_docstring(clazz, language, identity_subclasses=None):
@@ -223,6 +225,14 @@ def get_meta_info_data(prop, property_type, type_stmt, language, one_class_per_m
     presence = prop.stmt.search_one('presence')
     if presence is not None:
         meta_info_data.is_presence = True
+
+    when = prop.stmt.search_one('when')
+    if when is not None:
+        meta_info_data.has_when = True
+
+    must = prop.stmt.search_one('must')
+    if must is not None:
+        meta_info_data.has_must = True
 
     units = prop.stmt.search_one('units')
     if units is not None:

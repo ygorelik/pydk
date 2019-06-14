@@ -25,6 +25,7 @@ from ydk.services import CRUDService
 from ydk.providers import NetconfServiceProvider
 from ydk.models.cisco_ios_xr import Cisco_IOS_XR_shellutil_oper as xr_shellutil_oper
 
+
 def enable_logging(level):
     log = logging.getLogger('ydk')
     log.setLevel(level)
@@ -32,6 +33,7 @@ def enable_logging(level):
     formatter = logging.Formatter(("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
     handler.setFormatter(formatter)
     log.addHandler(handler)
+
 
 if __name__ == "__main__":
     """Main execution path"""

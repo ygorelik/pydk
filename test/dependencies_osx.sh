@@ -28,6 +28,19 @@ function print_msg {
     echo -e "${MSG_COLOR}*** $(date) *** dependencies_osx.sh | $@ ${NOCOLOR}"
 }
 
+function run_cmd {
+    local cmd=$@
+    print_msg "Running: $cmd"
+    $@
+    local status=$?
+    if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Exiting '$@' with status=$status"
+        exit $status
+    fi
+    return $status
+}
+
 function install_dependencies {
     print_msg "install_dependencies"
 
@@ -54,8 +67,28 @@ function download_moco {
     cd -
 }
 
+function check_python_installation {
+  print_msg "Checking python and pip installation"
+  python3 -V
+  status=$?
+  if [ $status -ne 0 ]; then
+    print_msg "Installing python3"
+    brew upgrade python
+  fi
+  pip3 -V
+  status=$?
+  if [ $status -ne 0 ]; then
+    print_msg "Installing pip3"
+    run_cmd curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+    run_cmd sudo -H python3 get-pip.py
+  fi
+  sudo pip3 install virtualenv
+}
+
 ########################## EXECUTION STARTS HERE #############################
 
 install_dependencies
 install_confd
 download_moco
+
+check_python_installation

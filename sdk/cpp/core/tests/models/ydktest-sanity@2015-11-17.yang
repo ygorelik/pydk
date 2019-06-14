@@ -120,7 +120,7 @@ module ydktest-sanity {
       container one {
         leaf name-of-one {
           type string {
-            pattern "(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(%[\p{N}\p{L}]+)?";
+            pattern "(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]).){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(%[p{N}p{L}]+)?";
           }
 
         }
@@ -672,6 +672,57 @@ module ydktest-sanity {
        leaf some-leaf {
           type string;
        }
+    }
+
+    list one-key-list {
+        key testy;
+        leaf testy {
+            type string;
+        }
+        container test {
+          container best {
+            leaf gest {
+                type string;
+            }
+          }
+        }
+    }
+
+    list mand-list {
+        key "name";
+        leaf name {
+            type string;
+        }
+        leaf num {
+            type int16;
+            mandatory true;
+        }
+    }
+  }
+
+  container conditional-interface {
+    leaf ifType {
+        type enumeration {
+            enum ethernet;
+            enum atm;
+            enum ds0;
+        }
+    }
+    leaf ifMTU {
+        type uint32;
+    }
+    must "(ifType != 'ethernet' and ifType != 'atm') or " +
+         "(ifType = 'ethernet' and ifMTU = 1500)" {
+        error-message "An ethernet MTU must be 1500";
+    }
+    must "(ifType != 'atm' and ifType != 'ethernet') or " +
+         "(ifType = 'atm' and ifMTU <= 17966 and ifMTU >= 64)" {
+        error-message "An atm MTU must be  64 .. 17966";
+    }
+
+    when "/conditional-interface/ifType='ds0'";
+    leaf ds0ChannelNumber {
+      type uint16;
     }
   }
 }

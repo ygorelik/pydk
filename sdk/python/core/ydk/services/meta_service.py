@@ -18,8 +18,10 @@
    The MetaService class. Inject i_meta to entity
 
 """
+import logging
 import copy
 import importlib
+
 from ydk.errors import YPYModelError, YPYServiceError
 from ydk.types import YList, READ, DELETE, YListItem, YLeafList
 from ydk._core._dm_meta_info import (REFERENCE_CLASS, REFERENCE_LIST,
@@ -75,7 +77,7 @@ class MetaService(Service):
             Args:
                 cls: First argument for class method
                 capabilities: List of capabilities get from provider
-                enttiy: An instance of YDk object
+                entity: An instance of YDk object
 
             Returns:
                 deviation_tables: A dictionary for deviation tables
@@ -84,9 +86,14 @@ class MetaService(Service):
         active_pmodule_names = _get_active_deviation_module_names(capabilities, entity)
         deviation_tables = {}
         for pname in active_pmodule_names:
-            module = importlib.import_module('ydk.models._deviate._%s' % pname)
-            deviation_table = getattr(module, '_deviation_table')
-            deviation_tables[pname] = deviation_table
+            try:
+                module = importlib.import_module('ydk.models._deviate._%s' % pname)
+                deviation_table = getattr(module, '_deviation_table')
+                deviation_tables[pname] = deviation_table
+            except ImportError:
+                logger = logging.getLogger(__name__)
+                logger.warning("Warning: Failed import module: ydk.models._deviate._%s; ignoring." % pname)
+                continue
 
         return deviation_tables
 
