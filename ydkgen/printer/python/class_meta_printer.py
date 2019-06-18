@@ -21,7 +21,7 @@ class_meta_printer.py
 
 """
 from ydkgen.api_model import Class, Enum, Property
-from ydkgen.common import sort_classes_at_same_level, get_module_name, is_config_stmt
+from ydkgen.common import sort_classes_at_same_level, get_module_name
 from ydkgen.printer.meta_data_util import get_meta_info_data
 from .enum_printer import EnumPrinter
 
@@ -76,16 +76,9 @@ class ClassMetaPrinter(object):
         self._print_meta_member(clazz)
 
     def _print_meta_member(self, clazz):
-        mtype = 'REFERENCE_CLASS'
-        if clazz.stmt.keyword == 'list':
-            mtype = 'REFERENCE_LIST'
-        elif clazz.stmt.keyword == 'leaf-list':
-            mtype = 'REFERENCE_LEAFLIST'
-        elif clazz.stmt.keyword == 'identity':
-            mtype = 'REFERENCE_IDENTITY_CLASS'
         self.ctx.writeln('\'%s\' : {' % (clazz.qn()))
         self.ctx.lvl_inc()
-        self.ctx.writeln("'meta_info' : _MetaInfoClass('%s', %s," % (clazz.qn(), mtype))
+        self.ctx.writeln("'meta_info' : _MetaInfoClass('%s'," % clazz.qn())
         self.ctx.lvl_inc()
         description = " "
         for st in clazz.stmt.substmts:
@@ -99,6 +92,7 @@ class ClassMetaPrinter(object):
             self.ctx.writeln('False, ')
         self.ctx.writeln('[')
 
+        prop_list = []
         if self.is_rpc:
             prop_list = [p for p in clazz.owned_elements if isinstance(p, Property)]
         else:
@@ -110,7 +104,20 @@ class ClassMetaPrinter(object):
                 self.identity_subclasses)
             self.print_meta_class_member(meta_info_data, self.ctx)
 
-        self.ctx.writeln('],')
+        '''
+        class _MetaInfoClass(object):
+
+    def __init__(
+            self,
+            name,
+            is_abstract,
+            meta_info_class_members,
+            module_name,
+            yang_name,
+            namespace,
+            pmodule_name):
+        '''
+        self.ctx.writeln('],'),
         module_name = "%s" % get_module_name(clazz.stmt)
         self.ctx.writeln("'%s'," % module_name)
         self.ctx.writeln("'%s'," % clazz.stmt.arg)
@@ -118,19 +125,8 @@ class ClassMetaPrinter(object):
             self.ctx.writeln('None,')
         else:
             self.ctx.writeln("_yang_ns._namespaces['%s']," % module_name)
-        self.ctx.writeln("'%s'," % clazz.get_py_mod_name(self.one_class_per_module))
-        if mtype == 'REFERENCE_CLASS' or mtype == 'REFERENCE_LIST':
-            if not is_config_stmt(clazz.stmt):
-                self.ctx.writeln("is_config=False,")
-            if clazz.stmt.search_one('presence'):
-                self.ctx.writeln("is_presence=True,")
-            if clazz.stmt.search_one('mandatory'):
-                self.ctx.writeln("has_mandatory=True,")
-            if clazz.stmt.search_one('when'):
-                self.ctx.writeln("has_when=True,")
-            if clazz.stmt.search_one('must'):
-                self.ctx.writeln("has_must=True,")
         self.ctx.lvl_dec()
+        self.ctx.writeln("'%s'" % clazz.get_py_mod_name(self.one_class_per_module))
         self.ctx.writeln('),')
 
         self.ctx.lvl_dec()
@@ -153,10 +149,10 @@ class ClassMetaPrinter(object):
         min_elements = meta_info_data.min_elements
         default_value_object = meta_info_data.default_value_object
 
-        ctx.writeln("_MetaInfoClassMember('%s', %s, '%s', '%s'," % (name, mtype, ptype, ytype))
+        ctx.writeln("_MetaInfoClassMember('%s', %s, \'%s\', \'%s\', %s, %s, " %
+                    (name, mtype, ptype, ytype, pmodule_name, clazz_name))
         ctx.lvl_inc()
-        ctx.writeln("%s, %s," % (pmodule_name, clazz_name))
-        ctx.writeln("%s, %s," % (str(prange), str(pattern)))
+        ctx.writeln("%s, %s, " % (str(prange), str(pattern)))
         ctx.write("'''")
         if meta_info_data.comment is not None:
             for line in meta_info_data.comment.split('\n'):
@@ -188,10 +184,6 @@ class ClassMetaPrinter(object):
             ctx.str(", is_presence=True")
         if meta_info_data.mandatory:
             ctx.str(", is_mandatory=True")
-        if meta_info_data.has_when:
-            ctx.str(", has_when=True")
-        if meta_info_data.has_must:
-            ctx.str(", has_must=True")
         ctx.str('),\n')
 
         ctx.lvl_dec()

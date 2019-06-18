@@ -37,13 +37,12 @@ class EnumPrinter(object):
         self._print_enum_trailer(enum_class)
 
     def print_enum_meta(self, enum_class):
-        self.ctx.writeln("'%s' : _MetaInfoEnum('%s'," % (
+        self.ctx.writeln("'%s' : _MetaInfoEnum('%s', '%s', '%s'," % (
                          enum_class.qn(),
-                         enum_class.name))
-        self.ctx.lvl_inc()
-        self.ctx.writeln("'%s', '%s'," % (
+                         enum_class.name,
                          enum_class.get_py_mod_name(),
                          enum_class.qn()))
+        self.ctx.lvl_inc()
         description = " "
         for st in enum_class.stmt.parent.substmts:
             if st.keyword == 'description':

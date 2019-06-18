@@ -61,9 +61,9 @@ function install_dependencies {
                             lcov \
                             cmake > /dev/null
 
-#    sudo apt-get install clang-3.8 lldb-3.8 -y
-#    sudo ln -fs /usr/bin/clang++-3.8 /usr/bin/clang++
-#    sudo ln -fs /usr/bin/clang-3.8 /usr/bin/clang
+    sudo apt-get install clang-3.8 lldb-3.8 -y
+    sudo ln -fs /usr/bin/clang++-3.8 /usr/bin/clang++
+    sudo ln -fs /usr/bin/clang-3.8 /usr/bin/clang
 }
 
 function install_confd {

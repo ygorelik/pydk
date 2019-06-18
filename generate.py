@@ -162,10 +162,9 @@ def generate_documentations(output_directory, ydk_root, language, is_bundle, is_
     print(msg)
 
 
-def create_pip_packages(out_dir):
-    py_sdk_root = out_dir
+def create_pip_packages(output_directory):
+    py_sdk_root = output_directory
     os.chdir(py_sdk_root)
-    shutil.rmtree('dist', ignore_errors=True)
     args = [sys.executable, 'setup.py', 'sdist']
     exit_code = subprocess.call(args, env=os.environ.copy())
 

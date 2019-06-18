@@ -15,15 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
-
 from __future__ import print_function
-
 from ydk.providers import NetconfServiceProvider
 from ydk.services import CRUDService
 
 
 def _get_obj_system():
-    from ydk.models.ydktest_new import ietf_system
+    from ydk.models.ietf import ietf_system
 
     obj_system=ietf_system.System()
     obj_system.contact = 'support@example.com'
@@ -136,7 +134,7 @@ def _init_logging():
 def ietf_run(crud_service, provider):
     print('==============\nCRUD SERVICE\n==============')
 
-    from ydk.models.ydktest_new import ietf_system
+    from ydk.models.ietf import ietf_system
     sys_obj = _get_obj_system()
 
     crud_service.delete(provider, ietf_system.System())
