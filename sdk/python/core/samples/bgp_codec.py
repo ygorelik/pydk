@@ -22,10 +22,8 @@
 #  ydk.models.bgp.bgp.py which in turn is derived from the
 #  open-config bgp yang module.
 #
+
 from __future__ import print_function
-
-import logging
-
 from ydk.providers import CodecServiceProvider
 from ydk.services import CodecService
 
@@ -54,9 +52,10 @@ def run_multiple_routing_bgp(codec_service, provider):
     assert multi_payload == codec_service.encode(provider, multi_entity)
 
 
-def init_logging(logging_level):
+def init_logging():
+    import logging
     logger = logging.getLogger("ydk")
-    logger.setLevel(logging_level)
+    logger.setLevel(logging.DEBUG)
     handler = logging.StreamHandler()
     formatter = logging.Formatter(("%(asctime)s - %(name)s - "
                                   "%(levelname)s - %(message)s"))
@@ -65,7 +64,7 @@ def init_logging(logging_level):
 
 
 if __name__ == "__main__":
-    init_logging(logging.INFO)
+    init_logging()
     provider = CodecServiceProvider(type='xml')
     codec_service = CodecService()
     bgp_run(codec_service, provider)

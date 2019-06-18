@@ -19,6 +19,15 @@
 #
 # ------------------------------------------------------------------
 
+# Terminal colors
+RED="\033[0;31m"
+NOCOLOR="\033[0m"
+YELLOW='\033[1;33m'
+MSG_COLOR=$YELLOW
+
+PY_GENERATE="python2"
+PY_TEST="python3"
+
 function print_msg {
     echo -e "${MSG_COLOR}*** $(date) *** tests.sh | $@ ${NOCOLOR}"
 }
@@ -26,7 +35,7 @@ function print_msg {
 function run_exec_test {
     $@
     local status=$?
-    if [[ $status -ne 0 ]]; then
+    if [ $status -ne 0 ]; then
         MSG_COLOR=$RED
         print_msg "Exiting '$@' with status=$status"
         exit $status
@@ -35,38 +44,31 @@ function run_exec_test {
 }
 
 function run_test_no_coverage {
-    print_msg "Executing: ${PYTHON_BIN} $@"
     python $@
     local status=$?
-    if [[ $status -ne 0 ]]; then
+    if [ $status -ne 0 ]; then
         MSG_COLOR=$RED
-        print_msg "Exiting 'python $@' with status=$status"
+        print_msg "Exiting '$@' with status=$status"
         exit $status
     fi
     return $status
 }
 
 function run_test {
-  if [[ $(command -v coverage) && $run_with_coverage ]] ; then
-    print_msg "Executing with coverage: python $@"
-    coverage run --source=ydkgen,sdk,generate --branch --parallel-mode $@
+    coverage run --source=ydkgen,sdk,generate --branch --parallel-mode $@ > /dev/null
     local status=$?
-    if [[ $status -ne 0 ]]; then
+    if [ $status -ne 0 ]; then
         MSG_COLOR=$RED
-        print_msg "Exiting 'python $@' with status=$status"
+        print_msg "Exiting '$@' with status=$status"
         exit $status
     fi
-    return ${status}
-  fi
-  run_test_no_coverage $@
-  local status=$?
-  return $status
+    return $status
 }
 
 function init_env {
     print_msg "init_env"
 
-    YDKGEN_HOME=$(pwd)
+    export YDKGEN_HOME=`pwd` && cd $YDKGEN_HOME
 
     PY_GENERATE="$1"
     PY_TEST="$2"
@@ -77,22 +79,14 @@ function init_env {
     print_msg "init_env: Generating interpreter $YDK_GEN_ENV"
     print_msg "init_env: Testing interpreter $YDK_TEST_ENV"
 
-    virtualenv -p $PY_GENERATE ${HOME}/gen_env
-    virtualenv -p $PY_TEST ${HOME}/test_env
+    virtualenv -p $PY_GENERATE gen_env
+    virtualenv -p $PY_TEST test_env
 
-    print_msg "Activating test_env virtualenv"
-    source ${HOME}/test_env/bin/activate
-    pip install -r requirements.txt > /dev/null
-    if [[ $run_with_coverage ]] ; then
-        pip install coverage > /dev/null
-    fi
+    source test_env/bin/activate
+    pip install -r requirements.txt coverage > /dev/null
 
-    print_msg "Activating gen_env virtualenv"
-    source ${HOME}/gen_env/bin/activate
-    pip install -r requirements.txt > /dev/null
-    if [[ $run_with_coverage ]] ; then
-        pip install coverage > /dev/null
-    fi
+    source gen_env/bin/activate
+    pip install -r requirements.txt coverage > /dev/null
 }
 
 function init_confd {
@@ -124,8 +118,7 @@ function py_sanity_ydktest {
 function py_sanity_ydktest_gen {
     print_msg "Generating python ydk core and ydktest bundle"
 
-    print_msg "Activating gen_env virtualenv"
-    cd $YDKGEN_HOME && source ${HOME}/gen_env/bin/activate
+    cd $YDKGEN_HOME && source gen_env/bin/activate
 
     print_msg "py_sanity_ydktest_gen: testing grouping as class"
     run_test generate.py --bundle profiles/test/ydktest.json --python --groupings-as-class
@@ -139,10 +132,8 @@ function py_sanity_ydktest_gen {
 
 function py_sanity_ydktest_install {
     print_msg "py_sanity_ydktest_install"
-    print_msg "Activating test_env virtualenv"
-    cd $YDKGEN_HOME && source ${HOME}/test_env/bin/activate
-
-    print_msg "Installing core and ydktest bundle"
+    print_msg "Installing"
+    cd $YDKGEN_HOME && source test_env/bin/activate
     pip install gen-api/python/ydk/dist/ydk*.tar.gz
     pip install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
 }
@@ -156,25 +147,25 @@ function py_sanity_ydktest_test {
 
     run_test gen-api/python/ydktest-bundle/ydk/models/ydktest/test/import_tests.py
 
-#    print_msg "deactivate virtualenv to gather coverage"
-#    deactivate
-#    pip install -r requirements.txt
-#    pip install coverage
-#    export PYTHONPATH=$PYTHONPATH:sdk/python/core
+    print_msg "deactivate virtualenv to gather coverage"
+    deactivate
+    pip install -r requirements.txt
+    pip install coverage
+    export PYTHONPATH=$PYTHONPATH:sdk/python/core
 
-#    print_msg "Copy cpp-wrapper to sdk directory"
-#    cd gen-api/python/ydk/ && python setup.py build && cd -
-#    cp gen-api/python/ydk/build/lib*/*.so sdk/python/core
+    print_msg "Copy cpp-wrapper to sdk directory"
+    cd gen-api/python/ydk/ && python setup.py build && cd -
+    cp gen-api/python/ydk/build/lib*/*.so sdk/python/core
 
     run_test sdk/python/core/tests/test_sanity_codec.py
 
     py_sanity_ydktest_test_ncclient
 
-#    git checkout .
-#    export PYTHONPATH=
+    git checkout .
+    export PYTHONPATH=
 
-#    print_msg "reactivate virtualenv"
-#    source ${HOME}/test_env/bin/activate
+    print_msg "reactivate virtualenv"
+    source test_env/bin/activate
 }
 
 function py_sanity_ydktest_test_ncclient {
@@ -207,16 +198,14 @@ function py_sanity_deviation_ydktest_gen {
     print_msg "py_sanity_deviation_ydktest_gen"
 
     rm -rf gen-api/python/*
-    print_msg "Activating test_env virtualenv"
-    cd $YDKGEN_HOME && source ${HOME}/gen_env/bin/activate
+    cd $YDKGEN_HOME && source gen_env/bin/activate
     run_test generate.py --bundle profiles/test/ydktest.json --python
 }
 
 function py_sanity_deviation_ydktest_install {
     print_msg "py_sanity_deviation_ydktest_install"
 
-    print_msg "Activating test_env virtualenv"
-    source ${HOME}/test_env/bin/activate
+    source test_env/bin/activate
     pip uninstall ydk-models-ydktest -y && pip install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
 }
 
@@ -231,16 +220,14 @@ function py_sanity_deviation_bgp_gen {
     print_msg "py_sanity_deviation_bgp_gen"
 
     rm -rf gen-api/python/*
-    print_msg "Activating gen_env virtualenv"
-    cd $YDKGEN_HOME && source ${HOME}/gen_env/bin/activate
+    cd $YDKGEN_HOME && source gen_env/bin/activate
     run_test generate.py --bundle profiles/test/deviation.json --verbose
 }
 
 function py_sanity_deviation_bgp_install {
     print_msg "py_sanity_deviation_bgp_install"
 
-    print_msg "Activating test_env virtualenv"
-    cd $YDKGEN_HOME && source ${HOME}/test_env/bin/activate
+    cd $YDKGEN_HOME && source test_env/bin/activate
     pip install gen-api/python/deviation-bundle/dist/*.tar.gz
 }
 
@@ -262,8 +249,7 @@ function py_sanity_augmentation_gen {
     print_msg "py_sanity_augmentation_gen"
 
     cd $YDKGEN_HOME && rm -rf gen-api/python/*
-    print_msg "Activating gen_env virtualenv"
-    source ${HOME}/gen_env/bin/activate
+    source gen_env/bin/activate
     run_test generate.py --core
     run_test generate.py --bundle profiles/test/ydktest-augmentation.json
 }
@@ -271,8 +257,7 @@ function py_sanity_augmentation_gen {
 function py_sanity_augmentation_install {
     print_msg "py_sanity_augmentation_install"
 
-    print_msg "Activating test_env virtualenv"
-    cd $YDKGEN_HOME && source ${HOME}/test_env/bin/activate
+    cd $YDKGEN_HOME && source test_env/bin/activate
     pip uninstall ydk -y
     pip install gen-api/python/ydk/dist/ydk*.tar.gz
     pip install gen-api/python/augmentation-bundle/dist/*.tar.gz
@@ -286,15 +271,12 @@ function py_sanity_augmentation_test {
 }
 
 function py_sanity_one_class_per_module {
-    print_msg "Activating gen_env virtualenv"
+    print_msg "deactivate virtualenv"
     deactivate
-    cd $YDKGEN_HOME && source ${HOME}/gen_env/bin/activate
+    cd $YDKGEN_HOME && source gen_env/bin/activate
     print_msg "generating one class per module style of classes"
     run_test generate.py --bundle profiles/test/ydktest.json -o
-    deactivate
-
-    print_msg "Activating test_env virtualenv"
-    source ${HOME}/test_env/bin/activate
+    source test_env/bin/activate
     pip install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
     run_test sdk/python/core/tests/test_sanity_levels.py
     run_test sdk/python/core/tests/test_sanity_types.py
@@ -307,8 +289,7 @@ function py_sanity_one_class_per_module {
 function cpp_sanity_core_gen_install {
     print_msg "cpp_sanity_core_gen_install"
 
-    print_msg "Activating gen_env virtualenv"
-    cd $YDKGEN_HOME && source ${HOME}/gen_env/bin/activate
+    cd $YDKGEN_HOME && source gen_env/bin/activate
     cd $YDKGEN_HOME/sdk/cpp/core
     mkdir -p build && cd build
     run_exec_test cmake -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ..
@@ -341,8 +322,7 @@ function cpp_sanity_ydktest {
 function generate_install_cpp_bundle {
    bundle_profile=$1
    bundle_name=$2
-   print_msg "Activating gen_env virtualenv"
-   cd $YDKGEN_HOME && source ${HOME}/gen_env/bin/activate
+   cd $YDKGEN_HOME && source gen_env/bin/activate
     run_test generate.py --bundle $bundle_profile --cpp --generate-doc
     cd gen-api/cpp/$2/build
     run_exec_test make install
@@ -375,7 +355,7 @@ function cpp_sanity_ydktest_test {
 function teardown_env {
     print_msg "teardown_env"
     deactivate
-    cd $YDKGEN_HOME && rm -rf ${HOME}/gen_env ${HOME}/test_env
+    cd $YDKGEN_HOME && rm -rf gen_env test_env
 }
 
 function py_tests {
@@ -388,12 +368,14 @@ function py_tests {
     py_sanity_deviation
     py_sanity_augmentation
     py_sanity_one_class_per_module
+    teardown_env
 }
 
 function cpp_tests {
     init_env "python" "python"
     cpp_sanity_core_test
     cpp_sanity_ydktest
+    teardown_env
 }
 
 function cpp_test_gen_test {
@@ -445,9 +427,8 @@ function test_gen_tests {
     print_msg "test_gen_tests"
 
     init_env "python" "python"
-    print_msg "Activating gen_env virtualenv"
-    cd ${YDKGEN_HOME} && source ${HOME}/gen_env/bin/activate
-    #git clone https://github.com/abhikeshav/ydk-test-yang.git sdk/cpp/core/tests/confd/testgen
+    cd $YDKGEN_HOME && source gen_env/bin/activate
+    git clone https://github.com/abhikeshav/ydk-test-yang.git sdk/cpp/core/tests/confd/testgen
 
     py_test_gen
     cpp_test_gen
@@ -455,29 +436,8 @@ function test_gen_tests {
 
 ########################## EXECUTION STARTS HERE #############################
 
-# Terminal colors
-RED="\033[0;31m"
-NOCOLOR="\033[0m"
-YELLOW='\033[1;33m'
-MSG_COLOR=$YELLOW
-
-PY_GENERATE="python2"
-PY_TEST="python3"
-
-os_type=$(uname)
-if [[ ${os_type} == "Linux" ]] ; then
-    os_info=$(cat /etc/*-release)
-else
-    os_info=$(sw_vers)
-fi
-print_msg "Running OS type: $os_type"
-print_msg "OS info: $os_info"
-if [[ ${os_type} == "Linux" && ${os_info} != *"trusty"* && ${os_info} != *"fedora"* ]] ; then
-    run_with_coverage=1
-fi
-
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd ${DIR}/..
+cd $DIR/..
 
 py_tests
 
@@ -485,11 +445,7 @@ py_tests
 #cpp_tests
 #test_gen_tests
 
-cd ${YDKGEN_HOME}
-print_msg "Activating test_env virtualenv"
-source ${HOME}/test_env/bin/activate
-if [[ $(command -v coverage) && ${run_with_coverage} ]] ; then
-    print_msg "Combining python coverage"
-    coverage combine
-fi
-teardown_env
+cd $YDKGEN_HOME
+#print_msg "gathering cpp coverage"
+print_msg "combining python coverage"
+coverage combine
