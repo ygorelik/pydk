@@ -60,7 +60,7 @@ class XmlEncoder(object):
                     elem.set('{' + xc + '}operation', get_yfilter_tag(yfilter))
             parent_ns = None
             current_parent = root
-            while current_parent != None and parent_ns is None:
+            while current_parent is not None and parent_ns is None:
                 parent_ns = current_parent.get('xmlns')
                 current_parent = current_parent.getparent()
 

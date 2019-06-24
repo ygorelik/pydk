@@ -130,7 +130,7 @@ class _MetaInfoClassMember(object):
         _list = []
         if self._mtype == REFERENCE_UNION:
             for union_member in self._members:
-                if (union_member._ptype == 'str'):
+                if union_member._ptype == 'str':
                     pattern = union_member._pattern
                 else:
                     pattern = union_member._range

@@ -22,27 +22,29 @@
 from __future__ import absolute_import
 
 from decimal import Decimal, getcontext
-from .errors import YPYModelError
+from .errors import YPYModelError, YPYError
+from ._core._dm_meta_info import ANYXML_CLASS, REFERENCE_CLASS, REFERENCE_LIST, REFERENCE_LEAFLIST
+from ._core._dm_meta_info import REFERENCE_IDENTITY_CLASS, REFERENCE_UNION, ATTRIBUTE
 
 
 class DELETE(object):
-    '''Marker class used to mark nodes that are to be deleted
+    """Marker class used to mark nodes that are to be deleted
     Assign DELETE object to a mark a leaf for deletion.
-    A CRUD update operation will delete the leaf from the device it is on.'''
+    A CRUD update operation will delete the leaf from the device it is on."""
     pass
 
 
 class REMOVE(object):
-    '''Marker class used to mark nodes that are to be removed
+    """Marker class used to mark nodes that are to be removed
     Assign REMOVE object to a mark a leaf for deletion.
-    A CRUD update operation will delete the leaf from the device it is on.'''
+    A CRUD update operation will delete the leaf from the device it is on."""
     pass
 
 
 class MERGE(object):
-    '''Marker MERGE used to mark nodes that are to be merged
+    """Marker MERGE used to mark nodes that are to be merged
     Assign DELETE object to a mark a leaf for deletion.
-    A CRUD update operation will delete the leaf from the device it is on.'''
+    A CRUD update operation will delete the leaf from the device it is on."""
 
     def __init__(self, value=None):
         self._value = value
@@ -55,9 +57,9 @@ class MERGE(object):
 
 
 class REPLACE(object):
-    '''Marker class used to mark nodes that are to be replaced
+    """Marker class used to mark nodes that are to be replaced
     Assign REPLACE object to a mark a leaf for deletion.
-    A CRUD update operation will delete the leaf from the device it is on.'''
+    A CRUD update operation will delete the leaf from the device it is on."""
 
     def __init__(self, value=None):
         self._value = value
@@ -68,10 +70,11 @@ class REPLACE(object):
     def set(self, value):
         self._value = value
 
+
 class CREATE(object):
-    '''Marker class used to mark nodes that are to be created
+    """Marker class used to mark nodes that are to be created
     Assign CREATE object to a mark a leaf for deletion.
-    A CRUD update operation will delete the leaf from the device it is on.'''
+    A CRUD update operation will delete the leaf from the device it is on."""
 
     def __init__(self, value=None):
         self._value = value
@@ -84,8 +87,9 @@ class CREATE(object):
 
 
 class READ(object):
-    '''Marker class used to mark nodes that are to be read '''
+    """Marker class used to mark nodes that are to be read """
     pass
+
 
 class Empty(object):
     """
@@ -283,12 +287,13 @@ class YList(list):
         return ret
 
     def append(self, item):
-       super(YList, self).append(item)
-       item.parent = self.parent
+        super(YList, self).append(item)
+        item.parent = self.parent
 
     def extend(self, items):
-       for item in items:
-           self.append(item)
+        for item in items:
+            self.append(item)
+
 
 class YListItem(object):
     def __init__(self, item, parent, name):
@@ -411,3 +416,102 @@ class YLeafList(YList):
             if i.item == item:
                 cnt += 1
         return cnt
+
+
+def get_absolute_path(entity):
+    path = entity._common_path
+    segments = path.split("/")
+    module = segments[1].split(':', 1)[0]
+    for i in range(2, len(segments)):
+        del_str = module + ':'
+        if del_str in segments[i]:
+            segments[i] = segments[i].replace(del_str, '')
+        else:
+            if ':' in segments[i]:
+                module = segments[i].split(':', 1)[0]
+    path = '/'.join(segments)
+    return path
+
+
+def get_name_leaf_data(entity):
+    leaf_name_data = {}
+    for member in entity._meta_info().meta_info_class_members:
+        value = getattr(entity, member.presentation_name)
+        if value is None or isinstance(value, list) and value == []:
+            continue
+
+        if member.mtype in [ATTRIBUTE, REFERENCE_IDENTITY_CLASS]:
+            leaf_name_data[member.name] = value
+        elif member.mtype == REFERENCE_LEAFLIST and isinstance(value, list):
+            for child in value:
+                key = "%s[.='%s']" % (member.name, child)
+                leaf_name_data[key] = ''
+    return leaf_name_data
+
+
+def get_children(entity):
+    children = {}
+    for member in entity._meta_info().meta_info_class_members:
+        value = getattr(entity, member.presentation_name)
+        if value is None or isinstance(value, list) and value == []:
+            continue
+
+        if member.mtype == REFERENCE_CLASS:
+            abs_path = get_absolute_path(value)
+            children[abs_path] = value
+        elif member.mtype == REFERENCE_LIST:
+            for child in value:
+                abs_path = get_absolute_path(child)
+                children[abs_path] = child
+    return children
+
+
+def entity_to_dict(entity):
+    edict = {}
+    abs_path = get_absolute_path(entity)
+    ent_meta = entity._meta_info()
+    if (hasattr(ent_meta, 'is_presence') and ent_meta.is_presence) or \
+            abs_path.endswith(']'):
+        edict[abs_path] = ''
+    leaf_name_data = get_name_leaf_data(entity)
+    for leaf_name, leaf_value in leaf_name_data.items():
+        if leaf_name not in entity.ylist_key_names:
+            edict["%s/%s" % (abs_path, leaf_name)] = leaf_value
+    for name, child in get_children(entity).items():
+        child_dict = entity_to_dict(child)
+        for n, v in child_dict.items():
+            edict[n] = v
+    return edict
+
+
+def entity_diff(ent1, ent2):
+    if ent1 is None or ent2 is None or type(ent1) != type(ent2):
+        raise YPYError("entity_diff: Incompatible arguments provided.")
+
+    diffs = {}
+    ent1_dict = entity_to_dict(ent1)
+    ent2_dict = entity_to_dict(ent2)
+    ent1_keys = sorted(ent1_dict.keys())
+    ent2_keys = sorted(ent2_dict.keys())
+    ent1_skip_keys = []
+    for key in ent1_keys:
+        if key in ent1_skip_keys:
+            continue
+        if key in ent2_keys:
+            if ent1_dict[key] != ent2_dict[key]:
+                diffs[key] = (ent1_dict[key], ent2_dict[key])
+            ent2_keys.remove(key)
+        else:
+            diffs[key] = (ent1_dict[key], None)
+            for dup_key in ent1_keys:
+                if dup_key.startswith(key):
+                    ent1_skip_keys.append(dup_key)
+    ent2_skip_keys = []
+    for key in ent2_keys:
+        if key in ent2_skip_keys:
+            continue
+        diffs[key] = (None, ent2_dict[key])
+        for dup_key in ent2_keys:
+            if dup_key.startswith(key):
+                ent2_skip_keys.append(dup_key)
+    return diffs

@@ -67,6 +67,7 @@ function init_env {
     print_msg "init_env"
 
     YDKGEN_HOME=$(pwd)
+    print_msg "YDKGEN_HOME is set to ${YDKGEN_HOME}"
 
     PY_GENERATE="$1"
     PY_TEST="$2"
@@ -180,6 +181,7 @@ function py_sanity_ydktest_test {
 function py_sanity_ydktest_test_ncclient {
     print_msg "py_sanity_ydktest_test_ncclient"
     run_test sdk/python/core/tests/test_sanity_types.py
+    run_test sdk/python/core/tests/test_entity_diff.py
     run_test sdk/python/core/tests/test_sanity_errors.py
     run_test sdk/python/core/tests/test_sanity_filters.py
     run_test sdk/python/core/tests/test_sanity_levels.py
