@@ -1,3 +1,33 @@
+### 2019-06-25 version 0.5.5.post2
+
+#### Python
+
+##### Enhancements
+ * Add function to return difference between two YDK Objects of the same type ([#925](https://github.com/CiscoDevNet/ydk-gen/issues/925))
+ * Add function to return Enum object from type and value ([#926](https://github.com/CiscoDevNet/ydk-gen/issues/926))
+ * Add YDK Meta Data for must and when statements in a contaner ([#927](https://github.com/CiscoDevNet/ydk-gen/issues/927))
+
+##### Bug fixes
+ * Fix ydk-gen to handle multiple augments ([#922](https://github.com/CiscoDevNet/ydk-gen/issues/922))
+ * Navigate xpath is not covered if the middle path is a list and has more than 2 items ([#928](https://github.com/CiscoDevNet/ydk-gen/issues/928))
+ * YDK-0.5.5: generated bundle code fails initialize leaves of type bits ([#936](https://github.com/CiscoDevNet/ydk-gen/issues/936))
+
+
+### 2019-03-26 version 0.5.5.post1
+
+#### Python
+
+##### Enhancements
+ * adding new operations, merge, replace, remove [#816](https://github.com/CiscoDevNet/ydk-gen/issues/816))
+ * Add _is_present attribute in present container meta data [#896](https://github.com/CiscoDevNet/ydk-gen/issues/896))
+ * YDK MetaInfo should have a field for mandatory leaf ([#918](https://github.com/CiscoDevNet/ydk-gen/issues/918))
+
+##### Bug fixes
+ * The deepcopy of YLeafList changes type of member elements ([#904](https://github.com/CiscoDevNet/ydk-gen/issues/904))
+ * Fix deepcopy usage with CRUD ([#908](https://github.com/CiscoDevNet/ydk-gen/issues/908))
+ * Max value of range is set to None when not specified in the Yang model ([#916](https://github.com/CiscoDevNet/ydk-gen/issues/916))
+
+
 ### 2017-06-06 version 0.5.5
 
 #### Python

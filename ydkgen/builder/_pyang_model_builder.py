@@ -206,11 +206,11 @@ class PyangModelBuilder(object):
                 logger.debug(
                     'Parsing file %s format %s name %s revision %s', filename, format, name, rev)
                 module = self.ctx.add_module(filename, text, format, name, rev,
-                                        expect_failure_error=False)
+                                             expect_failure_error=False)
             else:
                 module = self.ctx.add_module(filename, text)
             if module is None:
-                raise YdkGenException('Could not add module ')
+                raise YdkGenException('Could not add module %s' % filename)
             else:
                 modules.append(module)
         return modules

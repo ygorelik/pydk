@@ -270,13 +270,13 @@ module ydktest-sanity {
           description "64 bit uinteger value type";
           type uint64;
         }
+
         leaf leaf-ref {
           description "leaf-ref";
           type leafref {
             path "/runner/ytypes/built-in-t/number8";
           }
         }
-
 
         leaf deci64 {
           description "this is decimal value";
@@ -334,16 +334,7 @@ module ydktest-sanity {
         }
 
         leaf bits-value {
-          description "this is bits type value";
-          type bits {
-            bit disable-nagle {
-              position 0;
-            }
-
-            bit auto-sense-speed {
-              position 1;
-            }
-          }
+          type types:Ydk-bits-type;
           default "auto-sense-speed";
         }
 

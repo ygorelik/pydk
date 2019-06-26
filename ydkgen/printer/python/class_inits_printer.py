@@ -68,7 +68,7 @@ class ClassInitsPrinter(object):
             self._print_presence_property(clazz)
 
         if len(properties) == 0 and not clazz.is_rpc() and len(clazz.extends) == 0 and isinstance(clazz.owner, Package):
-                self.ctx.writeln('pass')
+            self.ctx.writeln('pass')
         else:
             for prop in properties:
                 self._print_class_inits_property(prop, clazz)
@@ -97,23 +97,20 @@ class ClassInitsPrinter(object):
             stmt = prop.property_type.stmt
             if stmt.search_one('presence') is None:
                 if self.one_class_per_module:
-                    self.ctx.writeln('self.%s = %s.%s()' % (prop.name, get_property_name(prop.property_type, prop.property_type.iskeyword), prop.property_type.name))
+                    self.ctx.writeln('self.%s = %s.%s()' %
+                                     (prop.name,
+                                      get_property_name(prop.property_type, prop.property_type.iskeyword),
+                                      prop.property_type.name))
                     self.ctx.writeln('self.%s.parent = self' % prop.name)
                 else:
-                    self.ctx.writeln('self.%s = %s()' %
-                                     (prop.name, prop.property_type.qn()))
-                    self.ctx.writeln('self.%s.parent = self' % (prop.name))
+                    self.ctx.writeln('self.%s = %s()' % (prop.name, prop.property_type.qn()))
+                    self.ctx.writeln('self.%s.parent = self' % prop.name)
             else:
                 self.ctx.writeln('self.%s = None' % (prop.name,))
         elif isinstance(prop.property_type, Bits):
-            if self.one_class_per_module:
-                self.ctx.writeln('self.%s = %s.%s()' %
-                                 (prop.name, clazz.name, prop.property_type.name))
-            else:
-                self.ctx.writeln('self.%s = %s()' %
-                                 (prop.name, prop.property_type.qn()))
+            self.ctx.writeln('self.%s = FixedBitsDict()' % prop.name)
         else:
-            self.ctx.writeln('self.%s = None' % (prop.name,))
+            self.ctx.writeln('self.%s = None' % prop.name)
 
     def print_class_is_rpc(self, clazz):
         if clazz.is_rpc():

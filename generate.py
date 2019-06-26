@@ -79,12 +79,12 @@ def get_py_release_version(output_directory):
         for line in f:
             if ('version=' in line or 'version =' in line or
                 'NMSP_PKG_VERSION' in line and '$VERSION$' not in line or
-                line.startswith('VERSION =')):
+                    line.startswith('VERSION =')):
                 rv = line[line.find('=')+1:].strip(' \'"\n')
                 release = "release=" + rv
                 version = "version=" + rv
                 break
-    return (release, version)
+    return release, version
 
 
 def get_cpp_release_version(output_directory):
@@ -98,7 +98,7 @@ def get_cpp_release_version(output_directory):
                 version_string = major_match.group('version')
     release = "release=%s" % version_string
     version = "version=%s" % version_string
-    return (release, version)
+    return release, version
 
 
 def copy_docs_from_bundles(output_directory, destination_dir):
