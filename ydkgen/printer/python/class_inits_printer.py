@@ -102,16 +102,12 @@ class ClassInitsPrinter(object):
                 else:
                     self.ctx.writeln('self.%s = %s()' %
                                      (prop.name, prop.property_type.qn()))
-                    self.ctx.writeln('self.%s.parent = self' % (prop.name))
+                    self.ctx.writeln('self.%s.parent = self' % prop.name)
             else:
                 self.ctx.writeln('self.%s = None' % (prop.name,))
         elif isinstance(prop.property_type, Bits):
-            if self.one_class_per_module:
-                self.ctx.writeln('self.%s = %s.%s()' %
-                                 (prop.name, clazz.name, prop.property_type.name))
-            else:
-                self.ctx.writeln('self.%s = %s()' %
-                                 (prop.name, prop.property_type.qn()))
+            self.ctx.writeln('self.%s = FixedBitsDict()' % prop.name)
+
         else:
             self.ctx.writeln('self.%s = None' % (prop.name,))
 
