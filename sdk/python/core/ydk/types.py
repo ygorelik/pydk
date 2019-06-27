@@ -226,7 +226,6 @@ class FixedBitsDict(object):
     def __str__(self):
         return " ".join([key for key in self._dictionary if self._dictionary[key] == True])
 
-
     def __ne__(self, rhs):
         return not self.__eq__(rhs)
 

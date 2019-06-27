@@ -46,6 +46,7 @@ class ModulePrinter(FilePrinter):
         if self.one_class_per_module:
             if isinstance(package, Package):
                 self._print_module_enums(package)
+                self._print_module_bits(package)
                 identities = [child for child in package.owned_elements if isinstance(child, Class) and child.is_identity()]
                 ClassPrinter(self.ctx, self.one_class_per_module, self.sort_clazz).print_output(identities)
             else:
