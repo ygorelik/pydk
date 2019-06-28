@@ -103,12 +103,29 @@ class ClassInitsPrinter(object):
                                       prop.property_type.name))
                     self.ctx.writeln('self.%s.parent = self' % prop.name)
                 else:
-                    self.ctx.writeln('self.%s = %s()' % (prop.name, prop.property_type.qn()))
+                    self.ctx.writeln('self.%s = %s()' %
+                                     (prop.name, prop.property_type.qn()))
                     self.ctx.writeln('self.%s.parent = self' % prop.name)
             else:
-                self.ctx.writeln('self.%s = None' % (prop.name,))
+                self.ctx.writeln('self.%s = None' % prop.name)
         elif isinstance(prop.property_type, Bits):
-            self.ctx.writeln('self.%s = FixedBitsDict()' % prop.name)
+            ref = prop.property_type.fqn().rsplit('.', 1)
+            if self.one_class_per_module:
+                if clazz.module.arg != prop.property_type.stmt.i_module.arg:
+                    mod = ref[0].split('.', 1)[0]
+                    self.ctx.writeln('from ydk.models.%s.%s.%s import %s' %
+                                     (clazz.get_package().bundle_name, mod, ref[0], ref[1]))
+                    self.ctx.writeln('self.%s = %s()' % (prop.name, ref[1]))
+                else:
+                    self.ctx.writeln('self.%s = %s.%s()' %
+                                     (prop.name, clazz.name, prop.property_type.name))
+            else:
+                if clazz.module.arg != prop.property_type.stmt.i_module.arg:
+                    self.ctx.writeln('from ydk.models.%s.%s import %s' %
+                                     (clazz.get_package().bundle_name, ref[0], ref[1]))
+                    self.ctx.writeln('self.%s = %s()' % (prop.name, ref[1]))
+                else:
+                    self.ctx.writeln('self.%s = %s()' % (prop.name, prop.property_type.qn()))
         else:
             self.ctx.writeln('self.%s = None' % prop.name)
 

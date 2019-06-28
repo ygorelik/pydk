@@ -20,6 +20,7 @@ getting Enum and Union info
 """
 from __future__ import absolute_import
 
+import os
 import unittest
 
 try:

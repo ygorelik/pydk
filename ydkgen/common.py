@@ -229,7 +229,8 @@ def get_module_name(stmt):
 
 def get_property_name(element, iskeyword):
     name = snake_case(element.stmt.arg)
-    if iskeyword(name) or iskeyword(name.lower()) or (element.owner is not None and element.stmt.arg.lower() == element.owner.stmt.arg.lower()):
+    if iskeyword(name) or iskeyword(name.lower()) or \
+            (element.owner is not None and element.stmt.arg.lower() == element.owner.stmt.arg.lower()):
         name = '%s_' % name
     return name
 

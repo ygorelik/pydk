@@ -72,27 +72,28 @@ class BitsPrinter(object):
 
     def _print_bits_init(self, bits):
         self.ctx.writeln('def __init__(self):')
+        self.ctx.lvl_inc()
         self._print_bits_dictionary(bits)
         self._print_bits_pos_map(bits)
+        self.ctx.writeln('super().__init__(dictionary_, pos_map_)')
+        self.ctx.lvl_dec()
 
     def _print_bits_dictionary(self, bits):
-        self.ctx.lvl_inc()
-        self.ctx.writeln('self._dictionary = { ')
+        self.ctx.writeln('dictionary_ = { ')
         self.ctx.lvl_inc()
         for k in bits._dictionary:
-            self.ctx.writeln("'%s':False," % k)
+            self.ctx.writeln("'%s': False," % k)
 
         self.ctx.lvl_dec()
         self.ctx.writeln('}')
 
     def _print_bits_pos_map(self, bits):
-        self.ctx.writeln('self._pos_map = { ')
+        self.ctx.writeln('pos_map_ = { ')
         self.ctx.lvl_inc()
         for k in bits._pos_map:
-            self.ctx.writeln("'%s':%s," % (k, bits._pos_map[k]))
+            self.ctx.writeln("'%s': %s," % (k, bits._pos_map[k]))
         self.ctx.lvl_dec()
         self.ctx.writeln('}')
-        self.ctx.lvl_dec()
 
     def _print_bits_trailer(self, bits):
         self.ctx.bline()
