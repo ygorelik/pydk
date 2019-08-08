@@ -8,7 +8,7 @@ from __future__ import print_function
 
 import unittest
 
-from ydk.types import entity_to_dict, entity_diff
+from ydk.types import entity_to_dict, entity_diff, abs_path_to_entity
 
 from ydk.models.ydktest import ydktest_sanity as ysanity
 
@@ -27,14 +27,20 @@ def print_dictionary(legend, ent_dict, key_width=70):
         print("%s: %s" % (n.rjust(key_width), check_empty_str_value(v)))
 
 
-def print_diffs(diff, key_width=70):
-    print("\n------> DIFFS:")
-    for key in diff:
-        value = diff[key]
-        print("%s: %s vs %s" % (key.rjust(key_width), check_empty_str_value(value[0]), check_empty_str_value(value[1])))
-
-
 class EntityDiffTest(unittest.TestCase):
+
+    def print_diffs(self, diff, ent_left, ent_right, key_width=70):
+        print("\n------> DIFFS:")
+        for key in diff:
+            value = diff[key]
+            print("%s: %s vs %s" % (
+            key.rjust(key_width), check_empty_str_value(value[0]), check_empty_str_value(value[1])))
+            if value[0] is not None:
+                r = ent_left
+            else:
+                r = ent_right
+            entity = abs_path_to_entity(r, key)
+            self.assertIsNotNone(entity)
 
     def test_entity_diff_two_key(self):
         runner = ysanity.Runner()
@@ -44,7 +50,7 @@ class EntityDiffTest(unittest.TestCase):
         l_1.second, l_2.second = 11, 22
         l_1.property, l_2.property = '82', '83'
         runner.two_key_list.extend([l_1, l_2])
-        
+
         ent_dict = entity_to_dict(runner)
         self.assertEqual(len(ent_dict), 4)
         print_dictionary('-LEFT', ent_dict)
@@ -63,7 +69,7 @@ class EntityDiffTest(unittest.TestCase):
         print_dictionary('-RIGHT', entity_to_dict(runner2))
         diff = entity_diff(runner, runner2)
         self.assertEqual(len(diff), 1)
-        print_diffs(diff)
+        self.print_diffs(diff, runner, runner2)
 
     def test_entity_diff_two_key_not_equal(self):
         runner = ysanity.Runner()
@@ -90,7 +96,7 @@ class EntityDiffTest(unittest.TestCase):
 
         diff = entity_diff(runner, runner3)
         self.assertEqual(len(diff), 2)
-        print_diffs(diff)
+        self.print_diffs(diff, runner, runner3)
 
     def test_entity_to_dict_aug_onelist(self):
         runner = ysanity.Runner()
@@ -132,7 +138,7 @@ class EntityDiffTest(unittest.TestCase):
 
         diff = entity_diff(runner1, runner2)
         self.assertEqual(len(diff), 1)
-        print_diffs(diff, 50)
+        self.print_diffs(diff, runner1, runner2, 50)
 
     def test_entity_to_dict_presence(self):
         runner = ysanity.Runner()
@@ -150,7 +156,7 @@ class EntityDiffTest(unittest.TestCase):
 
         diff = entity_diff(runner, runner_)
         self.assertEqual(len(diff), 1)
-        print_diffs(diff, 40)
+        self.print_diffs(diff, runner, runner_, 40)
 
     def test_entity_diff_two_level_list(self):
         r_1 = ysanity.Runner()
@@ -199,7 +205,34 @@ class EntityDiffTest(unittest.TestCase):
 
         diff = entity_diff(r_1, r_2)
         self.assertEqual(len(diff), 1)
-        print_diffs(diff, 50)
+        self.print_diffs(diff, r_1, r_2, 50)
+
+    def test_entity_to_dict_no_key_list(self):
+        r_1 = ysanity.Runner()
+        test1 = ysanity.Runner.NoKeyList()
+        test1.test.best = 't1'
+        test2 = ysanity.Runner.NoKeyList()
+        test2.test.best = 't2'
+        r_1.no_key_list.extend([test1, test2])
+        ent_dict = entity_to_dict(r_1)
+        self.assertEqual(len(ent_dict), 4)
+        print_dictionary('-LEFT', ent_dict, 50)
+
+        r_2 = ysanity.Runner()
+        test1 = ysanity.Runner.NoKeyList()
+        test1.test.best = 't1'
+        test2 = ysanity.Runner.NoKeyList()
+        test2.test.best = 'tt'
+        test3 = ysanity.Runner.NoKeyList()
+        test3.test.best = 't3'
+        r_2.no_key_list.extend([test1, test2, test3])
+        ent_dict = entity_to_dict(r_2)
+        self.assertEqual(len(ent_dict), 6)
+        print_dictionary('-RIGHT', ent_dict, 50)
+
+        diff = entity_diff(r_1, r_2)
+        self.assertEqual(len(diff), 2)
+        self.print_diffs(diff, r_1, r_2, 30)
 
 
 if __name__ == '__main__':

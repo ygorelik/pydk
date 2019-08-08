@@ -682,6 +682,15 @@ module ydktest-sanity {
        }
     }
 
+    list no-key-list {
+        config false;
+        container test {
+            leaf best {
+                type string;
+            }
+        }
+    }
+
     list one-key-list {
         key testy;
         leaf testy {

@@ -19,7 +19,6 @@
    Contains type definitions.
 
 """
-from __future__ import absolute_import
 
 from decimal import Decimal, getcontext
 from .errors import YPYModelError, YPYError
@@ -262,6 +261,7 @@ class YList(list):
         super(YList, self).__init__()
         self.parent = None
         self.name = None
+        self.count = 0
 
     def __getitem__(self, key):
         if isinstance(key, slice):
@@ -288,6 +288,9 @@ class YList(list):
     def append(self, item):
         super(YList, self).append(item)
         item.parent = self.parent
+        if hasattr(item, 'ylist_key_names') and not item.ylist_key_names:
+            setattr(item, '_index', self.count)
+            self.count += 1
 
     def extend(self, items):
         for item in items:
@@ -417,11 +420,25 @@ class YLeafList(YList):
         return cnt
 
 
+def get_segment_path(entity):
+    path = entity._common_path.rsplit('/', 1)[1]
+    if hasattr(entity, '_index'):
+        path += '[%s]' % entity._index
+    return path
+
+
+def _absolute_path(entity):
+    path = get_segment_path(entity)
+    if hasattr(entity, 'parent') and entity.parent:
+        path = '/'.join([_absolute_path(entity.parent), path])
+    return path
+
+
 def get_absolute_path(entity):
-    path = entity._common_path
+    path = _absolute_path(entity)
     segments = path.split("/")
-    module = segments[1].split(':', 1)[0]
-    for i in range(2, len(segments)):
+    module = segments[0].split(':', 1)[0]
+    for i in range(1, len(segments)):
         del_str = module + ':'
         if del_str in segments[i]:
             segments[i] = segments[i].replace(del_str, '')
@@ -429,7 +446,7 @@ def get_absolute_path(entity):
             if ':' in segments[i]:
                 module = segments[i].split(':', 1)[0]
     path = '/'.join(segments)
-    return path
+    return '/' + path
 
 
 def get_name_leaf_data(entity):
@@ -514,3 +531,25 @@ def entity_diff(ent1, ent2):
             if dup_key.startswith(key):
                 ent2_skip_keys.append(dup_key)
     return diffs
+
+
+def abs_path_to_entity(entity, abs_path):
+    top_abs_path = get_absolute_path(entity)
+    if top_abs_path == abs_path:
+        return entity
+
+    if top_abs_path in abs_path:
+        leaf_name_data = get_name_leaf_data(entity)
+        for leaf_name in leaf_name_data:
+            if leaf_name not in entity.ylist_key_names:
+                leaf_path = "%s/%s" % (top_abs_path, leaf_name)
+                if leaf_path == abs_path:
+                    return entity
+
+        for child_abs_path, child in get_children(entity).items():
+            if child_abs_path == abs_path:
+                return child
+            matching_entity = abs_path_to_entity(child, abs_path)
+            if matching_entity:
+                return matching_entity
+    return None

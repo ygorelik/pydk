@@ -56,12 +56,11 @@ class ClassCommonPathPrinter(object):
         owners = []
         owner_key_props = []
         current_owner = clazz.owner
-        while current_owner != None and isinstance(current_owner, Class):
+        while current_owner is not None and isinstance(current_owner, Class):
             owners.append(current_owner)
             owner_key_props.extend(current_owner.get_key_props())
             current_owner = current_owner.owner
 
-        common_path = ''
         if len(owners) == 0 or len(owner_key_props) == 0:
             segments = ''
             for owner in reversed(owners):

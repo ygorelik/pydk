@@ -352,9 +352,14 @@ if __name__ == '__main__':
         create_shared_libraries(output_directory)
     else:
         create_pip_packages(output_directory)
+        dist_dir = os.path.join(output_directory, 'dist')
+        if options.core:
+            dst_dir = os.path.join(ydk_root, 'dist')
+            if os.path.exists(dst_dir):
+                shutil.rmtree(dst_dir)
+            shutil.copytree(dist_dir, dst_dir)
         if options.install:
-            dist_dir = '%s/dist' % output_directory
-            file_list=os.listdir(dist_dir)
+            file_list = os.listdir(dist_dir)
             if len(file_list) == 1:
                 dist = file_list[0]
                 print('\nInstalling {0} package {1} ...\n'.format(language, dist))

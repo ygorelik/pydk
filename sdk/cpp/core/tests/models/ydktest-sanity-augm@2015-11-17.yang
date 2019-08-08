@@ -92,7 +92,7 @@ module ydktest-sanity-augm {
     uses one-aug-level;
   }
   
-    augment "/ysanity:runner/ysanity:one" {
+  augment "/ysanity:runner/ysanity:one" {
     description "augment leaf to one";
     uses leaf-aug;
   }
