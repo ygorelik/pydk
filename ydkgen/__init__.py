@@ -429,6 +429,6 @@ def _check_description_file(description_file):
         YdkGenException: If path to description file is not valid.
     """
     if not os.path.isfile(description_file):
-        logger.error('Path to description file is not valid.')
-        raise YdkGenException('Path to description file is not valid.')
+        logger.error('Path to profile file is not valid.')
+        raise YdkGenException('Path to profile file is not valid.')
 
