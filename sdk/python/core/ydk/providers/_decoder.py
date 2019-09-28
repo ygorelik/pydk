@@ -89,7 +89,7 @@ class XmlDecoder(object):
             nmsp = _yang_ns._namespaces[module_name]
             tag_name = '{' + nmsp + '}' + member.name
             rt = [rt for rt in root.getchildren() if rt.tag == tag_name]
-            if rt == []:
+            if not rt:
                 continue
 
             if member.mtype == ATTRIBUTE:
@@ -161,17 +161,23 @@ class XmlDecoder(object):
 
     @classmethod
     def _to_real_list_type(cls, elems, member, entity):
-
         if isinstance(elems, list):
             results = YLeafList()
             results.parent = entity
-            results.name = member.presentation_name
             for elem in elems:
-                result = XmlDecoder._to_real_type_helper(elem, member, entity)
-                if result is None:
-                    return None
-                results.append(result)
-            results.parent = entity
+                if isinstance(member, list):
+                    for meta in member:
+                        result_elem = XmlDecoder._to_real_type_helper(elem, meta, entity)
+                        if result_elem:
+                            results.name = meta.presentation_name
+                            break
+                else:
+                    results.name = member.presentation_name
+                    result_elem = XmlDecoder._to_real_type_helper(elem, member, entity)
+                if result_elem:
+                    results.append(result_elem)
+            if len(results) == 0:
+                return None
             return results
         else:
             return XmlDecoder._to_real_type_helper(elems[0], member, entity)
@@ -179,15 +185,12 @@ class XmlDecoder(object):
     @classmethod
     def _to_real_union_type_helper(cls, rt, member, entity):
         potential_str_value = ''
+        union_members = member.get_all_union_members()
         for contained_member in member.members:
             if contained_member.mtype == REFERENCE_UNION:
                 return XmlDecoder._to_real_union_type_helper(rt, contained_member, entity)
             elif contained_member.mtype == REFERENCE_LEAFLIST:
-                result = XmlDecoder._to_real_list_type(rt, contained_member, entity)
-                if result is not None:
-                    return result
-                else:
-                    continue
+                return XmlDecoder._to_real_list_type(rt, union_members, entity)
             elif contained_member.mtype == REFERENCE_ENUM_CLASS:
                 clazz = get_class(contained_member.pmodule_name, contained_member.clazz_name)
                 meta_info = getattr(clazz, '_meta_info')()

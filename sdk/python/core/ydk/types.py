@@ -22,8 +22,9 @@
 
 from decimal import Decimal, getcontext
 from .errors import YPYModelError, YPYError
-from ._core._dm_meta_info import ANYXML_CLASS, REFERENCE_CLASS, REFERENCE_LIST, REFERENCE_LEAFLIST
-from ._core._dm_meta_info import REFERENCE_IDENTITY_CLASS, REFERENCE_UNION, ATTRIBUTE
+from ._core._dm_meta_info import REFERENCE_CLASS, REFERENCE_LIST, REFERENCE_LEAFLIST
+from ._core._dm_meta_info import REFERENCE_IDENTITY_CLASS, ATTRIBUTE
+from enum import Enum
 
 
 class DELETE(object):
@@ -216,7 +217,7 @@ class FixedBitsDict(object):
         self._pos_map = pos_map
 
     def __eq__(self, other):
-        return ( isinstance(other, self.__class__) and self.__dict__ == other.__dict__)
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
 
     def __setitem__(self, key, item):
         if key not in self._dictionary:
@@ -224,10 +225,10 @@ class FixedBitsDict(object):
         self._dictionary[key] = item
 
     def __getitem__(self, key):
-        return self.__dictionary[key]
+        return self._dictionary[key]
 
     def __str__(self):
-        return " ".join([key for key in self._dictionary if self._dictionary[key] == True])
+        return " ".join([key for key in self._dictionary if self._dictionary[key] is True])
 
     def __ne__(self, rhs):
         return not self.__eq__(rhs)
@@ -302,11 +303,12 @@ class YListItem(object):
         self.item = item
         self.parent = parent
         self.name = name
+        self.ylist_key_names = []
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             if self.item.__class__.__name__.endswith('Identity'):
-                return type(self.item) == type(other.item)
+                return self.item.__class__.__name__ == other.item.__class__.__name__
             else:
                 return self.item == other.item
         else:
@@ -335,16 +337,40 @@ class YLeafList(YList):
         argument, which is an identifier, followed by a block of
         substatements that holds detailed leaf-list information. Values in
         leaf-list should be unique.
-
     """
+
     def __init__(self):
         super(YLeafList, self).__init__()
 
     def __contains__(self, item):
+        item_to_compare = item
+        if isinstance(item, YListItem):
+            item_to_compare = item.item
         for i in super(YLeafList, self).__iter__():
-            if i.item == item:
-                return True
+            if item_to_compare.__class__.__name__.endswith('Identity'):
+                if item_to_compare.__class__.__name__ == i.item.__class__.__name__:
+                    return True
+            else:
+                if i.item == item_to_compare:
+                    return True
         return False
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            if len(self) != len(other):
+                return False
+            for item in super(YLeafList, self).__iter__():
+                if not other.__contains__(item):
+                    return False
+            return True
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __len__(self):
+        return super(YLeafList, self).__len__()
 
     def __setitem__(self, key, item):
         lst_item = YListItem(item, self.parent, self.name)

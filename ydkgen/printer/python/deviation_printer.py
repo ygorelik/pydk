@@ -39,7 +39,7 @@ class DeviationPrinter(object):
     def print_deviation(self, package):
         self.print_deviation_header()
         deviations = package.owned_elements
-        deviations = sorted(deviations, key= lambda d:d.qn())
+        deviations = sorted(deviations, key=lambda d: d.qn())
         for deviation in deviations:
             self.print_deviation_inline_class(deviation)
         self.print_deviation_table_header()
@@ -72,7 +72,7 @@ from ydk.providers._importer import _yang_ns
         self.ctx.writeln("}")
 
     def print_deviation_inline_class(self, deviation):
-        if deviation.owned_elements != []:
+        if deviation.owned_elements:
             bitz = [b for b in deviation.owned_elements if isinstance(b, Bits)]
             enumz = [e for e in deviation.owned_elements if isinstance(e, Enum)]
             for b in bitz:
@@ -95,7 +95,7 @@ from ydk.providers._importer import _yang_ns
     def print_deviation_entry(self, deviation):
         target = deviation.d_target
         stmts = list(deviation.d_stmts)
-        stmts = sorted(stmts, key=lambda s:s.arg)
+        stmts = sorted(stmts, key=lambda s: s.arg)
         typ = deviation.d_type
         qn = deviation.qn()
         self.ctx.lvl_inc()
@@ -107,7 +107,7 @@ from ydk.providers._importer import _yang_ns
             self.ctx.lvl_inc()
             for stmt in stmts:
                 key = stmt.keyword
-                self.ctx.write("(%s, " %self.convert_key_val(key))
+                self.ctx.write("(%s, " % self.convert_key_val(key))
                 if key == 'type':
                     prop = target.i_property
                     meta = get_meta_info_data(prop, prop.property_type, prop.stmt.search_one('type'), 'py', False)

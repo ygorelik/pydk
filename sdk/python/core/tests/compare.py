@@ -30,6 +30,7 @@ if sys.version_info > (3,):
 LOGGER = logging.getLogger('ydk.tests.unittest')
 LOGGER.setLevel(logging.DEBUG)
 
+
 def is_builtin_type(attr):
     # all the deridved types should have __cmp__ implemented
     if (isinstance(attr, (int, bool, dict, str, int, long, float)) or
@@ -39,6 +40,7 @@ def is_builtin_type(attr):
     else:
         return False
 
+
 class ErrNo(Enum):
     WRONG_VALUE = 0
     WRONG_TYPES = 1
@@ -46,6 +48,7 @@ class ErrNo(Enum):
     WRONG_DICT = 3
     WRONG_DICT_VALUE = 4
     WRONG_CLASS = 5
+
 
 class ErrorMsg(object):
     def __init__(self, lhs, rhs, errno):

@@ -15,7 +15,6 @@
 # ------------------------------------------------------------------
 
 from __future__ import absolute_import
-import ydk.types as ytypes
 import unittest
 import copy
 
@@ -23,7 +22,7 @@ from ydk.services import CRUDService
 try:
     from ydk.models.ydktest.ydktest_sanity import Runner, SubTest, ChildIdentityIdentity, ChildChildIdentityIdentity
     from ydk.models.ydktest.ydktest_sanity_types import YdktestTypeIdentity
-except:
+except ImportError:
     from ydk.models.ydktest.ydktest_sanity.runner.runner import Runner
     from ydk.models.ydktest.ydktest_sanity.sub_test.sub_test import SubTest
     from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import ChildIdentityIdentity, ChildChildIdentityIdentity
@@ -36,7 +35,7 @@ from ydk.errors import YPYError, YPYModelError
 
 try:
     from ydk.models.ydktest.ydktest_sanity import YdkEnumTestEnum, YdkEnumIntTestEnum
-except:
+except ImportError:
     from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import YdkEnumTestEnum, YdkEnumIntTestEnum
 
 
@@ -354,14 +353,12 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        result = is_equal(runner, runner1)
+        self.assertTrue(is_equal(runner1, runner))
 
-        self.assertEqual(result, True)
-
-    def test_union_list(self):
+    def test_union_leaflist(self):
         runner = self._create_runner()
-        runner.ytypes.built_in_t.llunion.append(1)
-        runner.ytypes.built_in_t.llunion.append(3)
+        runner.ytypes.built_in_t.llunion.append(111)
+        runner.ytypes.built_in_t.llunion.append('3:3')
         self.crud.create(self.ncc, runner)
 
         # Read into Runner2
@@ -369,8 +366,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        result = is_equal(runner, runner1)
-        self.assertEqual(result, True)
+        self.assertTrue(is_equal(runner1.ytypes.built_in_t.llunion, runner.ytypes.built_in_t.llunion))
 
     @unittest.skip('ConfD internal error.')
     def test_bits_leaflist(self):
@@ -419,7 +415,7 @@ class SanityTest(unittest.TestCase):
         result = is_equal(runner, runner1)
         self.assertEqual(result, True)
 
-        #DEEPCOPY
+        # DEEPCOPY
         runner_copy = copy.deepcopy(runner)
         # result = is_equal(runner, runner_copy)
         # self.assertEqual(result, True)
@@ -446,7 +442,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        union_list = runner.ytypes.built_in_t.younion_list
+        union_list = runner1.ytypes.built_in_t.younion_list
         self.assertTrue(23 in union_list and '123:45' in union_list)
 
     def test_identityref(self):
@@ -476,7 +472,6 @@ class SanityTest(unittest.TestCase):
         result = is_equal(runner, runner1)
         self.assertEqual(result, True)
 
-
     def test_leaflist_unique(self):
         runner = self._create_runner()
         with self.assertRaises(YPYModelError):
@@ -500,7 +495,7 @@ class SanityTest(unittest.TestCase):
         subtest.one_aug.name = 'test'
         subtest.one_aug.number = 3
 
-        res = self.crud.create(self.ncc, subtest)
+        self.crud.create(self.ncc, subtest)
 
         subtest1 = self.crud.read(self.ncc, SubTest())
 
@@ -522,11 +517,6 @@ class SanityTest(unittest.TestCase):
         result = is_equal(runner, runner1)
         self.assertEqual(result, True)
 
-    # def test_binary(self):
-    #     pass
-
-    # def test_binary_invalid(self):
-    #     pass
 
 if __name__ == '__main__':
     import sys
