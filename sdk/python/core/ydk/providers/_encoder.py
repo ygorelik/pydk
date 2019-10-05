@@ -18,6 +18,8 @@
    Encoder.
 
 """
+import logging
+
 from ._validator import validate_entity, is_yvalidate
 from ._value_encoder import ValueEncoder
 from lxml import etree
@@ -25,6 +27,7 @@ from ydk._core._dm_meta_info import REFERENCE_CLASS, REFERENCE_LIST , REFERENCE_
                                  REFERENCE_UNION, ANYXML_CLASS, REFERENCE_BITS, \
                                  REFERENCE_IDENTITY_CLASS, REFERENCE_ENUM_CLASS
 from ydk.types import Empty, DELETE, REMOVE, MERGE, REPLACE, CREATE, READ, Decimal64, YList, YLeafList, YListItem
+from ydk.errors import YPYModelError
 
 from ._importer import _yang_ns
 
@@ -42,11 +45,11 @@ class XmlEncoder(object):
         ''' Convert the entity to an xml payload '''
         # if the entity has a parent hierarchy use that to get
         # the parent related envelope that we need
-        if not has_yfilter(entity) and ((hasattr(entity, 'mtype') and not entity.mtype == ANYXML_CLASS) and \
-            (not is_filter and hasattr(entity, '_has_data') and not entity._has_data())):
+        if not has_yfilter(entity) and ((hasattr(entity, 'mtype') and not entity.mtype == ANYXML_CLASS) and
+                                        (not is_filter and hasattr(entity, '_has_data') and not entity._has_data())):
             return
 
-        if (validate):
+        if validate:
             validate_entity(entity, optype)
 
         if entity_is_rpc_input(entity):
@@ -67,7 +70,6 @@ class XmlEncoder(object):
             if entity.i_meta.namespace is not None and parent_ns != entity.i_meta.namespace:
                 elem.set('xmlns', entity.i_meta.namespace)
 
-
         for member in entity.i_meta.meta_info_class_members:
             value = getattr(entity, member.presentation_name)
             if value is None or isinstance(value, list) and value == [] and not has_yfilter(value):
@@ -78,10 +80,10 @@ class XmlEncoder(object):
 
             member_elem = None
             NSMAP = {}
-            if member.mtype not in [REFERENCE_CLASS, REFERENCE_LIST, REFERENCE_LEAFLIST, REFERENCE_IDENTITY_CLASS, \
+            if member.mtype not in [REFERENCE_CLASS, REFERENCE_LIST, REFERENCE_LEAFLIST, REFERENCE_IDENTITY_CLASS,
                                     REFERENCE_UNION] or is_edit_yfilter(value) or isinstance(value, READ):
                 if entity.i_meta.namespace is not None \
-                    and entity.i_meta.namespace != _yang_ns._namespaces[member.module_name]:
+                   and entity.i_meta.namespace != _yang_ns._namespaces[member.module_name]:
                     NSMAP[None] = _yang_ns._namespaces[member.module_name]
                 member_elem = etree.SubElement(elem, member.name, nsmap=NSMAP)
                 if member.mtype == ANYXML_CLASS:
@@ -92,7 +94,23 @@ class XmlEncoder(object):
                 xc = 'urn:ietf:params:xml:ns:netconf:base:1.0'
                 member_elem.set('{' + xc + '}operation', get_yfilter_tag(value))
                 if is_value_edit_yfilter(value):
-                    member_elem.text = self.encode_value(member, NSMAP, value.value(), validate)
+                    if member.mtype == REFERENCE_UNION:
+                        union_list = member.get_all_union_members()
+                        for union_member in union_list:
+                            try:
+                                member_elem.text = self.encode_value(union_member, NSMAP, value.value(), validate)
+                                if member_elem.text:
+                                    break
+                            except YPYModelError:
+                                continue
+                        if not member_elem.text and validate:
+                            ydk_logger = logging.getLogger(__name__)
+                            error_msg = "Could not encode leaf '{0}', to union types: {1}, value: {2}".\
+                                format(member.name, [m.ptype for m in union_list], value)
+                            ydk_logger.error(error_msg)
+                            raise YPYModelError(error_msg)
+                    else:
+                        member_elem.text = self.encode_value(member, NSMAP, value.value(), validate)
             elif isinstance(value, READ):
                 continue
             elif member.mtype == REFERENCE_CLASS:
@@ -180,7 +198,7 @@ def entity_is_rpc_input(entity):
 def has_yfilter(entity):
     if entity is None:
         return False
-    if hasattr(entity, 'yfilter') and not entity.yfilter is None:
+    if hasattr(entity, 'yfilter') and entity.yfilter:
         return True
     if not hasattr(entity, 'i_meta'):
         return False
@@ -206,8 +224,11 @@ def is_edit_yfilter(yfilter):
     return isinstance(yfilter, DELETE) or isinstance(yfilter, REMOVE) or isinstance(yfilter, MERGE) or \
            isinstance(yfilter, REPLACE) or isinstance(yfilter, CREATE)
 
+
 def is_value_edit_yfilter(yfilter):
-    return (isinstance(yfilter, MERGE) or isinstance(yfilter, REPLACE) or isinstance(yfilter, CREATE)) and yfilter.value() is not None
+    return (isinstance(yfilter, MERGE) or isinstance(yfilter, REPLACE) or isinstance(yfilter, CREATE)) and\
+           yfilter.value() is not None
+
 
 def get_yfilter_tag(yfilter):
     tag = ''

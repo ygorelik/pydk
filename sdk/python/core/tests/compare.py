@@ -19,7 +19,6 @@ return True if attributes in entity(lhs) = entity(rhs)
 
 import logging
 from enum import Enum
-from functools import reduce
 from ydk.types import (Empty, Decimal64, FixedBitsDict,
                        YList, YListItem, YLeafList)
 

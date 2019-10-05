@@ -29,7 +29,7 @@ except ImportError:
     from ydk.models.ydktest.ydktest_sanity_types.ydktest_sanity_types import YdktestTypeIdentity
 
 from ydk.providers import NetconfServiceProvider, NativeNetconfServiceProvider
-from ydk.types import Empty, DELETE, Decimal64
+from ydk.types import Empty, REPLACE, Decimal64
 from compare import is_equal
 from ydk.errors import YPYError, YPYModelError
 
@@ -314,8 +314,17 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        result = is_equal(runner, runner1)
-        self.assertEqual(result, True)
+        self.assertTrue(is_equal(runner, runner1))
+
+        runner.ytypes.built_in_t.younion = REPLACE(22)
+        self.crud.update(self.ncc, runner)
+
+        runner1 = Runner()
+        runner1 = self.crud.read(self.ncc, runner1)
+
+        # Compare runners
+        runner.ytypes.built_in_t.younion = 22
+        self.assertTrue(is_equal(runner, runner1))
 
     def test_union_enum(self):
         runner = self._create_runner()

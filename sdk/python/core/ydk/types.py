@@ -24,7 +24,6 @@ from decimal import Decimal, getcontext
 from .errors import YPYModelError, YPYError
 from ._core._dm_meta_info import REFERENCE_CLASS, REFERENCE_LIST, REFERENCE_LEAFLIST
 from ._core._dm_meta_info import REFERENCE_IDENTITY_CLASS, ATTRIBUTE
-from enum import Enum
 
 
 class DELETE(object):
@@ -33,12 +32,18 @@ class DELETE(object):
     A CRUD update operation will delete the leaf from the device it is on."""
     pass
 
+    def __str__(self):
+        return "Operation DELETE"
+
 
 class REMOVE(object):
     """Marker class used to mark nodes that are to be removed
     Assign REMOVE object to a mark a leaf for deletion.
     A CRUD update operation will delete the leaf from the device it is on."""
     pass
+
+    def __str__(self):
+        return "Operation REMOVE"
 
 
 class MERGE(object):
@@ -55,6 +60,12 @@ class MERGE(object):
     def set(self, value):
         self._value = value
 
+    def __str__(self):
+        text = "Operation MERGE"
+        if self._value:
+            text += " with value %s of type '%s'" % (self._value, type(self._value).__name__)
+        return text
+
 
 class REPLACE(object):
     """Marker class used to mark nodes that are to be replaced
@@ -69,6 +80,12 @@ class REPLACE(object):
 
     def set(self, value):
         self._value = value
+
+    def __str__(self):
+        text = "Operation REPLACE"
+        if self._value:
+            text += " with value %s of type '%s'" % (self._value, type(self._value).__name__)
+        return text
 
 
 class CREATE(object):
@@ -85,10 +102,19 @@ class CREATE(object):
     def set(self, value):
         self._value = value
 
+    def __str__(self):
+        text = "Operation CREATE"
+        if self._value:
+            text += " with value %s of type '%s'" % (self._value, type(self._value).__name__)
+        return text
+
 
 class READ(object):
     """Marker class used to mark nodes that are to be read """
     pass
+
+    def __str__(self):
+        return "Operation READ"
 
 
 class Empty(object):

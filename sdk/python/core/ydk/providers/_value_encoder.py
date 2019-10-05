@@ -42,7 +42,7 @@ def check_value_is_subclass_to_handle_deepcopy(value, clazz):
     try:
         val_str = str(value)
         if 'ydk.models' in val_str:
-            class_path =  val_str.split(' ')[0].lstrip('<')
+            class_path = val_str.split(' ')[0].lstrip('<')
             module_path = '.'.join(class_path.split('.')[:4])
             clazz_name = '.'.join(class_path.split('.')[4:])
             module = importlib.import_module(module_path)
