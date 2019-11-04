@@ -72,7 +72,7 @@ class XmlEncoder(object):
 
         for member in entity.i_meta.meta_info_class_members:
             value = getattr(entity, member.presentation_name)
-            if value is None or isinstance(value, list) and value == [] and not has_yfilter(value):
+            if value is None or isinstance(value, list) and not value and not has_yfilter(value):
                 continue
 
             if not has_yfilter(value) and (not member.mtype == ANYXML_CLASS and hasattr(value, '_has_data') and not value._has_data()):

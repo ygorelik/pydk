@@ -49,3 +49,5 @@ test/scripts
 sdk/python/core/dist
 sdk/python/core/ydk.egg-info
 yang/xr-config-models/
+scripts/
+venv

@@ -505,7 +505,7 @@ def get_name_leaf_data(entity):
     leaf_name_data = {}
     for member in entity._meta_info().meta_info_class_members:
         value = getattr(entity, member.presentation_name)
-        if value is None or isinstance(value, list) and value == []:
+        if value is None or isinstance(value, list) and not value:
             continue
 
         if member.mtype in [ATTRIBUTE, REFERENCE_IDENTITY_CLASS]:
@@ -521,7 +521,7 @@ def get_children(entity):
     children = {}
     for member in entity._meta_info().meta_info_class_members:
         value = getattr(entity, member.presentation_name)
-        if value is None or isinstance(value, list) and value == []:
+        if value is None or isinstance(value, list) and not value:
             continue
 
         if member.mtype == REFERENCE_CLASS:

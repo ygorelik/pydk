@@ -208,7 +208,7 @@ def _inject_imeta_helper(entity, deviation_table={}, parent=None):
             if new_member is None:
                 # not supported
                 if any((value is None,
-                        isinstance(value, list) and value == [],
+                        isinstance(value, list) and not value,
                         hasattr(value, '_has_data') and not value._has_data(),
                         isinstance(value, READ),
                         isinstance(value, DELETE))):
@@ -226,7 +226,7 @@ def _inject_imeta_helper(entity, deviation_table={}, parent=None):
         value = getattr(entity, member.presentation_name)
 
         if any((value is None,
-                isinstance(value, list) and value == [],
+                isinstance(value, list) and not value,
                 isinstance(value, (READ, DELETE)))):
             continue
         else:

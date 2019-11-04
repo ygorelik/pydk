@@ -79,7 +79,7 @@ class ErrorMsg(object):
 def is_equal(lhs, rhs):
     ret, errtyp = True, None
     if lhs is None and rhs is None or \
-            lhs == [] and rhs == []:
+            isinstance(lhs, list) and isinstance(rhs, list) and not lhs and not rhs:
         pass
     elif is_builtin_type(lhs) or is_builtin_type(rhs):
         try:
