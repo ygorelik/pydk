@@ -1,0 +1,415 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Read Using Object Filter &mdash; YANG Development Kit 0.5.5.post2 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/icon.ico"/>
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/width.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="YANG Development Kit 0.5.5.post2 documentation" href="index.html"/>
+        <link rel="up" title="Developer Guide" href="developer_guide.html"/>
+        <link rel="next" title="Delete operation" href="delete_operation.html"/>
+        <link rel="prev" title="Introduction" href="introduction.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> YANG Development Kit
+          
+
+          
+            
+            <img src="_static/logo.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.5.post2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="about_ydk.html">About YDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="developer_guide.html">Developer Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Read Using Object Filter</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#read-everything">Read everything</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#filter-out-more-stuff">Filter out more stuff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#content-match-nodes">Content match nodes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#read-on-leaf">Read on leaf</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="delete_operation.html">Delete operation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="presence_class.html">Presence Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types_doc.html">Using Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deviation.html">Deviation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api_guide.html">API Guide</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">YANG Development Kit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="developer_guide.html">Developer Guide</a> &raquo;</li>
+      
+    <li>Read Using Object Filter</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="read-using-object-filter">
+<h1>Read Using Object Filter<a class="headerlink" href="#read-using-object-filter" title="Permalink to this headline">¶</a></h1>
+<p>In read operation, YDK object is used as read filter. This document explains how to use YDK object as a read filter. Examples below use <a class="reference external" href="https://raw.githubusercontent.com/CiscoDevNet/ydk-gen/master/profiles/test/ydktest.json">ydktest.json</a> profile file to generate YDK test package.
+Let&#8217;s write some boilerplate code for device connection:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ydk.services</span> <span class="kn">import</span> <span class="n">CRUDService</span>
+<span class="kn">from</span> <span class="nn">ydk.providers</span> <span class="kn">import</span> <span class="n">NetconfServiceProvider</span>
+<span class="kn">from</span> <span class="nn">ydk.models</span> <span class="kn">import</span> <span class="n">ydktest_filterread</span> <span class="k">as</span> <span class="n">ysanity</span>
+<span class="n">ncc</span> <span class="o">=</span> <span class="n">NetconfServiceProvider</span><span class="p">(</span><span class="n">address</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span>
+                             <span class="n">username</span><span class="o">=</span><span class="s1">&#39;admin&#39;</span><span class="p">,</span>
+                             <span class="n">password</span><span class="o">=</span><span class="s1">&#39;admin&#39;</span><span class="p">,</span>
+                             <span class="n">protocol</span><span class="o">=</span><span class="s1">&#39;ssh&#39;</span><span class="p">,</span>
+                             <span class="n">port</span><span class="o">=</span><span class="mi">12022</span><span class="p">)</span>
+<span class="n">crud</span> <span class="o">=</span> <span class="n">CRUDService</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>and <a class="reference internal" href="ydk.services.html#ydk.services.CodecService" title="ydk.services.CodecService"><code class="xref py py-class docutils literal"><span class="pre">ydk.services.CodecService</span></code></a> to simplify payload comparison:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ydk.services.codec_service</span> <span class="kn">import</span> <span class="n">CodecService</span>
+<span class="kn">from</span> <span class="nn">ydk.providers.codec_provider</span> <span class="kn">import</span> <span class="n">CodecServiceProvider</span>
+<span class="n">codec</span> <span class="o">=</span> <span class="n">CodecService</span><span class="p">()</span>
+<span class="n">codec_provider</span> <span class="o">=</span> <span class="n">CodecServiceProvider</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;xml&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and configure the device with the initial data below:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">ysanity</span><span class="o">.</span><span class="n">A</span><span class="p">()</span>
+<span class="n">a</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">a3</span> <span class="o">=</span> <span class="s2">&quot;some value&quot;</span><span class="p">,</span> <span class="s2">&quot;value of a2&quot;</span><span class="p">,</span> <span class="s2">&quot;value of a3&quot;</span>
+<span class="n">a</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">b1</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">b2</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">b3</span> <span class="o">=</span> <span class="s2">&quot;some value&quot;</span><span class="p">,</span> <span class="s2">&quot;value of b2&quot;</span><span class="p">,</span> <span class="s2">&quot;value of b3&quot;</span>
+<span class="n">a</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">F</span><span class="p">()</span>
+<span class="n">a</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">f1</span> <span class="o">=</span> <span class="s1">&#39;f&#39;</span>
+<span class="n">a</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">C</span><span class="p">()</span>
+<span class="n">a</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">d1</span> <span class="o">=</span> <span class="s2">&quot;some value d1&quot;</span>
+<span class="n">a</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">d2</span> <span class="o">=</span> <span class="s2">&quot;value of d2&quot;</span>
+<span class="n">a</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">d3</span> <span class="o">=</span> <span class="s2">&quot;value of d3&quot;</span>
+<span class="n">a</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">e</span><span class="o">.</span><span class="n">e1</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">e</span><span class="o">.</span><span class="n">e2</span> <span class="o">=</span> <span class="s2">&quot;some value e1&quot;</span><span class="p">,</span> <span class="s2">&quot;value of e2&quot;</span>
+<span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="p">,</span> <span class="n">l3</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">Lst</span><span class="p">(),</span> <span class="n">a</span><span class="o">.</span><span class="n">Lst</span><span class="p">(),</span> <span class="n">a</span><span class="o">.</span><span class="n">Lst</span><span class="p">()</span>
+<span class="n">l1</span><span class="o">.</span><span class="n">number</span><span class="p">,</span> <span class="n">l1</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span>
+<span class="n">l2</span><span class="o">.</span><span class="n">number</span><span class="p">,</span> <span class="n">l2</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;two&quot;</span>
+<span class="n">l3</span><span class="o">.</span><span class="n">number</span><span class="p">,</span> <span class="n">l3</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;three&quot;</span>
+<span class="n">a</span><span class="o">.</span><span class="n">lst</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="p">,</span> <span class="n">l3</span><span class="p">])</span>
+
+<span class="n">crud</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">ncc</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The configuration above will config following data in device:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;a</span> <span class="na">xmlns=</span><span class="s">&quot;http://cisco.com/ns/yang/ydk-filter&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;a1&gt;</span>some value<span class="nt">&lt;/a1&gt;</span>
+  <span class="nt">&lt;a2&gt;</span>value of a2<span class="nt">&lt;/a2&gt;</span>
+  <span class="nt">&lt;a3&gt;</span>value of a3<span class="nt">&lt;/a3&gt;</span>
+  <span class="nt">&lt;b&gt;</span>
+    <span class="nt">&lt;b1&gt;</span>some value<span class="nt">&lt;/b1&gt;</span>
+    <span class="nt">&lt;b2&gt;</span>value of b2<span class="nt">&lt;/b2&gt;</span>
+    <span class="nt">&lt;b3&gt;</span>value of b3<span class="nt">&lt;/b3&gt;</span>
+    <span class="nt">&lt;c/&gt;</span>
+    <span class="nt">&lt;d&gt;</span>
+      <span class="nt">&lt;d1&gt;</span>some value d1<span class="nt">&lt;/d1&gt;</span>
+      <span class="nt">&lt;d2&gt;</span>value of d2<span class="nt">&lt;/d2&gt;</span>
+      <span class="nt">&lt;d3&gt;</span>value of d3<span class="nt">&lt;/d3&gt;</span>
+      <span class="nt">&lt;e&gt;</span>
+        <span class="nt">&lt;e1&gt;</span>some value e1<span class="nt">&lt;/e1&gt;</span>
+        <span class="nt">&lt;e2&gt;</span>value of e2<span class="nt">&lt;/e2&gt;</span>
+      <span class="nt">&lt;/e&gt;</span>
+    <span class="nt">&lt;/d&gt;</span>
+    <span class="nt">&lt;f&gt;</span>
+      <span class="nt">&lt;f1&gt;</span>f<span class="nt">&lt;/f1&gt;</span>
+    <span class="nt">&lt;/f&gt;</span>
+  <span class="nt">&lt;/b&gt;</span>
+  <span class="nt">&lt;lst&gt;</span>
+    <span class="nt">&lt;number&gt;</span>1<span class="nt">&lt;/number&gt;</span>
+    <span class="nt">&lt;value&gt;</span>one<span class="nt">&lt;/value&gt;</span>
+  <span class="nt">&lt;/lst&gt;</span>
+  <span class="nt">&lt;lst&gt;</span>
+    <span class="nt">&lt;number&gt;</span>2<span class="nt">&lt;/number&gt;</span>
+    <span class="nt">&lt;value&gt;</span>two<span class="nt">&lt;/value&gt;</span>
+  <span class="nt">&lt;/lst&gt;</span>
+  <span class="nt">&lt;lst&gt;</span>
+    <span class="nt">&lt;number&gt;</span>3<span class="nt">&lt;/number&gt;</span>
+    <span class="nt">&lt;value&gt;</span>three<span class="nt">&lt;/value&gt;</span>
+  <span class="nt">&lt;/lst&gt;</span>
+<span class="nt">&lt;/a&gt;</span>
+</pre></div>
+</div>
+<p>where <cite>&lt;c&gt;</cite> and <cite>&lt;f&gt;</cite> are presence container.</p>
+<div class="section" id="read-everything">
+<h2>Read everything<a class="headerlink" href="#read-everything" title="Permalink to this headline">¶</a></h2>
+<p>The simplest filter is the top level container:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">a_read</span> <span class="o">=</span> <span class="n">crud</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">ncc</span><span class="p">,</span> <span class="n">ysanity</span><span class="o">.</span><span class="n">A</span><span class="p">())</span>
+<span class="k">print</span> <span class="n">codec</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">codec_provider</span><span class="p">,</span> <span class="n">a_read</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>the top level container filters nothing and return every data under current level:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;a</span> <span class="na">xmlns=</span><span class="s">&quot;http://cisco.com/ns/yang/ydk-filter&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;a1&gt;</span>some value<span class="nt">&lt;/a1&gt;</span>
+  <span class="nt">&lt;a2&gt;</span>value of a2<span class="nt">&lt;/a2&gt;</span>
+  <span class="nt">&lt;a3&gt;</span>value of a3<span class="nt">&lt;/a3&gt;</span>
+  <span class="nt">&lt;b&gt;</span>
+    <span class="nt">&lt;b1&gt;</span>some value<span class="nt">&lt;/b1&gt;</span>
+    <span class="nt">&lt;b2&gt;</span>value of b2<span class="nt">&lt;/b2&gt;</span>
+    <span class="nt">&lt;b3&gt;</span>value of b3<span class="nt">&lt;/b3&gt;</span>
+    <span class="nt">&lt;c/&gt;</span>
+    <span class="nt">&lt;d&gt;</span>
+      <span class="nt">&lt;d1&gt;</span>some value d1<span class="nt">&lt;/d1&gt;</span>
+      <span class="nt">&lt;d2&gt;</span>value of d2<span class="nt">&lt;/d2&gt;</span>
+      <span class="nt">&lt;d3&gt;</span>value of d3<span class="nt">&lt;/d3&gt;</span>
+      <span class="nt">&lt;e&gt;</span>
+        <span class="nt">&lt;e1&gt;</span>some value e1<span class="nt">&lt;/e1&gt;</span>
+        <span class="nt">&lt;e2&gt;</span>value of e2<span class="nt">&lt;/e2&gt;</span>
+      <span class="nt">&lt;/e&gt;</span>
+    <span class="nt">&lt;/d&gt;</span>
+    <span class="nt">&lt;f&gt;</span>
+      <span class="nt">&lt;f1&gt;</span>f<span class="nt">&lt;/f1&gt;</span>
+    <span class="nt">&lt;/f&gt;</span>
+  <span class="nt">&lt;/b&gt;</span>
+  <span class="nt">&lt;lst&gt;</span>
+    <span class="nt">&lt;number&gt;</span>1<span class="nt">&lt;/number&gt;</span>
+    <span class="nt">&lt;value&gt;</span>one<span class="nt">&lt;/value&gt;</span>
+  <span class="nt">&lt;/lst&gt;</span>
+  <span class="nt">&lt;lst&gt;</span>
+    <span class="nt">&lt;number&gt;</span>2<span class="nt">&lt;/number&gt;</span>
+    <span class="nt">&lt;value&gt;</span>two<span class="nt">&lt;/value&gt;</span>
+  <span class="nt">&lt;/lst&gt;</span>
+  <span class="nt">&lt;lst&gt;</span>
+    <span class="nt">&lt;number&gt;</span>3<span class="nt">&lt;/number&gt;</span>
+    <span class="nt">&lt;value&gt;</span>three<span class="nt">&lt;/value&gt;</span>
+  <span class="nt">&lt;/lst&gt;</span>
+<span class="nt">&lt;/a&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="filter-out-more-stuff">
+<h2>Filter out more stuff<a class="headerlink" href="#filter-out-more-stuff" title="Permalink to this headline">¶</a></h2>
+<p>To make the filter more strict, you could assign more value to it. For example, if you are only interested in presence container <cite>C</cite>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">ysanity</span><span class="o">.</span><span class="n">A</span><span class="p">()</span>
+<span class="n">a</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">C</span><span class="p">()</span>
+<span class="n">a_read</span> <span class="o">=</span> <span class="n">crud</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">ncc</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">codec</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">a_read</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;a</span> <span class="na">xmlns=</span><span class="s">&quot;http://cisco.com/ns/yang/ydk-filter&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;b&gt;</span>
+    <span class="nt">&lt;c/&gt;</span>
+  <span class="nt">&lt;/b&gt;</span>
+<span class="nt">&lt;/a&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="content-match-nodes">
+<h2>Content match nodes<a class="headerlink" href="#content-match-nodes" title="Permalink to this headline">¶</a></h2>
+<p>According to <a class="reference external" href="https://tools.ietf.org/html/rfc6241#section-6.2.5">NETCONF RFC</a>, a &#8220;content match node&#8221; is used to select sibling nodes for filter output. Let&#8217;s try this concept with the following example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">ysanity</span><span class="o">.</span><span class="n">A</span><span class="p">()</span>
+<span class="n">a</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">b1</span> <span class="o">=</span> <span class="s2">&quot;some value&quot;</span>
+<span class="n">a_read</span> <span class="o">=</span> <span class="n">crud</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">ncc</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">codec</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">codec_provider</span><span class="p">,</span> <span class="n">a_read</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In the example show above, the <cite>a.b.b1</cite> leaf serves as a content match node, therefore its siblings <cite>&lt;b2&gt;</cite> , <cite>&lt;b3&gt;</cite>, <cite>&lt;c&gt;</cite>, <cite>&lt;d&gt;</cite>, <cite>&lt;f&gt;</cite> and their children are all being kept.</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;a</span> <span class="na">xmlns=</span><span class="s">&quot;http://cisco.com/ns/yang/ydk-filter&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;b&gt;</span>
+    <span class="nt">&lt;b1&gt;</span>some value<span class="nt">&lt;/b1&gt;</span>
+    <span class="nt">&lt;b2&gt;</span>value of b2<span class="nt">&lt;/b2&gt;</span>
+    <span class="nt">&lt;b3&gt;</span>value of b3<span class="nt">&lt;/b3&gt;</span>
+    <span class="nt">&lt;c/&gt;</span>
+    <span class="nt">&lt;d&gt;</span>
+      <span class="nt">&lt;d1&gt;</span>some value d1<span class="nt">&lt;/d1&gt;</span>
+      <span class="nt">&lt;d2&gt;</span>value of d2<span class="nt">&lt;/d2&gt;</span>
+      <span class="nt">&lt;d3&gt;</span>value of d3<span class="nt">&lt;/d3&gt;</span>
+      <span class="nt">&lt;e&gt;</span>
+        <span class="nt">&lt;e1&gt;</span>some value e1<span class="nt">&lt;/e1&gt;</span>
+        <span class="nt">&lt;e2&gt;</span>value of e2<span class="nt">&lt;/e2&gt;</span>
+      <span class="nt">&lt;/e&gt;</span>
+    <span class="nt">&lt;/d&gt;</span>
+    <span class="nt">&lt;f&gt;</span>
+      <span class="nt">&lt;f1&gt;</span>f<span class="nt">&lt;/f1&gt;</span>
+    <span class="nt">&lt;/f&gt;</span>
+  <span class="nt">&lt;/b&gt;</span>
+<span class="nt">&lt;/a&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="read-on-leaf">
+<h2>Read on leaf<a class="headerlink" href="#read-on-leaf" title="Permalink to this headline">¶</a></h2>
+<p>YDK also provides you with a <cite>READ</cite> class that could be used to read the value on a particular leaf. Let&#8217;s use this <cite>READ</cite> class and import it from <cite>ydk.types</cite>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ydk.types</span> <span class="kn">import</span> <span class="n">READ</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">ysanity</span><span class="o">.</span><span class="n">A</span><span class="p">()</span>
+<span class="n">a</span><span class="o">.</span><span class="n">a1</span> <span class="o">=</span> <span class="n">READ</span><span class="p">()</span>
+<span class="n">a_read</span> <span class="o">=</span> <span class="n">crud</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">ncc</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">codec</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">codec_provider</span><span class="p">,</span> <span class="n">a_read</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;a</span> <span class="na">xmlns=</span><span class="s">&quot;http://cisco.com/ns/yang/ydk-filter&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;a1&gt;</span>some value<span class="nt">&lt;/a1&gt;</span>
+<span class="nt">&lt;/a&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="delete_operation.html" class="btn btn-neutral float-right" title="Delete operation" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="introduction.html" class="btn btn-neutral" title="Introduction" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.5.5.post2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  false
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

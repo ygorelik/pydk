@@ -1,0 +1,1020 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Services &mdash; YANG Development Kit 0.5.5.post2 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/icon.ico"/>
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/width.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="YANG Development Kit 0.5.5.post2 documentation" href="index.html"/>
+        <link rel="up" title="API Guide" href="api_guide.html"/>
+        <link rel="next" title="YDK Types" href="ydk.types.html"/>
+        <link rel="prev" title="Service Providers" href="ydk.providers.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> YANG Development Kit
+          
+
+          
+            
+            <img src="_static/logo.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.5.post2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="about_ydk.html">About YDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="api_guide.html">API Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ydk.errors.html">Errors and Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ydk.providers.html">Service Providers</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Services</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#crud-service">CRUD Service</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#netconf-service">Netconf Service</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#codec-service">Codec Service</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#executor-service">Executor Service</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ydk.types.html">YDK Types</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">YANG Development Kit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="api_guide.html">API Guide</a> &raquo;</li>
+      
+    <li>Services</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="services">
+<h1><a class="toc-backref" href="#id1">Services</a><a class="headerlink" href="#services" title="Permalink to this headline">¶</a></h1>
+<div class="contents topic" id="table-of-contents">
+<p class="topic-title first">Table of Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#services" id="id1">Services</a><ul>
+<li><a class="reference internal" href="#crud-service" id="id2">CRUD Service</a></li>
+<li><a class="reference internal" href="#netconf-service" id="id3">Netconf Service</a></li>
+<li><a class="reference internal" href="#codec-service" id="id4">Codec Service</a></li>
+<li><a class="reference internal" href="#executor-service" id="id5">Executor Service</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="crud-service">
+<h2><a class="toc-backref" href="#id2">CRUD Service</a><a class="headerlink" href="#crud-service" title="Permalink to this headline">¶</a></h2>
+<p>Provides Create/Read/Update/Delete API&#8217;s</p>
+<dl class="class">
+<dt id="ydk.services.CRUDService">
+<em class="property">class </em><code class="descclassname">ydk.services.</code><code class="descname">CRUDService</code><a class="headerlink" href="#ydk.services.CRUDService" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">ydk.services.Service</span></code></p>
+<p>CRUD Service class for supporting CRUD operations on entities.</p>
+<dl class="method">
+<dt id="ydk.services.CRUDService.create">
+<code class="descname">create</code><span class="sig-paren">(</span><em>provider</em>, <em>entity</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.services.CRUDService.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the entity</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>provider</strong> &#8211; An instance of ydk.providers.ServiceProvider</li>
+<li><strong>entity</strong> &#8211; An instance of an entity class defined under the ydk.models package or subpackages.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">None</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYDataValidationError" title="ydk.errors.YPYDataValidationError"><strong>ydk.errors.YPYDataValidationError</strong></a> &#8211; if validation error has occurred</li>
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYError" title="ydk.errors.YPYError"><strong>ydk.errors.YPYError</strong></a> &#8211; if other error has occurred</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Possible Errors:</p>
+<ul class="simple">
+<li>a server side error</li>
+<li>there isn&#8217;t enough information in the entity to prepare the message (eg. missing keys)</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="ydk.services.CRUDService.read">
+<code class="descname">read</code><span class="sig-paren">(</span><em>provider</em>, <em>read_filter</em>, <em>only_config=False</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.services.CRUDService.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the entity or entities.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>provider</strong> &#8211; An instance of ydk.providers.ServiceProvider</li>
+<li><strong>read_filter</strong> &#8211; A read_filter is an instance of an entity class. An entity class is a class defined under the ydk.models package that is not an Enum, Identity or a subclass of FixedBitsDict). Attributes of this entity class may contain values that act as match expressions or can be explicitly marked as to be read by assigning an instance of type <cite>ydk.types.READ</cite> to them.</li>
+<li><strong>only_config</strong> &#8211; Flag that indicates that only the data that represents configuration data is to be fetched. Default is set to False i.e both oper and config data will be fetched.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The entity or list of entities as identified by the <cite>read_filter</cite></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYDataValidationError" title="ydk.errors.YPYDataValidationError"><strong>ydk.errors.YPYDataValidationError</strong></a> &#8211; if validation error has occurred</li>
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYError" title="ydk.errors.YPYError"><strong>ydk.errors.YPYError</strong></a> &#8211; if other error has occurred</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Possible errors could be</p>
+<ul class="simple">
+<li>a server side error</li>
+<li>if there isn&#8217;t enough information in the entity to prepare the message (missing keys for example)</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="ydk.services.CRUDService.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>provider</em>, <em>entity</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.services.CRUDService.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the entity.</p>
+<p>Note:</p>
+<ul class="simple">
+<li>An attribute of an entity class can be deleted by setting to an instance of <cite>ydk.types.DELETE</cite>.</li>
+<li>An entity can only be updated if it exists on the server. Otherwise a <cite>ydk.errors.YPYError</cite> will be raised.</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>provider</strong> &#8211; An instance of ydk.providers.ServiceProvider</li>
+<li><strong>entity</strong> &#8211; An instance of an entity class defined under the ydk.models package or subpackages.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">None</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYDataValidationError" title="ydk.errors.YPYDataValidationError"><strong>ydk.errors.YPYDataValidationError</strong></a> &#8211; if validation error has occurred</li>
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYError" title="ydk.errors.YPYError"><strong>ydk.errors.YPYError</strong></a> &#8211; if other error has occurred</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Possible errors could be</p>
+<ul class="simple">
+<li>a server side error</li>
+<li>if there isn&#8217;t enough information in the entity to the message (missing keys for example)</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="ydk.services.CRUDService.delete">
+<code class="descname">delete</code><span class="sig-paren">(</span><em>provider</em>, <em>entity</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.services.CRUDService.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the entity</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>provider</strong> &#8211; An instance of ydk.providers.ServiceProvider</li>
+<li><strong>entity</strong> &#8211; An instance of an entity class defined under the ydk.models package or subpackages.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">None</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYDataValidationError" title="ydk.errors.YPYDataValidationError"><strong>ydk.errors.YPYDataValidationError</strong></a> &#8211; if validation error has occurred</li>
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYError" title="ydk.errors.YPYError"><strong>ydk.errors.YPYError</strong></a> &#8211; if other error has occurred</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Possible errors could be</p>
+<ul class="simple">
+<li>a server side error</li>
+<li>if there isn&#8217;t enough information in the entity to the message (missing keys for example)</li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="netconf-service">
+<h2><a class="toc-backref" href="#id3">Netconf Service</a><a class="headerlink" href="#netconf-service" title="Permalink to this headline">¶</a></h2>
+<p>Provides API&#8217;s to execute netconf operations.</p>
+<dl class="class">
+<dt id="ydk.services.Datastore">
+<em class="property">class </em><code class="descclassname">ydk.services.</code><code class="descname">Datastore</code><a class="headerlink" href="#ydk.services.Datastore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></code></p>
+<p>Netconf datastore type</p>
+<dl class="data">
+<dt>
+<code class="descname">candidate = 1</code></dt>
+<dd><p>Candidate</p>
+</dd></dl>
+
+<dl class="data">
+<dt>
+<code class="descname">running = 2</code></dt>
+<dd><p>Running</p>
+</dd></dl>
+
+<dl class="data">
+<dt>
+<code class="descname">startup = 3</code></dt>
+<dd><p>Startup</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ydk.services.NetconfService">
+<em class="property">class </em><code class="descclassname">ydk.services.</code><code class="descname">NetconfService</code><a class="headerlink" href="#ydk.services.NetconfService" title="Permalink to this definition">¶</a></dt>
+<dd><p>Netconf Service class for executing netconf operations.</p>
+<p>Bases: <code class="xref py py-class docutils literal"><span class="pre">ydk.services.Service</span></code>.</p>
+<blockquote>
+<div><dl class="method">
+<dt id="ydk.services.NetconfService.cancel_commit">
+<code class="descname">cancel_commit</code><span class="sig-paren">(</span><em>provider</em>, <em>persist_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.services.NetconfService.cancel_commit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute an cancel-commit operation to cancel an ongoing confirmed commit.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>provider</strong> (<a class="reference internal" href="ydk.providers.html#ydk.providers.ServiceProvider" title="ydk.providers.ServiceProvider"><em>ydk.providers.ServiceProvider</em></a>) &#8211; A provider instance.</li>
+<li><strong>persist_id</strong> (<em>str</em>) &#8211; This parameter is given in order to cancel a persistent confirmed commit. The value must be equal to the value given in the &#8216;persist&#8217; parameter to the commit operation. If it does not match, the operation fails with an &#8216;invalid-value&#8217; error.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An ok reply string if operation succeeds.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">str</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYDataValidationError" title="ydk.errors.YPYDataValidationError"><strong>ydk.errors.YPYDataValidationError</strong></a> &#8211; If validation error has occurred.</li>
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYError" title="ydk.errors.YPYError"><strong>ydk.errors.YPYError</strong></a> &#8211; <p>If other error has occurred. Possible errors could be:</p>
+<ul>
+<li>A server side error</li>
+<li>If there isn&#8217;t enough information in the entity to the message (missing keys for example).</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ydk.services.NetconfService.close_session">
+<code class="descname">close_session</code><span class="sig-paren">(</span><em>provider</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.services.NetconfService.close_session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a close-session operation to cancel an ongoing confirmed commit.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>provider</strong> (<a class="reference internal" href="ydk.providers.html#ydk.providers.ServiceProvider" title="ydk.providers.ServiceProvider"><em>ydk.providers.ServiceProvider</em></a>) &#8211; A provider instance.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An ok reply string if operation succeeds.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">str</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYDataValidationError" title="ydk.errors.YPYDataValidationError"><strong>ydk.errors.YPYDataValidationError</strong></a> &#8211; if validation error has occurred</li>
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYError" title="ydk.errors.YPYError"><strong>ydk.errors.YPYError</strong></a> &#8211; <p>if other error has occurred.</p>
+<p>Possible errors could be:</p>
+<ul>
+<li>A server side error.</li>
+<li>If there isn&#8217;t enough information in the entity to the message (missing keys for example).</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ydk.services.NetconfService.commit">
+<code class="descname">commit</code><span class="sig-paren">(</span><em>provider</em>, <em>confirmed=False</em>, <em>confirm_timeout=None</em>, <em>persist=False</em>, <em>persist_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.services.NetconfService.commit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a commit operation to commit the candidate configuration as the device&#8217;s new current configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>provider</strong> (<a class="reference internal" href="ydk.providers.html#ydk.providers.ServiceProvider" title="ydk.providers.ServiceProvider"><em>ydk.providers.ServiceProvider</em></a>) &#8211; A provider instance.</li>
+<li><strong>confirmed</strong> (<em>bool</em>) &#8211; Perform a confirmed commit operation.</li>
+<li><strong>confirm_timeout</strong> (<em>int</em>) &#8211; The timeout interval for a confirmed commit.</li>
+<li><strong>persist</strong> (<em>str</em>) &#8211; Make a confirmed commit persistent. A persistent confirmed commit is not aborted if the NETCONF session terminates. The only way to abort a persistent confirmed commit is to let the timer expire, or to use the &lt;cancel-commit&gt; operation. The value of this parameter is a token that must be given in the &#8216;persist-id&#8217; parameter of &lt;commit&gt; or &lt;cancel-commit&gt; operations in order to confirm or cancel the persistent confirmed commit. The token should be a random string.</li>
+<li><strong>persist_id</strong> (<em>str</em>) &#8211; This parameter is given in order to commit a persistent confirmed commit. The value must be equal to the value given in the &#8216;persist&#8217; parameter to the &lt;commit&gt; operation. If it does not match, the operation fails with an &#8216;invalid-value&#8217; error.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An ok reply string if operation succeeds.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">str</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYDataValidationError" title="ydk.errors.YPYDataValidationError"><strong>ydk.errors.YPYDataValidationError</strong></a> &#8211; if validation error has occurred.</li>
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYError" title="ydk.errors.YPYError"><strong>ydk.errors.YPYError</strong></a> &#8211; <p>if other error has occurred.</p>
+<p>Possible errors could be:</p>
+<ul>
+<li>A server side error.</li>
+<li>If there isn&#8217;t enough information in the entity to the message (missing keys for example).</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ydk.services.NetconfService.copy_config">
+<code class="descname">copy_config</code><span class="sig-paren">(</span><em>provider</em>, <em>target</em>, <em>source</em>, <em>with_defaults_option=None</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.services.NetconfService.copy_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a copy-config operation to create or replace an entire configuration datastore with the contents of another complete configuration datastore.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>provider</strong> (<a class="reference internal" href="ydk.providers.html#ydk.providers.ServiceProvider" title="ydk.providers.ServiceProvider"><em>ydk.providers.ServiceProvider</em></a>) &#8211; A provider instance.</li>
+<li><strong>target</strong> &#8211; Particular configuration to copy to. Valid options are <code class="xref py py-attr docutils literal"><span class="pre">Datastore.candidate</span></code>, <code class="xref py py-attr docutils literal"><span class="pre">Datastore.running</span></code>, <code class="xref py py-attr docutils literal"><span class="pre">Datastore.startup</span></code> and url(<code class="docutils literal"><span class="pre">str</span></code>) if the device has such feature advertised in device capability.</li>
+<li><strong>source</strong> &#8211; Particular configuration to copy from. Valid options are <code class="xref py py-attr docutils literal"><span class="pre">Datastore.candidate</span></code>, <code class="xref py py-attr docutils literal"><span class="pre">Datastore.running</span></code>, <code class="xref py py-attr docutils literal"><span class="pre">Datastore.startup</span></code> and url(<code class="docutils literal"><span class="pre">str</span></code>) if the deivce has such feature advertised in capability. A YDK entity object can also be used for this parameter.</li>
+<li><strong>with_defaults</strong> (<code class="xref py py-attr docutils literal"><span class="pre">ietf_netconf.WithDefaultsModeEnum</span></code>) &#8211; The explicit defaults processing mode requested.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An ok reply string if operation succeeds.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">str</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYDataValidationError" title="ydk.errors.YPYDataValidationError"><strong>ydk.errors.YPYDataValidationError</strong></a> &#8211; if validation error has occurred.</li>
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYError" title="ydk.errors.YPYError"><strong>ydk.errors.YPYError</strong></a> &#8211; <p>if other error has occurred.</p>
+<p>Possible errors could be</p>
+<ul>
+<li>A server side error.</li>
+<li>If there isn&#8217;t enough information in the entity to the message (missing keys for example).</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ydk.services.NetconfService.delete_config">
+<code class="descname">delete_config</code><span class="sig-paren">(</span><em>provider</em>, <em>target</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.services.NetconfService.delete_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute an delete-config operation to delete a configuration datastore.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>provider</strong> (<a class="reference internal" href="ydk.providers.html#ydk.providers.ServiceProvider" title="ydk.providers.ServiceProvider"><em>ydk.providers.ServiceProvider</em></a>) &#8211; A provider instance.</li>
+<li><strong>target</strong> &#8211; Particular configuration to delete. Valid options are <code class="xref py py-attr docutils literal"><span class="pre">Datastore.startup</span></code> or url(<code class="docutils literal"><span class="pre">str</span></code>).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An ok reply string if operation succeeds.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">str</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYDataValidationError" title="ydk.errors.YPYDataValidationError"><strong>ydk.errors.YPYDataValidationError</strong></a> &#8211; if validation error has occurred.</li>
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYError" title="ydk.errors.YPYError"><strong>ydk.errors.YPYError</strong></a> &#8211; <p>if other error has occurred.</p>
+<p>Possible errors could be:</p>
+<ul>
+<li>A server side error.</li>
+<li>If there isn&#8217;t enough information in the entity to the message (missing keys for example).</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ydk.services.NetconfService.discard_changes">
+<code class="descname">discard_changes</code><span class="sig-paren">(</span><em>provider</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.services.NetconfService.discard_changes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a discard-changes operation to revert the candidate configuration to the current running configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>provider</strong> (<a class="reference internal" href="ydk.providers.html#ydk.providers.ServiceProvider" title="ydk.providers.ServiceProvider"><em>ydk.providers.ServiceProvider</em></a>) &#8211; A provider instance.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An ok reply string if operation succeeds.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">str</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYDataValidationError" title="ydk.errors.YPYDataValidationError"><strong>ydk.errors.YPYDataValidationError</strong></a> &#8211; if validation error has occurred.</li>
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYError" title="ydk.errors.YPYError"><strong>ydk.errors.YPYError</strong></a> &#8211; <p>if other error has occurred.</p>
+<p>Possible errors could be:</p>
+<ul>
+<li>A server side error.</li>
+<li>If there isn&#8217;t enough information in the entity to the message (missing keys for example).</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ydk.services.NetconfService.edit_config">
+<code class="descname">edit_config</code><span class="sig-paren">(</span><em>provider</em>, <em>target</em>, <em>config</em>, <em>default_operation=None</em>, <em>error_option=None</em>, <em>test_option=None</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.services.NetconfService.edit_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute an edit-config operation to load all or part of a specified configuration to the specified target configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>provider</strong> (<a class="reference internal" href="ydk.providers.html#ydk.providers.ServiceProvider" title="ydk.providers.ServiceProvider"><em>ydk.providers.ServiceProvider</em></a>) &#8211; A provider instance.</li>
+<li><strong>target</strong> &#8211; Particular configuration to copy from. Valid options are <code class="xref py py-attr docutils literal"><span class="pre">Datastore.candidate</span></code>, <code class="xref py py-attr docutils literal"><span class="pre">Datastore.running</span></code>.</li>
+<li><strong>config</strong> &#8211; A YDK entity object used as a config block.</li>
+<li><strong>default_operation</strong> (<code class="xref py py-class docutils literal"><span class="pre">EditConfigRpc.Input.DefaultOperationEnum</span></code>) &#8211; Selects the default operation for this edit-config request.</li>
+<li><strong>error_option</strong> (<code class="xref py py-class docutils literal"><span class="pre">EditConfigRpc.Input.ErrorOptionEnum</span></code>) &#8211; Selects the error option for this edit-config request.</li>
+<li><strong>test_option</strong> (<code class="xref py py-class docutils literal"><span class="pre">EditConfigRpc.Input.TestOptionEnum</span></code>) &#8211; Selects the test option for this edit-config request.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An ok reply string if operation succeeds.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">str</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYDataValidationError" title="ydk.errors.YPYDataValidationError"><strong>ydk.errors.YPYDataValidationError</strong></a> &#8211; if validation error has occurred.</li>
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYError" title="ydk.errors.YPYError"><strong>ydk.errors.YPYError</strong></a> &#8211; <p>if other error has occurred.</p>
+<p>Possible errors could be:</p>
+<ul>
+<li>A server side error.</li>
+<li>If there isn&#8217;t enough information in the entity to the message (missing keys for example).</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ydk.services.NetconfService.get_config">
+<code class="descname">get_config</code><span class="sig-paren">(</span><em>provider</em>, <em>source</em>, <em>get_filter</em>, <em>with_defaults_option=None</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.services.NetconfService.get_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a get-config operation to retrieve all or part of a specified configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>provider</strong> (<a class="reference internal" href="ydk.providers.html#ydk.providers.ServiceProvider" title="ydk.providers.ServiceProvider"><em>ydk.providers.ServiceProvider</em></a>) &#8211; A provider instance.</li>
+<li><strong>get_filter</strong> &#8211; A YDK entity object used as a subtree filter or XPath filter.</li>
+<li><strong>source</strong> &#8211; Particular configuration to retrieve. Valid options are <code class="xref py py-attr docutils literal"><span class="pre">Datastore.candidate</span></code>, <code class="xref py py-attr docutils literal"><span class="pre">Datastore.running</span></code>, and <code class="xref py py-attr docutils literal"><span class="pre">Datastore.startup</span></code>.</li>
+<li><strong>with_defaults</strong> (<code class="xref py py-attr docutils literal"><span class="pre">ietf_netconf.WithDefaultsModeEnum</span></code>) &#8211; The explicit defaults processing mode requested.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A YDK entity object represents copy of the running datastore subset and/or state data that matched the filter criteria (if any). An empty data container indicates that the request did not produce any results.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">object</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYDataValidationError" title="ydk.errors.YPYDataValidationError"><strong>ydk.errors.YPYDataValidationError</strong></a> &#8211; if validation error has occurred.</li>
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYError" title="ydk.errors.YPYError"><strong>ydk.errors.YPYError</strong></a> &#8211; <p>if other error has occurred.</p>
+<p>Possible errors could be:</p>
+<ul>
+<li>A server side error.</li>
+<li>If there isn&#8217;t enough information in the entity to the message (missing keys for example).</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ydk.services.NetconfService.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>provider</em>, <em>get_filter</em>, <em>with_defaults_option=None</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.services.NetconfService.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a get operation to retrieve running configuration and device state information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>provider</strong> (<a class="reference internal" href="ydk.providers.html#ydk.providers.ServiceProvider" title="ydk.providers.ServiceProvider"><em>ydk.providers.ServiceProvider</em></a>) &#8211; A provider instance.</li>
+<li><strong>get_filter</strong> &#8211; This parameter specifies the portion of the system configuration and state data to retrieve.</li>
+<li><strong>with_defaults</strong> (<code class="xref py py-attr docutils literal"><span class="pre">ietf_netconf.WithDefaultsModeEnum</span></code>) &#8211; The explicit defaults processing mode requested.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A YDK entity object represents copy of the running datastore subset and/or state data that matched the filter criteria (if any). An empty data container indicates that the request did not produce any results.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">object</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYDataValidationError" title="ydk.errors.YPYDataValidationError"><strong>ydk.errors.YPYDataValidationError</strong></a> &#8211; if validation error has occurred.</li>
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYError" title="ydk.errors.YPYError"><strong>ydk.errors.YPYError</strong></a> &#8211; <p>if other error has occurred.</p>
+<p>Possible errors could be:</p>
+<ul>
+<li>A server side error.</li>
+<li>If there isn&#8217;t enough information in the entity to the message (missing keys for example).</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ydk.services.NetconfService.kill_session">
+<code class="descname">kill_session</code><span class="sig-paren">(</span><em>provider</em>, <em>session_id</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.services.NetconfService.kill_session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a kill-session operation to force the termination of a NETCONF session.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>provider</strong> (<a class="reference internal" href="ydk.providers.html#ydk.providers.ServiceProvider" title="ydk.providers.ServiceProvider"><em>ydk.providers.ServiceProvider</em></a>) &#8211; A provider instance.</li>
+<li><strong>session_id</strong> (<em>int</em>) &#8211; Particular session to kill.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An ok reply string if operation succeeds.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">str</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYDataValidationError" title="ydk.errors.YPYDataValidationError"><strong>ydk.errors.YPYDataValidationError</strong></a> &#8211; if validation error has occurred.</li>
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYError" title="ydk.errors.YPYError"><strong>ydk.errors.YPYError</strong></a> &#8211; <p>if other error has occurred.</p>
+<p>Possible errors could be:</p>
+<ul>
+<li>A server side error.</li>
+<li>If there isn&#8217;t enough information in the entity to the message (missing keys for example).</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ydk.services.NetconfService.lock">
+<code class="descname">lock</code><span class="sig-paren">(</span><em>provider</em>, <em>target</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.services.NetconfService.lock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a lock operation to allow the client to lock the configuration system of a device.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>provider</strong> (<a class="reference internal" href="ydk.providers.html#ydk.providers.ServiceProvider" title="ydk.providers.ServiceProvider"><em>ydk.providers.ServiceProvider</em></a>) &#8211; A provider instance.</li>
+<li><strong>target</strong> &#8211; Particular configuration to lock. Valid options are <code class="xref py py-attr docutils literal"><span class="pre">Datastore.candidate</span></code>, <code class="xref py py-attr docutils literal"><span class="pre">Datastore.running</span></code>, and <code class="xref py py-attr docutils literal"><span class="pre">Datastore.startup</span></code> if the device has such feature advertised.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An ok reply string if operation succeeds.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">str</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYDataValidationError" title="ydk.errors.YPYDataValidationError"><strong>ydk.errors.YPYDataValidationError</strong></a> &#8211; if validation error has occurred.</li>
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYError" title="ydk.errors.YPYError"><strong>ydk.errors.YPYError</strong></a> &#8211; <p>if other error has occurred.</p>
+<p>Possible errors could be:</p>
+<ul>
+<li>A server side error.</li>
+<li>If there isn&#8217;t enough information in the entity to the message (missing keys for example).</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ydk.services.NetconfService.unlock">
+<code class="descname">unlock</code><span class="sig-paren">(</span><em>provider</em>, <em>target</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.services.NetconfService.unlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute an unlock operation to  release a configuration lock, previously obtained with the &#8216;lock&#8217; operation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>provider</strong> (<a class="reference internal" href="ydk.providers.html#ydk.providers.ServiceProvider" title="ydk.providers.ServiceProvider"><em>ydk.providers.ServiceProvider</em></a>) &#8211; A provider instance.</li>
+<li><strong>target</strong> &#8211; Particular configuration to unlock. Valid options are <code class="xref py py-attr docutils literal"><span class="pre">Datastore.candidate</span></code>, <code class="xref py py-attr docutils literal"><span class="pre">Datastore.running</span></code>, and <code class="xref py py-attr docutils literal"><span class="pre">Datastore.startup</span></code> if the device has such feature advertised.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An ok reply string if operation succeeds.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">str</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYDataValidationError" title="ydk.errors.YPYDataValidationError"><strong>ydk.errors.YPYDataValidationError</strong></a> &#8211; if validation error has occurred</li>
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYError" title="ydk.errors.YPYError"><strong>ydk.errors.YPYError</strong></a> &#8211; <p>if other error has occurred</p>
+<p>Possible errors could be:</p>
+<ul>
+<li>A server side error.</li>
+<li>If there isn&#8217;t enough information in the entity to the message (missing keys for example).</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ydk.services.NetconfService.validate">
+<code class="descname">validate</code><span class="sig-paren">(</span><em>provider</em>, <em>source=None</em>, <em>config=None</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.services.NetconfService.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a validate operation to validate the contents of the specified configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>provider</strong> (<a class="reference internal" href="ydk.providers.html#ydk.providers.ServiceProvider" title="ydk.providers.ServiceProvider"><em>ydk.providers.ServiceProvider</em></a>) &#8211; A provider instance.</li>
+<li><strong>source</strong> &#8211; Particular configuration to validate. Valid options are <code class="xref py py-attr docutils literal"><span class="pre">Datastore.candidate</span></code>, <code class="xref py py-attr docutils literal"><span class="pre">Datastore.running</span></code>, <code class="xref py py-attr docutils literal"><span class="pre">Datastore.startup</span></code> and url(<code class="docutils literal"><span class="pre">str</span></code>) if the deivce has such feature advertised in device capability. A YDK entity object can also be used for this parameter.</li>
+<li><strong>with_defaults</strong> (<code class="xref py py-attr docutils literal"><span class="pre">ietf_netconf.WithDefaultsModeEnum</span></code>) &#8211; The explicit defaults processing mode requested.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An ok reply string if operation succeeds.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">str</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYDataValidationError" title="ydk.errors.YPYDataValidationError"><strong>ydk.errors.YPYDataValidationError</strong></a> &#8211; if validation error has occurred.</li>
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYError" title="ydk.errors.YPYError"><strong>ydk.errors.YPYError</strong></a> &#8211; <p>if other error has occurred.</p>
+<p>Possible errors could be:</p>
+<ul>
+<li>A server side error.</li>
+<li>If there isn&#8217;t enough information in the entity to the message (missing keys for example).</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="codec-service">
+<h2><a class="toc-backref" href="#id4">Codec Service</a><a class="headerlink" href="#codec-service" title="Permalink to this headline">¶</a></h2>
+<p>Provides encode/decode API&#8217;s</p>
+<dl class="class">
+<dt id="ydk.services.CodecService">
+<em class="property">class </em><code class="descclassname">ydk.services.</code><code class="descname">CodecService</code><a class="headerlink" href="#ydk.services.CodecService" title="Permalink to this definition">¶</a></dt>
+<dd><p>Codec Service class for supporting encoding entities and decoding payloads.</p>
+<blockquote>
+<div><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">ydk.services.Service</span></code></p>
+<dl class="method">
+<dt id="ydk.services.CodecService.encode">
+<code class="descname">encode</code><span class="sig-paren">(</span><em>provider</em>, <em>entity</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.services.CodecService.encode" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Encodes the python entity and returns the payload. Entity is either:</dt>
+<dd><ul class="first last simple">
+<li>an instance of an entity class defined under the ydk.models package or subpackages, or</li>
+<li><dl class="first docutils">
+<dt>a dictionary containing:</dt>
+<dd>module names as keys and
+entity instances as values</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">encoded value can be:
+- an instance of an XML payload defined for a yang module, or
+- a dictionary containing:<blockquote>
+<div><ul class="simple">
+<li>module names as keys and</li>
+<li>instances of XML payload defined for a yang module as values</li>
+</ul>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="ydk.errors.html#ydk.errors.YPYDataValidationError" title="ydk.errors.YPYDataValidationError">ydk.errors.YPYDataValidationError</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">if validation error has occurred</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ydk.services.CodecService.decode">
+<code class="descname">decode</code><span class="sig-paren">(</span><em>provider</em>, <em>payload</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.services.CodecService.decode" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Decodes the the payload and returns the python entity. Payload is either:</dt>
+<dd><ul class="first last simple">
+<li>an instance of an XML payload defined for a yang module, or</li>
+<li><dl class="first docutils">
+<dt>a dictionary containing:</dt>
+<dd>module names as keys and
+instances of XML payload defined for a yang module as values</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">decoded entity. Entity is either:
+- an instance of an entity class defined under the ydk.models package or subpackages, or
+- a dictionary containing:<blockquote>
+<div>module names as keys and
+entity instances as values</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="ydk.errors.html#ydk.errors.YPYDataValidationError" title="ydk.errors.YPYDataValidationError">ydk.errors.YPYDataValidationError</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">if validation error has occurred</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="executor-service">
+<h2><a class="toc-backref" href="#id5">Executor Service</a><a class="headerlink" href="#executor-service" title="Permalink to this headline">¶</a></h2>
+<p>Provides API to execute RPCs.</p>
+<dl class="class">
+<dt id="ydk.services.ExecutorService">
+<em class="property">class </em><code class="descclassname">ydk.services.</code><code class="descname">ExecutorService</code><a class="headerlink" href="#ydk.services.ExecutorService" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executor Service class for supporting execution of RPCs.</p>
+<blockquote>
+<div><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">ydk.services.Service</span></code></p>
+<dl class="method">
+<dt>
+<code class="descname">execute_rpc(self, provider, rpc):</code></dt>
+<dd><p>Create the entity</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>provider</strong> &#8211; An instance of ydk.providers.ServiceProvider</li>
+<li><strong>rpc</strong> &#8211; An instance of an RPC class defined under the ydk.models package or subpackages</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">None</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYDataValidationError" title="ydk.errors.YPYDataValidationError"><strong>ydk.errors.YPYDataValidationError</strong></a> &#8211; if validation error has occurred</li>
+<li><a class="reference internal" href="ydk.errors.html#ydk.errors.YPYError" title="ydk.errors.YPYError"><strong>ydk.errors.YPYError</strong></a> &#8211; if other error has occurred</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Possible Errors:</p>
+<ul class="simple">
+<li>a server side error</li>
+<li>there isn&#8217;t enough information in the entity to prepare the message (eg. missing keys)</li>
+</ul>
+</dd></dl>
+
+</div></blockquote>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ydk.types.html" class="btn btn-neutral float-right" title="YDK Types" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ydk.providers.html" class="btn btn-neutral" title="Service Providers" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.5.5.post2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  false
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

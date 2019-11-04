@@ -1,10 +1,10 @@
-ydk.types module
-================
+YDK Types
+=========
 
-types.py
+.. contents:: Table of Contents
 
-Contains type definitions.
-
+Filters and markers
+-------------------
 
 .. py:class:: ydk.types.DELETE()
 
@@ -72,6 +72,9 @@ Contains type definitions.
     Assign `REPLACE()` to a container object attribute `yfilter` to mark it for replace operation.
 
 
+Data Types
+----------
+
 .. py:class:: ydk.types.Decimal64(str_val)
 
 	Bases: :class:`object`
@@ -94,6 +97,9 @@ Contains type definitions.
 	Represents the empty type in YANG. The empty built-in type represents a leaf that does 
 	not have any value, it conveys information by its presence or absence.
 
+
+Data Containers
+---------------
 
 .. py:class:: ydk.types.FixedBitsDict(dictionary, pos_map)
 

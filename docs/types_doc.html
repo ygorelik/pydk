@@ -1,0 +1,308 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Using Types &mdash; YANG Development Kit 0.5.5.post2 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/icon.ico"/>
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/width.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="YANG Development Kit 0.5.5.post2 documentation" href="index.html"/>
+        <link rel="up" title="Developer Guide" href="developer_guide.html"/>
+        <link rel="next" title="Deviation" href="deviation.html"/>
+        <link rel="prev" title="Presence Classes" href="presence_class.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> YANG Development Kit
+          
+
+          
+            
+            <img src="_static/logo.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.5.post2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="about_ydk.html">About YDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="developer_guide.html">Developer Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="read_filter.html">Read Using Object Filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="delete_operation.html">Delete operation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="presence_class.html">Presence Classes</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Using Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example-use-of-empty-type">Example use of Empty type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-use-of-decimal64-type">Example use of Decimal64 type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-use-of-fixedbitsdict-type">Example use of FixedBitsDict type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-use-of-ylist-type">Example use of YList type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-use-of-yleaflist-type">Example use of YLeafList type</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deviation.html">Deviation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api_guide.html">API Guide</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">YANG Development Kit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="developer_guide.html">Developer Guide</a> &raquo;</li>
+      
+    <li>Using Types</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="using-types">
+<h1>Using Types<a class="headerlink" href="#using-types" title="Permalink to this headline">¶</a></h1>
+<p>This document explains and shows examples for using some of the YDK types.
+Types explained will include:</p>
+<ul class="simple">
+<li>Empty</li>
+<li>Decimal64</li>
+<li>FixedBitsDict</li>
+<li>YList</li>
+<li>YLeafList</li>
+</ul>
+<div class="section" id="example-use-of-empty-type">
+<h2>Example use of Empty type<a class="headerlink" href="#example-use-of-empty-type" title="Permalink to this headline">¶</a></h2>
+<p>The leaf being configured (accept_route) under the module ydk.models.openconfig.openconfig_routing_policy:</p>
+<p><strong>accept_route:</strong> accepts the route into the routing table.
+<strong>type:</strong> Empty</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ydk.models.openconfig.openconfig_routing_policy</span> <span class="kn">import</span> <span class="n">RoutingPolicy</span>
+
+<span class="c1"># configure policy definition</span>
+<span class="n">routing_policy</span> <span class="o">=</span> <span class="n">RoutingPolicy</span><span class="p">()</span>
+<span class="n">policy_definition</span> <span class="o">=</span> <span class="n">routing_policy</span><span class="o">.</span><span class="n">policy_definitions</span><span class="o">.</span><span class="n">PolicyDefinition</span><span class="p">()</span>
+<span class="n">policy_definition</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;POLICY2&quot;</span>
+<span class="c1"># community-set statement</span>
+<span class="n">statement</span> <span class="o">=</span> <span class="n">policy_definition</span><span class="o">.</span><span class="n">statements</span><span class="o">.</span><span class="n">Statement</span><span class="p">()</span>
+<span class="n">statement</span><span class="o">.</span><span class="n">actions</span><span class="o">.</span><span class="n">accept_route</span> <span class="o">=</span> <span class="n">Empty</span><span class="p">()</span> <span class="c1"># accept_route is of Empty type</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-use-of-decimal64-type">
+<h2>Example use of Decimal64 type<a class="headerlink" href="#example-use-of-decimal64-type" title="Permalink to this headline">¶</a></h2>
+<p>The leaf being configured (restart_timer) under the ydk.models.openconfig_bgp.bgp module:
+<strong>restart_timer:</strong> Time interval in seconds after which the BGP session is re-established after being torn down due to exceeding the max-prefix limit.
+<strong>type:</strong> Decimal64</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ydk.models.openconfig.openconfig_bgp</span> <span class="kn">import</span> <span class="n">Bgp</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">Bgp</span><span class="o">.</span><span class="n">Neighbors</span><span class="o">.</span><span class="n">Neighbor</span><span class="o">.</span><span class="n">AfiSafis</span><span class="o">.</span><span class="n">AfiSafi</span><span class="o">.</span><span class="n">Ipv4LabelledUnicast</span><span class="o">.</span><span class="n">PrefixLimit</span><span class="o">.</span><span class="n">Config</span><span class="p">()</span>
+<span class="n">config</span><span class="o">.</span><span class="n">restart_timer</span> <span class="o">=</span> <span class="n">Decimal64</span><span class="p">(</span><span class="s1">&#39;3.343&#39;</span><span class="p">)</span> <span class="c1"># restart_timer is of Decimal64 type</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-use-of-fixedbitsdict-type">
+<h2>Example use of FixedBitsDict type<a class="headerlink" href="#example-use-of-fixedbitsdict-type" title="Permalink to this headline">¶</a></h2>
+<p>The leaf being configured (restart_timer) under the ydk.models.ietf.ietf_netconf_acm module:
+<strong>access_operations:</strong> Access operations associated with this rule.  This leaf matches if it has the value &#8216;*&#8217; or if the bit corresponding to the requested operation is set.
+<strong>type:</strong> str</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ydk.models.ietf.ietf_netconf_acm</span> <span class="kn">import</span> <span class="n">Nacm</span>
+
+<span class="n">rule_list</span>   <span class="o">=</span> <span class="n">Nacm</span><span class="o">.</span><span class="n">RuleList</span><span class="p">()</span>
+<span class="n">rule</span>        <span class="o">=</span> <span class="n">rule_list</span><span class="o">.</span><span class="n">Rule</span><span class="p">()</span>
+<span class="n">rule</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">rule_list</span>
+<span class="n">rule</span><span class="o">.</span><span class="n">rule_list</span><span class="o">.</span><span class="n">rule</span><span class="o">.</span><span class="n">access_operations</span><span class="p">[</span><span class="s1">&#39;read&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span> <span class="c1"># access_operations is of bits type</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-use-of-ylist-type">
+<h2>Example use of YList type<a class="headerlink" href="#example-use-of-ylist-type" title="Permalink to this headline">¶</a></h2>
+<p>The node being configured is afi_safi under the ydk.models.openconfig_bgp.bgp module:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ydk.models.openconfig.openconfig_bgp</span> <span class="kn">import</span> <span class="n">Bgp</span>
+
+<span class="n">bgp</span> <span class="o">=</span> <span class="n">Bgp</span><span class="p">()</span>
+<span class="n">afi_safi</span> <span class="o">=</span> <span class="n">bgp</span><span class="o">.</span><span class="n">global_</span><span class="o">.</span><span class="n">afi_safis</span><span class="o">.</span><span class="n">AfiSafi</span><span class="p">()</span> <span class="c1"># afi_safi is of YList type</span>
+<span class="n">afi_safi</span><span class="o">.</span><span class="n">afi_safi_name</span> <span class="o">=</span> <span class="n">oc_bgp_types</span><span class="o">.</span><span class="n">Ipv4UnicastIdentity</span><span class="p">()</span>
+<span class="n">afi_safi</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">afi_safi_name</span> <span class="o">=</span> <span class="n">oc_bgp_types</span><span class="o">.</span><span class="n">Ipv4UnicastIdentity</span><span class="p">()</span>
+<span class="n">afi_safi</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">bgp</span><span class="o">.</span><span class="n">global_</span><span class="o">.</span><span class="n">afi_safis</span><span class="o">.</span><span class="n">afi_safi</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">afi_safi</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-use-of-yleaflist-type">
+<h2>Example use of YLeafList type<a class="headerlink" href="#example-use-of-yleaflist-type" title="Permalink to this headline">¶</a></h2>
+<p>The leaf being configured (ipv4_dscp) under the ydk.models.cisco_ios_xr.Cisco_IOS_XR_asr9k_policymgr_cfg module:
+<strong>ipv4_dscp:</strong> An leaflist of Match IPv4 DSCP.
+<strong>type:</strong> YLeafList</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ydk.models.asr9k.Cisco_IOS_XR_asr9k_policymgr_cfg</span> <span class="kn">import</span> <span class="n">PolicyManager</span>
+
+<span class="n">match</span> <span class="o">=</span> <span class="n">PolicyManager</span><span class="o">.</span><span class="n">ClassMaps</span><span class="o">.</span><span class="n">ClassMap</span><span class="o">.</span><span class="n">Match</span><span class="p">()</span>
+<span class="n">match</span><span class="o">.</span><span class="n">ipv4_dscp</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;15&#39;</span><span class="p">,</span> <span class="s1">&#39;16&#39;</span><span class="p">,</span> <span class="s1">&#39;17&#39;</span><span class="p">,</span> <span class="s1">&#39;18&#39;</span><span class="p">,</span> <span class="s1">&#39;19&#39;</span><span class="p">])</span>
+<span class="n">even_elements</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">ipv4_dscp</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span>
+
+<span class="c1"># Note: YLeafList is associative array, attempt to add duplicated element will raise Exception.</span>
+<span class="n">match</span><span class="o">.</span><span class="n">ipv4_dscp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;15&#39;</span><span class="p">)</span>
+<span class="c1"># YPYDataValidationError will be raised.</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="deviation.html" class="btn btn-neutral float-right" title="Deviation" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="presence_class.html" class="btn btn-neutral" title="Presence Classes" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.5.5.post2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  false
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

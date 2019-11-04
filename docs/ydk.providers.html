@@ -1,0 +1,305 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Service Providers &mdash; YANG Development Kit 0.5.5.post2 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/icon.ico"/>
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/width.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="YANG Development Kit 0.5.5.post2 documentation" href="index.html"/>
+        <link rel="up" title="API Guide" href="api_guide.html"/>
+        <link rel="next" title="Services" href="ydk.services.html"/>
+        <link rel="prev" title="Errors and Exceptions" href="ydk.errors.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> YANG Development Kit
+          
+
+          
+            
+            <img src="_static/logo.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.5.post2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="about_ydk.html">About YDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="api_guide.html">API Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ydk.errors.html">Errors and Exceptions</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Service Providers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#netconf-service-provider">Netconf Service Provider</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#codec-service-provider">Codec Service Provider</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ydk.services.html">Services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ydk.types.html">YDK Types</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">YANG Development Kit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="api_guide.html">API Guide</a> &raquo;</li>
+      
+    <li>Service Providers</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="service-providers">
+<h1><a class="toc-backref" href="#id1">Service Providers</a><a class="headerlink" href="#service-providers" title="Permalink to this headline">¶</a></h1>
+<div class="contents topic" id="table-of-contents">
+<p class="topic-title first">Table of Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#service-providers" id="id1">Service Providers</a><ul>
+<li><a class="reference internal" href="#netconf-service-provider" id="id2">Netconf Service Provider</a></li>
+<li><a class="reference internal" href="#codec-service-provider" id="id3">Codec Service Provider</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<dl class="class">
+<dt id="ydk.providers.ServiceProvider">
+<em class="property">class </em><code class="descclassname">ydk.providers.</code><code class="descname">ServiceProvider</code><a class="headerlink" href="#ydk.providers.ServiceProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Base class for Service Providers.</p>
+<dl class="method">
+<dt id="ydk.providers.ServiceProvider.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ydk.providers.ServiceProvider.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base method to close service provider instance session.</p>
+</dd></dl>
+
+<p>Exception for Client Side Data Validation.</p>
+<p>Type Validation.</p>
+<p>Any data validation error encountered that is related to type validation encountered does not
+raise an Exception right away.</p>
+<p>To uncover as many client side issues as possible, an i_errors list is injected in the parent entity of
+any entity with issues. The items added to this i_errors list captures the object types that caused
+the error as well as an error message.</p>
+</dd></dl>
+
+<div class="section" id="netconf-service-provider">
+<h2><a class="toc-backref" href="#id2">Netconf Service Provider</a><a class="headerlink" href="#netconf-service-provider" title="Permalink to this headline">¶</a></h2>
+<p>Current YDK implementation supports the NetconfServiceProvider, which
+uses ncclient (a Netconf client library) to provide CRUD services.</p>
+<dl class="class">
+<dt id="ydk.providers.NetconfServiceProvider">
+<em class="property">class </em><code class="descclassname">ydk.providers.</code><code class="descname">NetconfServiceProvider</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.providers.NetconfServiceProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ydk.providers.ServiceProvider" title="ydk.providers.ServiceProvider"><code class="xref py py-class docutils literal"><span class="pre">ydk.providers.ServiceProvider</span></code></a></p>
+<p>NCClient based Netconf Service Provider.</p>
+<p>Initialization parameter of NetconfServiceProvider</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>address</strong> &#8211; The address of the netconf server</li>
+<li><strong>port</strong> &#8211; The port to use default is 830</li>
+<li><strong>username</strong> &#8211; The name of the user</li>
+<li><strong>password</strong> &#8211; The password to use</li>
+<li><strong>protocol</strong> &#8211; One of either ssh or tcp</li>
+<li><strong>timeout</strong> &#8211; Default to 45</li>
+<li><strong>key_filename</strong> &#8211; Netconf server SSL authentication certificate (public key) file location; default value is <cite>None</cite>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="ydk.providers.NetconfServiceProvider.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ydk.providers.NetconfServiceProvider.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes the netconf session.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="codec-service-provider">
+<h2><a class="toc-backref" href="#id3">Codec Service Provider</a><a class="headerlink" href="#codec-service-provider" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ydk.providers.CodecServiceProvider">
+<em class="property">class </em><code class="descclassname">ydk.providers.</code><code class="descname">CodecServiceProvider</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.providers.CodecServiceProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ydk.providers.ServiceProvider" title="ydk.providers.ServiceProvider"><code class="xref py py-class docutils literal"><span class="pre">ydk.providers.ServiceProvider</span></code></a></p>
+<p>Codec Service Provider.</p>
+<p>Initialization parameter of CodecServiceProvider</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>type</strong> &#8211; Type of encoding. Currently, &#8216;xml&#8217; type is supported</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ydk.services.html" class="btn btn-neutral float-right" title="Services" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ydk.errors.html" class="btn btn-neutral" title="Errors and Exceptions" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.5.5.post2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  false
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

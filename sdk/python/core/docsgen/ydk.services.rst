@@ -1,15 +1,12 @@
-ydk.services module
-===================
+Services
+========
 
-.. toctree::
-    :maxdepth: 1
+.. contents:: Table of Contents
 
-services.py
+CRUD Service
+------------
 
-The Services module. Supported services include
-
-CRUDService: Provides Create/Read/Update/Delete API's
--------------------------------------------------------
+Provides Create/Read/Update/Delete API's
 
 .. py:class:: ydk.services.CRUDService
 
@@ -98,8 +95,11 @@ CRUDService: Provides Create/Read/Update/Delete API's
                 * if there isn't enough information in the entity to the message (missing keys for example)
 
 
-NetconfService: Provides API's to execute netconf operations
---------------------------------------------------------------
+Netconf Service
+---------------
+
+Provides API's to execute netconf operations.
+
 .. py:class:: ydk.services.Datastore
 
     Bases: :class:`enum.Enum`
@@ -121,9 +121,9 @@ NetconfService: Provides API's to execute netconf operations
 
 .. py:class:: ydk.services.NetconfService
 
-Bases: :py:class:`ydk.services.Service`.
+    Netconf Service class for executing netconf operations.
 
-Netconf Service class for executing netconf operations.
+    Bases: :py:class:`ydk.services.Service`.
 
         .. py:method:: cancel_commit(provider, persist_id=None)
 
@@ -389,14 +389,16 @@ Netconf Service class for executing netconf operations.
                     * If there isn't enough information in the entity to the message (missing keys for example).
 
 
-CodecService: Provides encode/decode API's
---------------------------------------------
+Codec Service
+-------------
+
+Provides encode/decode API's
 
 .. py:class:: ydk.services.CodecService
 
-        Bases: :class:`ydk.services.Service`
+    Codec Service class for supporting encoding entities and decoding payloads.
 
-        Codec Service class for supporting encoding entities and decoding payloads.
+        Bases: :class:`ydk.services.Service`
 
         .. py:method:: encode(provider, entity)
 
@@ -433,14 +435,16 @@ CodecService: Provides encode/decode API's
                 :raises ydk.errors.YPYDataValidationError: if validation error has occurred
 
 
-ExecutorService: Provides API to execute RPCs
----------------------------------------------
+Executor Service
+----------------
+
+Provides API to execute RPCs.
 
 .. py:class:: ydk.services.ExecutorService
 
-        Bases: :class:`ydk.services.Service`
+    Executor Service class for supporting execution of RPCs.
 
-        Executor Service class for supporting execution of RPCs.
+        Bases: :class:`ydk.services.Service`
 
         .. py:method:: execute_rpc(self, provider, rpc):
 
@@ -458,4 +462,3 @@ ExecutorService: Provides API to execute RPCs
 
                 * a server side error
                 * there isn't enough information in the entity to prepare the message (eg. missing keys)
-

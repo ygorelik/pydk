@@ -1,0 +1,345 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>YDK Types &mdash; YANG Development Kit 0.5.5.post2 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/icon.ico"/>
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/width.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="YANG Development Kit 0.5.5.post2 documentation" href="index.html"/>
+        <link rel="up" title="API Guide" href="api_guide.html"/>
+        <link rel="prev" title="Services" href="ydk.services.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> YANG Development Kit
+          
+
+          
+            
+            <img src="_static/logo.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.5.post2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="about_ydk.html">About YDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="api_guide.html">API Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ydk.errors.html">Errors and Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ydk.providers.html">Service Providers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ydk.services.html">Services</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">YDK Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#filters-and-markers">Filters and markers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-types">Data Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-containers">Data Containers</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">YANG Development Kit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="api_guide.html">API Guide</a> &raquo;</li>
+      
+    <li>YDK Types</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="ydk-types">
+<h1><a class="toc-backref" href="#id1">YDK Types</a><a class="headerlink" href="#ydk-types" title="Permalink to this headline">¶</a></h1>
+<div class="contents topic" id="table-of-contents">
+<p class="topic-title first">Table of Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#ydk-types" id="id1">YDK Types</a><ul>
+<li><a class="reference internal" href="#filters-and-markers" id="id2">Filters and markers</a></li>
+<li><a class="reference internal" href="#data-types" id="id3">Data Types</a></li>
+<li><a class="reference internal" href="#data-containers" id="id4">Data Containers</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="filters-and-markers">
+<h2><a class="toc-backref" href="#id2">Filters and markers</a><a class="headerlink" href="#filters-and-markers" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ydk.types.DELETE">
+<em class="property">class </em><code class="descclassname">ydk.types.</code><code class="descname">DELETE</code><a class="headerlink" href="#ydk.types.DELETE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Marker class used to mark existing nodes that are to be deleted.</p>
+<p>Assign <cite>DELETE()</cite> to a leaf for its deletion. A CRUD update operation will delete the leaf from the device when this marker is set.</p>
+<p>Assign <cite>DELETE()</cite> to a container object attribute <cite>yfilter</cite> in order to mark it for delete operation.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ydk.types.REMOVE">
+<em class="property">class </em><code class="descclassname">ydk.types.</code><code class="descname">REMOVE</code><a class="headerlink" href="#ydk.types.REMOVE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Class marker, which is used to mark nodes that are to be deleted silently (no error developed, if the object does not exists).</p>
+<p>Assign <cite>REMOVE()</cite> to a leaf for its deletion. A CRUD update operation will silently delete the leaf from the device when this marker is set.</p>
+<p>Assign <cite>REMOVE()</cite> to a container object attribute <cite>yfilter</cite> in order to mark it for remove operation.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ydk.types.READ">
+<em class="property">class </em><code class="descclassname">ydk.types.</code><code class="descname">READ</code><a class="headerlink" href="#ydk.types.READ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Class marker, which is used to mark nodes that are to be read from device.</p>
+<p>Assign <cite>READ()</cite> to a leaf in order to read specifically leaf value.</p>
+<p>Assign <cite>READ()</cite> to a container object attribute <cite>yfilter</cite> to mark it for read operation.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ydk.types.CREATE">
+<em class="property">class </em><code class="descclassname">ydk.types.</code><code class="descname">CREATE</code><span class="sig-paren">(</span><em>value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.types.CREATE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Class marker, which is used to mark nodes that are to be created.</p>
+<p>Assign <cite>CREATE(value)</cite> to a leaf in order to create it with specified <cite>value</cite>.</p>
+<p>Assign <cite>CREATE()</cite> to a container object attribute <cite>yfilter</cite> to mark it for create operation.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ydk.types.MERGE">
+<em class="property">class </em><code class="descclassname">ydk.types.</code><code class="descname">MERGE</code><span class="sig-paren">(</span><em>value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.types.MERGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Class marker, which is used to mark nodes that are to be merged with existing configuration.</p>
+<p>Assign <cite>MERGE(value)</cite> to a leaf in order to create or replace it with specified <cite>value</cite>.</p>
+<p>Assign <cite>MERGE()</cite> to a container object attribute <cite>yfilter</cite> to mark it for merge operation.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ydk.types.REPLACE">
+<em class="property">class </em><code class="descclassname">ydk.types.</code><code class="descname">REPLACE</code><span class="sig-paren">(</span><em>value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.types.REPLACE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Class marker, which is used to mark nodes that are to be merged with existing configuration.</p>
+<p>Assign <cite>REPLACE(value)</cite> to a leaf in order to replace its value with specified <cite>value</cite>.</p>
+<p>Assign <cite>REPLACE()</cite> to a container object attribute <cite>yfilter</cite> to mark it for replace operation.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="data-types">
+<h2><a class="toc-backref" href="#id3">Data Types</a><a class="headerlink" href="#data-types" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ydk.types.Decimal64">
+<em class="property">class </em><code class="descclassname">ydk.types.</code><code class="descname">Decimal64</code><span class="sig-paren">(</span><em>str_val</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.types.Decimal64" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Represents the decimal64 YANG type. The decimal64 type represents a subset
+of the real numbers, which can be represented by decimal numerals.</p>
+<p>The value space of decimal64 is the set of numbers that can be obtained by multiplying
+a 64-bit signed integer by a negative power of ten, i.e., expressible as “i x 10^-n”
+where i is an integer64 and n is an integer between 1 and 18, inclusively.</p>
+<dl class="docutils">
+<dt>str_val</dt>
+<dd>String representation of the decimal64 number.</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="ydk.types.Empty">
+<em class="property">class </em><code class="descclassname">ydk.types.</code><code class="descname">Empty</code><a class="headerlink" href="#ydk.types.Empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Represents the empty type in YANG. The empty built-in type represents a leaf that does
+not have any value, it conveys information by its presence or absence.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="data-containers">
+<h2><a class="toc-backref" href="#id4">Data Containers</a><a class="headerlink" href="#data-containers" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ydk.types.FixedBitsDict">
+<em class="property">class </em><code class="descclassname">ydk.types.</code><code class="descname">FixedBitsDict</code><span class="sig-paren">(</span><em>dictionary</em>, <em>pos_map</em><span class="sig-paren">)</span><a class="headerlink" href="#ydk.types.FixedBitsDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Super class of all classes that represents the bits type in YANG</p>
+<p>A concrete implementation of this class has a dictionary. The bits built-in type
+represents a bit set. That is, a bits value is a set of flags identified by small
+integer position numbers starting at 0. Each bit number has an assigned name.
+To set a bit use the name of the bit as a key into the dictionary and set the
+value to True (False to unset).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ydk.types.YList">
+<em class="property">class </em><code class="descclassname">ydk.types.</code><code class="descname">YList</code><a class="headerlink" href="#ydk.types.YList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">list</span></code></p>
+<p>Represents a list with support for hanging a parent.</p>
+<p>All YANG based entity classes that have lists in them
+use YList to represent the list.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ydk.types.YLeafList">
+<em class="property">class </em><code class="descclassname">ydk.types.</code><code class="descname">YLeafList</code><a class="headerlink" href="#ydk.types.YLeafList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ydk.types.YList" title="ydk.types.YList"><code class="xref py py-class docutils literal"><span class="pre">ydk.types.YList</span></code></a></p>
+<p>Represents a leaf-list with support for hanging a parent.</p>
+<p>All YANG leaf-list is represented as YLeafList. YLeafList is
+associative array, it contains unique elemenets.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="ydk.services.html" class="btn btn-neutral" title="Services" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.5.5.post2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  false
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
