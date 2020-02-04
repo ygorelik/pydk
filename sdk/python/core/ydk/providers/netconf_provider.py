@@ -50,6 +50,7 @@ class NetconfServiceProvider(ServiceProvider):
         self.timeout = kwargs.get('timeout', 60)
         self.key_filename = kwargs.get('key_filename', None)
         self.sp_instance = None
+        self.with_defaults = kwargs.get('with_defaults', None)
 
         if self.protocol == 'tcp':
             self.session_config = _SessionConfig(

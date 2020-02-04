@@ -248,7 +248,7 @@ class _SPPlugin(object):
 
 class _ClientSPPlugin(_SPPlugin):
 
-    def __init__(self, timeout, use_native_client, onbox=False):
+    def __init__(self, timeout, use_native_client, onbox=False, with_defaults = None):
         self.head = None
         self._nc_manager = None
         self.use_native_client = use_native_client
@@ -261,6 +261,7 @@ class _ClientSPPlugin(_SPPlugin):
         else:
             self._nc_manager = None
         self.timeout = timeout
+        self.with_defaults = with_defaults
 
     def encode(self, entity, operation, only_config):
         root = self._create_root()
@@ -658,6 +659,13 @@ class _ClientSPPlugin(_SPPlugin):
             root = etree.SubElement(candidate, config_or_filter)
             root.set('xmlns', "urn:ietf:params:xml:ns:netconf:base:1.0")
         elif optype == 'READ':
+            if self.with_defaults is not None:
+                subroot = etree.SubElement(root, "with-defaults")
+                subroot.set('xmlns', "urn:ietf:params:xml:ns:yang:ietf-netconf-with-defaults")
+                if isinstance(self.with_defaults, str):
+                    subroot.text = self.with_defaults
+                else:
+                    subroot.text = self.with_defaults.name
             root = etree.SubElement(root, config_or_filter)
             root.set('type', "subtree")
         else:
