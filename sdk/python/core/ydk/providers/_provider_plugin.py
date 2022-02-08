@@ -376,20 +376,21 @@ class _ClientSPPlugin(_SPPlugin):
 
         if self.use_native_client:
             assert self.ydk_client is not None
+            self.netconf_sp_logger.info('Sending RPC:\n%s', payload)
             reply = self.ydk_client.execute_payload(payload)
-            self.netconf_sp_logger.debug('\n%s', _get_pretty(reply.xml))
+            self.netconf_sp_logger.info('Received RPC:\n%s', _get_pretty(reply.xml))
             return self._handle_rpc_reply(operation, payload, reply)
         elif self.onbox:
-            self.netconf_sp_logger.debug('\n%s', payload)
+            self.netconf_sp_logger.info('Sending RPC:\n%s', payload)
             reply = self.onbox_client.execute_payload(payload)
-            self.netconf_sp_logger.debug('\n%s', _get_pretty(reply))
+            self.netconf_sp_logger.info('Received RPC:\n%s', _get_pretty(reply))
             return self._handle_rpc_reply(operation, payload, reply)
         else:
             service_provider_rpc = self._create_rpc_instance(self.timeout)
             payload = payload.replace("101", service_provider_rpc._id, 1)
-            self.netconf_sp_logger.debug('\n%s', payload)
+            self.netconf_sp_logger.info('Sending RPC:\n%s', payload)
             reply = service_provider_rpc._request(payload)
-            self.netconf_sp_logger.debug('\n%s', _get_pretty(reply.xml))
+            self.netconf_sp_logger.info('Received RPC:\n%s', _get_pretty(reply.xml))
             return self._handle_rpc_reply(operation, payload, reply.xml)
 
     def _create_rpc_instance(self, timeout):

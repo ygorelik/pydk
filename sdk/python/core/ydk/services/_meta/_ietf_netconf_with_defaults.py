@@ -7,9 +7,9 @@ _meta_table = {
         'ydk.models.ydktest.ietf_netconf_with_defaults', 'WithDefaultsModeEnum',
         '''Possible modes to report default data.''',
         {
-            'report-all':'report_all',
-            'report-all-tagged':'report_all_tagged',
-            'trim':'trim',
-            'explicit':'explicit',
+            'report-all': 'report_all',
+            'report-all-tagged': 'report_all_tagged',
+            'trim': 'trim',
+            'explicit': 'explicit',
         }, 'ietf-netconf-with-defaults', _yang_ns._namespaces['ietf-netconf-with-defaults']),
 }
