@@ -178,14 +178,13 @@ class GetSegmentPathPrinter(object):
         self.ctx.writeln('{')
         self.ctx.lvl_inc()
 
-
     def _print_get_ydk_segment_path_body(self, clazz):
         path='"'
         if clazz.owner is not None:
             if isinstance(clazz.owner, Package):
-                path+= clazz.owner.stmt.arg + ':'
+                path += clazz.owner.stmt.arg + ':'
             elif clazz.owner.stmt.i_module.arg != clazz.stmt.i_module.arg:
-                path+=clazz.stmt.i_module.arg + ':'
+                path += clazz.stmt.i_module.arg + ':'
 
         path+= clazz.stmt.arg
         path+='"'

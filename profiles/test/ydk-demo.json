@@ -1,0 +1,13 @@
+{
+    "name": "ydkdemo",
+    "version": "0.1.1",
+    "ydk_version":"0.5.5",
+    "author": "Yan",
+    "copyright": "Cisco Systems",
+    "description": "YDK Demo Profile",
+    "models": {
+        "dir": [
+	        "profiles/bundles/yang/cisco-iosxr"
+        ]
+    }
+}

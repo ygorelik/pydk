@@ -59,7 +59,7 @@ class ClassMetaPrinter(object):
             self.sort_clazz)
         self.print_parents(nested_classes)
         for nested_class in nested_classes:
-            self.ctx.writeln('_meta_table[\'%s\'][\'meta_info\'].parent =_meta_table[\'%s\'][\'meta_info\']' % (
+            self.ctx.writeln('_meta_table[\'%s\'][\'meta_info\'].parent = _meta_table[\'%s\'][\'meta_info\']' % (
                 nested_class.qn(), clazz.qn()))
 
     def print_class_meta(self, clazz):
@@ -85,7 +85,7 @@ class ClassMetaPrinter(object):
             mtype = 'REFERENCE_IDENTITY_CLASS'
         self.ctx.writeln('\'%s\' : {' % (clazz.qn()))
         self.ctx.lvl_inc()
-        self.ctx.writeln("'meta_info' : _MetaInfoClass('%s', %s," % (clazz.qn(), mtype))
+        self.ctx.writeln("'meta_info': _MetaInfoClass('%s', %s," % (clazz.qn(), mtype))
         self.ctx.lvl_inc()
         description = " "
         for st in clazz.stmt.substmts:

@@ -53,7 +53,7 @@ class EnumPrinter(object):
         self.ctx.writeln("{")
         self.ctx.lvl_inc()
         for literal in enum_class.literals:
-            self.ctx.writeln("'%s':'%s'," % (literal.stmt.arg, literal.name))
+            self.ctx.writeln("'%s': '%s'," % (literal.stmt.arg, literal.name))
         self.ctx.lvl_dec()
         self.ctx.writeln("}, '%s', _yang_ns._namespaces['%s'])," % (get_module_name(enum_class.stmt), get_module_name(enum_class.stmt)))
         self.ctx.lvl_dec()
